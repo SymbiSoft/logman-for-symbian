@@ -1,0 +1,233 @@
+//  RESOURCE IDENTIFIER
+NAME LOSE    // 4 letter ID
+
+
+//  INCLUDES
+#include <eikon.rh>
+#include <avkon.rh>
+#include <avkon.rsg>
+#include <appinfo.rh>
+#include "LogManGui.hrh"
+#include "LogManGui.rls"
+
+//  RESOURCE DEFINITIONS
+// -----------------------------------------------------------------------------
+//
+//    Define the resource file signature
+//    This resource should be empty.
+//
+// -----------------------------------------------------------------------------
+//
+RESOURCE RSS_SIGNATURE
+    {
+    }
+
+// -----------------------------------------------------------------------------
+//
+//    Default Document Name
+//
+// -----------------------------------------------------------------------------
+//
+RESOURCE TBUF r_default_document_name
+    {
+    buf="LOSE";
+    }
+
+// -----------------------------------------------------------------------------
+//
+//    Define default menu and CBA key.
+//
+// -----------------------------------------------------------------------------
+//
+RESOURCE EIK_APP_INFO
+    {
+    menubar = r_LoggingServerGui_menubar;
+    cba = R_AVKON_SOFTKEYS_OPTIONS_EXIT;
+    }
+
+
+// -----------------------------------------------------------------------------
+//
+//   r_LoggingServerGui_menubar
+//   Menubar for LoggingServerGui example
+//
+// -----------------------------------------------------------------------------
+//
+RESOURCE MENU_BAR r_LoggingServerGui_menubar
+    {
+    titles =
+        {
+        MENU_TITLE { menu_pane = r_LoggingServerGui_menu; }
+        };
+    }
+
+
+// -----------------------------------------------------------------------------
+//
+//   r_LoggingServerGui_menu
+//   Menu for "Options"
+//
+// -----------------------------------------------------------------------------
+//
+RESOURCE MENU_PANE r_service_sub_menu
+    {
+    items =
+        {
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainStartService;
+            txt = str_r_menu_main_service_start;
+            },
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainCloseService;
+            txt = str_r_menu_main_service_close;
+            }
+        };
+    }
+
+RESOURCE MENU_PANE r_serial_sub_menu
+    {
+    items =
+        {
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainConnect;
+            txt = str_r_menu_main_connect;
+            },
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainSetPortName;
+            txt = str_r_menu_main_set_port_name;
+            },
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainSetPort;
+            txt = str_r_menu_main_set_port;
+            },
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainDisconnect;
+            txt = str_r_menu_main_disconnect;
+            },
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainLoadSerial;
+            txt = str_r_menu_main_load_serial;
+            }
+        };
+    }
+
+RESOURCE MENU_PANE r_LoggingServerGui_menu
+    {
+    items =
+        {
+        // added the new Options menu command here
+
+        MENU_ITEM
+                {
+                command = ELogServCmdMenuUpdateInfo;
+                txt = str_r_menu_main_update_info;
+                },
+        MENU_ITEM
+                {
+                txt     = str_r_menu_main_service;
+                cascade = r_service_sub_menu;
+                },
+
+        MENU_ITEM
+                {
+                txt     = str_r_menu_main_serial;
+                cascade = r_serial_sub_menu;
+                },
+
+        MENU_ITEM
+                {
+                command = ELogServCmdMenuMainSendTest;
+                txt = str_r_menu_main_test_msg;
+                },
+        MENU_ITEM
+                {
+                command = ELogServCmdMenuMainSendTestAsync;
+                txt = str_r_menu_main_test_async;
+                },
+
+
+
+        MENU_ITEM
+                {
+                command = EAknSoftkeyExit;
+                txt = str_r_menu_main_exit;
+                }
+        };
+    }
+
+// ----------------------------------------------------------------------------
+//
+// r_LoggingServerGui_localisable_app_info
+//
+// ----------------------------------------------------------------------------
+//
+RESOURCE LOCALISABLE_APP_INFO r_LoggingServerGui_localisable_app_info
+    {
+    short_caption = str_r_logging_server_short_caption;
+    caption_and_icon =
+    CAPTION_AND_ICON_INFO
+        {
+        caption = str_r_logging_server_caption;
+
+        number_of_icons = 1;
+	   	icon_file = "\\resource\\apps\\LoggingServerGui_aif.mif";
+	    };
+    }
+
+
+/// Dialog for querying text from user
+RESOURCE DIALOG R_GENERIC_TEXT_QUERY_DIALOG
+    {
+    flags = EGeneralQueryFlags;
+    buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+    items=
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control= AVKON_DATA_QUERY
+                {
+                layout = EDataLayout;
+                control = EDWIN
+                    {
+                    flags= EEikEdwinNoHorizScrolling | EEikEdwinResizable;
+                    maxlength = 16; // Length of TPortName
+                    width = 4;
+                    lines = 1;
+                    };
+                };
+            }
+        };
+    }
+
+/// Dialog for querying numeric data from user
+RESOURCE DIALOG R_GENERIC_NUMERIC_QUERY_DIALOG
+    {
+    flags = EGeneralQueryFlags;
+    buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control= AVKON_DATA_QUERY
+                {
+                layout = ENumberLayout;
+                control = AVKON_INTEGER_EDWIN
+                    {
+                    min = 0;
+                    max = 255;
+                    };
+                };
+            }
+        };
+    }

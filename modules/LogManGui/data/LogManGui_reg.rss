@@ -1,0 +1,17 @@
+#include "LogManGui.rls"
+#include <appinfo.rh>
+#include <LogManGui.rsg>
+
+UID2 KUidAppRegistrationResourceFile
+UID3 0xAF111111
+
+RESOURCE APP_REGISTRATION_INFO
+  {
+  app_file="LogManGui";
+  localisable_resource_file =  STRING_r_LoggingServerGui_loc_resource_file_1;
+  localisable_resource_id = R_LOGGINGSERVERGUI_LOCALISABLE_APP_INFO;
+
+  embeddability=KAppNotEmbeddable;
+  newfile=KAppDoesNotSupportNewFile;
+  }
+

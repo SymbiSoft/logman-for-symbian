@@ -1,0 +1,152 @@
+-------------------|                 LogMan                 |-------------------
+ ------------------|       The serial logging service       |------------------
+  -----------------|             for Symbian OS             |-----------------
+    ---------------|   ===================================  |--------------
+          ---------|          Author: Jussi Toivola         |---------
+               ----|    EMail: jtoivola at gmail dot com    |----
+                   \----------------------------------------/
+                    \______________________________________/
+What is LogMan?
+===============
+
+LogMan is a logging service running on the phone, which allows one to send text 
+messages through a serial connection to PC. The service has been used with 
+ACM( USB ) connection, but it should work with other serial connection methods 
+also. IrComm( Infrared ), for example. The software consists of RLogMan client 
+and the service process. Python(PyS60) client module is also included with 
+Python application for managing the service. Logging from C++ and Python code is
+supported.
+
+
+Why should I use LogMan?
+========================
+
+- You need to get debug logs from your code on-device.
+This is the main purpose of the software. There are not many with access to on-
+device debugger and even then, there are situations when logging is the way to 
+go. But, I see no restrictions to use it for other message sending tasks also. 
+
+- You don't like file-based logging.
+If you have been frustrated with on-device debugging by using log files, this is 
+especially for you. You can send the log to PC and write it to file there 
+instead. No need to copy the log from device or play with memory cards.
+
+- You need\want real-time logging output or just snappier logging. File logging 
+is quite slow due to hardware constaints. Serial logging through USB is much 
+faster.
+
+- You have used some other USB-logging tool, but it does not fulfill your needs 
+and it (as usual) happens to be closed-source( like RDebug ). This is all Open-
+Source, my friends. If there is some feature missing, feel free to add it 
+yourself.
+
+
+Why use separate service process?
+=================================
+
+1. Centralized logging management. External tools can be used to configure the 
+logging system, without worrying about correct serial ports and modules when 
+writing your logging code. Except in rare situations like logging during boot 
+when you cannot configure LogMan server manually before use. You can always do 
+it programmatically from your application though.
+2. Reducing risks associated with serial connections.
+3. Reducing the size of your application(stacks 'n' heaps).
+4. Your code is faster. By using asynchronous sending, logging does not reduce 
+the responsiveness of your applications as much, since you do not have to wait 
+for the log sending to finish.
+5. There are not enough serial ports available, if you want to test two 
+applications simultaneously. If the serial connection was handled in your 
+application, you could have only 1 reliable connection.
+
+How to use LogMan from C++?
+===========================
+
+There are 2 ways to use the LogMan service.
+
+- Use static RLogMan::Log, which creates a temporary RLogMan instance, connects 
+to service, sends log and cleans up. This is a bit slower, but usefull for small 
+debugging tasks.
+
+Example:
+#include "LogMan.h" //RLogMan
+RLogMan::Log(_L("Hello world"));
+
+- Create your own instance. To make it easier to remove logging there are a few 
+helper macros available in "logmanutils.h", but I'll show you how it really 
+happens. Check the macros when you are ready to do some serious logging.
+
+
+Example:
+#include "LogMan.h" //RLogMan
+
+// Store this as a member of your class, for example
+RLogMan logman;
+// Do this in the constructor.
+logman.Connect();
+// Do some logging.
+logman.Write( _L("Hello world") );
+// Do this in the destructor. 
+logman.Close();
+
+
+Q: How to format data like with RDebug::Print. 
+   ex. RDebug::Print(_L("%d"), 3 );
+A: Use logman.Writef(_L("%d"), EFalse, 3) or RLogMan::Log( _L("%d"), EFalse, 3 )
+
+Q: What is that EFalse there?
+A: You can send messages asynchronously by giving a second argument ETrue to the 
+C++ "Log", "Write", or "Writef" and True for Python's "write" method. When using 
+formatting the mode must be defined before the formatted values. See the "
+logmanutils.h" how to get around this with macros. The message is added to queue 
+in server,  the Active Object handling the asynchronous sending is immediately 
+activated, and the client request ends. Thus the client does not wait for the 
+server to send the message.
+
+
+How to use LogMan from Python?
+==============================
+
+import pylogman
+
+# This is the static, slower method
+pylogman.write( "Hello world")
+
+# Using instance.
+logman = pylogman.LogMan()
+logman.Connect()
+logman.write( "Hello world" )
+logman.close()
+
+
+Q: Why 'write' and not 'Write' and why 'close' and not 'Close'?
+A: Using Symbian naming conventions in C++, but trying to mimic the Python's 
+stdout interface in Python.
+
+How to redirect 'print' to LogMan.
+==================================
+
+import sys, pylogman
+l = pylogman.LogMan()
+# Replace standard output with LogMan's write method.
+sys.stdout.write = l.write
+
+print "Hello!" # 'Hello' is sent to PC
+
+This very handy when combined with logging module!
+
+
+Is this reliable? What if the server is not running or client not connected?
+============================================================================
+
+Well, I wouldn't use it, if it crashed all the time. And I do use LogMan myself. 
+
+Server is started when first client connects. And if the serial connection is 
+not established, the server does not even try to use it. Thus the log data is 
+discarded. One reason to move the sending to server is to avoid problems with 
+serial connections and crashing your application. 
+
+Currently formatted text has limitation of 1024 characters. The limitation is 
+defined in the logman.h header so you can modify it to suit your needs better. 
+If the formatted text's length exceeds 1024 characters, the client (your 
+application) crashes.
+

@@ -1,0 +1,25 @@
+TARGET        LogMan.dll
+TARGETTYPE    dll
+//UID           0x100039CE 0xAF111112
+//VENDORID 0
+
+//define __DEBUG_LOGGING__
+//MACRO  __DEBUG_LOGGING__
+
+SOURCEPATH    .
+SOURCE        LogMan.cpp
+
+USERINCLUDE   .
+USERINCLUDE   ..\LogManServer
+
+SYSTEMINCLUDE \Epoc32\include
+
+LIBRARY       euser.lib
+LIBRARY       efsrv.lib
+
+#ifdef EKA2
+CAPABILITY NetworkServices LocalServices ReadUserData WriteUserData Location UserEnvironment PowerMgmt ProtServ SwEvent SurroundingsDD ReadDeviceData WriteDeviceData TrustedUI
+#endif
+
+EXPORTUNFROZEN
+NOSTRICTDEF

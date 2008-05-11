@@ -1,0 +1,60 @@
+TARGET            LogManGui.exe
+TARGETTYPE        exe
+UID		          0x100039CE 0xAF111111
+
+SECUREID	      0xAF111111
+EPOCSTACKSIZE	  0x5000
+
+//MACRO __LOGMAN_ENABLED__
+
+SYSTEMINCLUDE     ..\..\LogManClient
+USERINCLUDE       ..\inc
+
+SOURCEPATH        ..\src
+SOURCE            LogManGui.cpp
+SOURCE            LogManGui_Application.cpp
+SOURCE            LogManGui_AppView.cpp
+SOURCE            LogManGui_AppUi.cpp
+SOURCE            LogManGui_Document.cpp
+
+SOURCE            LogManGui_Utils.cpp
+
+SOURCEPATH        ..\data
+
+START RESOURCE    LogManGui.rss
+HEADER
+TARGETPATH resource\apps
+END //RESOURCE
+
+START RESOURCE    LogManGui_reg.rss
+#ifdef WINSCW
+TARGETPATH 	  \private\10003a3f\apps
+#else
+TARGETPATH 	  \private\10003a3f\import\apps
+#endif
+END //RESOURCE
+
+
+SYSTEMINCLUDE     \epoc32\include
+
+LIBRARY           euser.lib
+LIBRARY           apparc.lib
+LIBRARY           cone.lib
+LIBRARY           eikcore.lib
+LIBRARY           avkon.lib
+LIBRARY           commonengine.lib
+LIBRARY		      efsrv.lib
+LIBRARY           estor.lib
+LIBRARY           eikcoctl.lib
+LIBRARY           eikdlg.lib
+LIBRARY           gdi.lib
+LIBRARY           LogMan.lib
+
+
+LANG SC
+
+VENDORID	  	  0
+CAPABILITY	NONE
+
+// End of File
+

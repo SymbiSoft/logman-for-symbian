@@ -1,0 +1,27 @@
+targettype dll
+TARGET	       pylogman.pyd
+TARGETPATH     \sys\bin
+
+#ifdef EKA2
+CAPABILITY NetworkServices LocalServices ReadUserData WriteUserData Location UserEnvironment PowerMgmt ProtServ SwEvent SurroundingsDD ReadDeviceData WriteDeviceData TrustedUI
+#endif
+
+//MACRO  __DEBUG_LOGGING__
+
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\libc
+SYSTEMINCLUDE \epoc32\include\python
+
+USERINCLUDE   ..\LogManClient
+
+USERINCLUDE   .
+
+LIBRARY python222.lib
+LIBRARY euser.lib
+
+LIBRARY LogMan.lib
+
+source		logmanmodule.cpp
+
+NOSTRICTDEF
+

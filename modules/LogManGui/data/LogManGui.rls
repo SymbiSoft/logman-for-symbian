@@ -1,0 +1,24 @@
+//  LOCALISATION STRINGS
+// Captions for app.
+rls_string str_r_logging_server_caption       "LogManGui"
+rls_string str_r_logging_server_short_caption "LogManGui"
+
+//Menu strings
+rls_string str_r_menu_main_update_info   "Update Info"
+rls_string str_r_menu_main_test_msg      "Test Message"
+rls_string str_r_menu_main_test_async    "Test Async Message"
+rls_string str_r_menu_main_exit          "Exit"
+
+
+rls_string str_r_menu_main_serial        "Serial"
+rls_string str_r_menu_main_connect       "Connect"
+rls_string str_r_menu_main_disconnect    "Disconnect"
+rls_string str_r_menu_main_set_port_name "Set Port Name"
+rls_string str_r_menu_main_set_port      "Set Port"
+rls_string str_r_menu_main_load_serial   "Load Serial Module"
+
+rls_string str_r_menu_main_service       "Service"
+rls_string str_r_menu_main_service_close "Close Service"
+rls_string str_r_menu_main_service_start "Start Service"
+
+// End of File

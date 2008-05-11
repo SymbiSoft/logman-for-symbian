@@ -1,0 +1,28 @@
+;[[[cog
+;import pkg_gen
+;cog.outl( pkg_gen.get_pkg_prefix( "LogMan", "0xe3195807" ) )
+;]]]
+
+;Languages
+&EN
+
+;Localised package name
+#{"LogMan"},(0xe3195807),1,08,00406,TYPE=SISSYSTEM
+
+;Localised Vendor name
+%{"Jussi Toivola"}
+
+;Unique Vendor name
+:"JT"
+
+[0x101F7961], 0, 0, 0, {"Series60ProductID"}
+
+;[[[end]]]
+
+;===============================================================================
+; Files to install
+"\EPOC32\RELEASE\GCCE\UREL\LogMan.exe"          -"!:\sys\bin\LogMan.exe"
+"\EPOC32\RELEASE\GCCE\UREL\LogMan.dll"          -"!:\sys\bin\LogMan.dll"
+
+"\EPOC32\RELEASE\GCCE\UREL\pylogman.pyd"        -"!:\sys\bin\pylogman.pyd"
+"..\modules\pylogman\Logman_Manager.py"         -"!:\Python\Logman_Manager.py"

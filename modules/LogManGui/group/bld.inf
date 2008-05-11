@@ -1,0 +1,11 @@
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_EXPORTS
+
+PRJ_MMPFILES
+
+gnumakefile icons_scalable_dc.mk
+
+LogManGui.mmp
+

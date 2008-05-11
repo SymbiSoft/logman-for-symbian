@@ -1,0 +1,28 @@
+;[[[cog
+;import pkg_gen
+;cog.outl( pkg_gen.get_pkg_prefix( "LogManGui", "0xAF111111" ) )
+;]]]
+
+;Languages
+&EN
+
+;Localised package name
+#{"LogManGui"},(0xAF111111),1,08,00406,TYPE=SISSYSTEM
+
+;Localised Vendor name
+%{"Jussi Toivola"}
+
+;Unique Vendor name
+:"JT"
+
+[0x101F7961], 0, 0, 0, {"Series60ProductID"}
+
+;[[[end]]] cog
+
+;===============================================================================
+;Files to install
+"\epoc32\release\gcce\urel\LogManGui.exe"    -"!:\sys\bin\LogManGui.exe"
+"\epoc32\data\z\resource\apps\LogManGui.rsc" -"!:\resource\apps\LogManGui.rsc"
+"\epoc32\data\z\private\10003a3f\import\apps\LogManGui_reg.rsc" -"!:\private\10003a3f\import\apps\LogManGui_reg.rsc"
+
+;"\epoc32\data\z\resource\apps\LogManGui.mif" -"!:\resource\apps\LogManGui_aif.mif"

@@ -1,0 +1,25 @@
+; LogManGui_gcce.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"LogManGui"},(0xAF111111),1,0,0
+
+;Localised Vendor name
+%{"Jussi Toivola"}
+
+;Unique Vendor name
+:"JT"
+
+;Supports Series 60 v 3.0
+[0x101F7961], 0, 0, 0, {"S60ProductID"}
+
+;Files to install
+"\epoc32\release\gcce\urel\LogManGui.exe" -"!:\sys\bin\LogManGui.exe"
+"\epoc32\data\z\resource\apps\LogManGui.rsc" -"!:\resource\apps\LogManGui.rsc"
+
+"\epoc32\data\z\private\10003a3f\import\apps\LogManGui_reg.rsc" -"!:\private\10003a3f\import\apps\LogManGui_reg.rsc"
+
+;"\epoc32\data\z\resource\apps\LogManGui.mif" -"!:\resource\apps\LogManGui_aif.mif"
+

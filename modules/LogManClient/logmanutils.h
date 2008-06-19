@@ -31,6 +31,27 @@
 
     #endif
 
+    /** Log information about stack usage */
+    static TInt StackInfo()
+    {
+
+        TUint32 stack_pointer = 0;
+        stack_pointer = (TUint32)&stack_pointer;
+        RThread thread;
+        TThreadStackInfo stackinfo;
+        thread.StackInfo( stackinfo );
+        return RLogMan::Log( _L8("Left:%u, Filled:%u, Base:%u, Limit:%u, Pointer:%u, Stack size:%u\n")
+                        ,EFalse
+                        ,stack_pointer   - stackinfo.iLimit // Pointer value reduces->Base is larger than Limit( reverse your mind )
+                        ,stackinfo.iBase - stack_pointer
+                        ,stackinfo.iBase
+                        ,stackinfo.iLimit
+                        ,stack_pointer
+                        ,stackinfo.iBase - stackinfo.iLimit
+                        );
+
+    }
+    
     // =========================================================================================
     // Using static RLogMan functions( a bit slower than using member instance )
     // =========================================================================================
@@ -44,7 +65,11 @@
     #define LOGMAN_SENDLOGF2( x, async, args... )  RLogMan::Log( GETMSG(x), async, args );
     // Log line of code before executing it.
     #define LOGMAN_SENDLINE( line ) LOGMAN_SENDLOG( #line ); line
-
+    // Write descriptor directly
+    #define LOGMAN_SENDDESC( desc ) RLogMan::Log( desc );
+    // Write information about current process
+    #define LOGMAN_SEND_STACK_INFO() StackInfo();
+        
     // =========================================================================================
     // Using RLogMan as a member
     // =========================================================================================
@@ -77,7 +102,9 @@
     #define LOGMAN_SENDLOGF( x, args... )
     #define LOGMAN_SENDLOGF2( x, async, args... )
     #define LOGMAN_SENDLINE( line ) line
-
+    #define LOGMAN_SENDDESC( desc )
+    #define LOGMAN_SEND_STACK_INFO()
+    
     #define LOGMAN_MEMBER
     #define LOGMAN_INIT
     #define LOGMAN_LOG( x )

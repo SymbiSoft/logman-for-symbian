@@ -68,7 +68,15 @@ public:
      */
     IMPORT_C TInt LoadModule( TFullName& aModuleName );
 
-
+    /** Log information about stack usage */
+    IMPORT_C TInt RLogMan::StackInfo();
+    
+    /** Log information about heap usage */
+    IMPORT_C TInt RLogMan::HeapInfo();
+    
+    /** Utility to log both stack and heap usage */
+    IMPORT_C TInt RLogMan::MemoryInfo();
+    
     /**
     High-level logging interface for simple one-line logging.
     Handles client init, message sending and closing.

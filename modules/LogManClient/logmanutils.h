@@ -31,27 +31,6 @@
 
     #endif
 
-    /** Log information about stack usage */
-    static TInt StackInfo()
-    {
-
-        TUint32 stack_pointer = 0;
-        stack_pointer = (TUint32)&stack_pointer;
-        RThread thread;
-        TThreadStackInfo stackinfo;
-        thread.StackInfo( stackinfo );
-        return RLogMan::Log( _L8("Left:%u, Filled:%u, Base:%u, Limit:%u, Pointer:%u, Stack size:%u\n")
-                        ,EFalse
-                        ,stack_pointer   - stackinfo.iLimit // Pointer value reduces->Base is larger than Limit( reverse your mind )
-                        ,stackinfo.iBase - stack_pointer
-                        ,stackinfo.iBase
-                        ,stackinfo.iLimit
-                        ,stack_pointer
-                        ,stackinfo.iBase - stackinfo.iLimit
-                        );
-
-    }
-    
     // =========================================================================================
     // Using static RLogMan functions( a bit slower than using member instance )
     // =========================================================================================
@@ -67,8 +46,12 @@
     #define LOGMAN_SENDLINE( line ) LOGMAN_SENDLOG( #line ); line
     // Write descriptor directly
     #define LOGMAN_SENDDESC( desc ) RLogMan::Log( desc );
-    // Write information about current process
-    #define LOGMAN_SEND_STACK_INFO() StackInfo();
+    // Easy one liner for logging information about thread's stack usage
+    #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.StackInfo(); __logman.Close(); }
+    // Easy one liner for logging information about thread's heap usage
+    #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
+    // Easy one liner for logging information about thread's memory usage
+    #define LOGMAN_SEND_MEMORY_INFO() { RLogMan __logman;__logman.Connect();__logman.MemoryInfo(); __logman.Close(); }
         
     // =========================================================================================
     // Using RLogMan as a member
@@ -88,6 +71,10 @@
     #define LOGMAN_LOGF( x, args... )         LOGMAN_MEMBER_VARIABLE->Writef( GETMSG(x) , __LOGMAN_SEND_ASYNC__, args );
     #define LOGMAN_LOGF2( x, async, args... ) LOGMAN_MEMBER_VARIABLE->Writef( GETMSG(x) , async, args );
 
+    #define LOGMAN_STACK_INFO()  LOGMAN_MEMBER_VARIABLE->StackInfo();
+    #define LOGMAN_HEAP_INFO()   LOGMAN_MEMBER_VARIABLE->HeapInfo();
+    #define LOGMAN_MEMORY_INFO() LOGMAN_MEMBER_VARIABLE->MemoryInfo();
+    
     // Log line of code before executing it.
     #define LOGMAN_LINE( line ) LOGMAN_LOG( #line ); line
 
@@ -111,6 +98,10 @@
     #define LOGMAN_LOG2( x, async )
     #define LOGMAN_LOGF( x, args... )
     #define LOGMAN_LOGF2( x, async, args... )
+    #define LOGMAN_STACK_INFO() 
+    #define LOGMAN_HEAP_INFO()  
+    #define LOGMAN_MEMORY_INFO()
+    
     #define LOGMAN_CLOSE
     #define LOGMAN_LINE( line ) line
 

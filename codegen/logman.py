@@ -38,16 +38,8 @@ def getStrSetter( fname, type, prefix = "Set" ):
 LOADMODULE_IMPLEMENTATION    = getStrSetter("LoadModule", "TFullName", "")
 
 PYTHON_STRING_GETTER_TEMPLATE_CODE = """
-TInt err = KErrNone;
-//Py_BEGIN_ALLOW_THREADS;
+
 %(TYPE)s result = self->iLogMan->%(FNAME)s( );
-//Py_END_ALLOW_THREADS;
-
-if (err)
-{
-	return SPyErr_SetFromSymbianOSErr(err);
-}
-
 PyObject* pyresult = Py_BuildValue("u#",result.Ptr(),result.Length());
 return pyresult;
 """
@@ -84,7 +76,7 @@ return Py_False;
 def getBoolGetter( fname ):
     return BOOL_RETURNING_TEMPLATE % {"FNAME" : fname }
 
-ERROR_RAISING_TEMPLATE = """
+ERROR_RAISING_GETTER_TEMPLATE = """
 PRINTF("%(FNAME)s");
 TInt result = self->iLogMan->%(FNAME)s();
 if( result == KErrNone ) {
@@ -96,7 +88,7 @@ return SPyErr_SetFromSymbianOSErr(result);
 
 """
 def getErrorRaisingGetter( fname ):
-    return ERROR_RAISING_TEMPLATE % {"FNAME" : fname }
+    return ERROR_RAISING_GETTER_TEMPLATE % {"FNAME" : fname }
 
 
 CONNECT_IMPLEMENTATION              = getErrorRaisingGetter("Connect" )
@@ -231,7 +223,10 @@ class LogMan:
                           code = getSimpleGetter( "BytesSent", "TUint32", "l" )
                         ),
                         
-                
+                Function( "static PyObject*", "LogMan_MemoryInfo",
+                            SELF,
+                            code = getErrorRaisingGetter( "MemoryInfo" ) 
+                        ),
                 
                 Function( "static PyObject*", "LogMan_Write",
                             [ Attribute( "Type_LogMan*", "self"),

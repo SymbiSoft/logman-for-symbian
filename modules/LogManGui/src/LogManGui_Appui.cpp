@@ -173,7 +173,7 @@ void CLoggingServerGuiAppUi::HandleCommandL( TInt aCommand )
     break;
 
     case ELogServCmdMenuMainSendTest:
-    {
+    {        
         _LIT8(KTestMsg8, "This is 8-bit test message\n");
         _LIT(KTestMsg16, "This is 16-bit test message\n");
         log.Write( KTestMsg8 );
@@ -193,6 +193,18 @@ void CLoggingServerGuiAppUi::HandleCommandL( TInt aCommand )
         _LIT( KTestStaticFormattedMsg16, "This is %d-bit formatted message sent using static Log\n" );
         RLogMan::Log( KTestStaticFormattedMsg8, EFalse, 8 );
         RLogMan::Log( KTestStaticFormattedMsg16, EFalse, 16 );
+        
+        
+        log.Log( _L( "Testing memory info logging\n" ) );
+        
+        log.Log( _L( "StackInfo\n" ) );
+        log.StackInfo();
+        
+        log.Log( _L( "HeapInfo\n" ) );
+        log.HeapInfo();
+        
+        log.Log( _L( "MemoryInfo\n" ) );
+        log.MemoryInfo();
 
     }
     break;

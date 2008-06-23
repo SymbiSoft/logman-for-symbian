@@ -267,3 +267,54 @@ EXPORT_C TInt RLogMan::SetPort( TInt& aData )
     TInt result = SendReceive(ESetPort, args);
     return result;
 }
+
+_LIT8(KFmtStackInfo,"\nStackInfo\n  Free:%u, Used:%u, Base:%u, Limit:%u, Pointer:%u, Stack size:%u\n");
+_LIT8(KFmtHeapInfo,"\nHeapInfo\n  Free:%u, Used:%u, Size:%u\n");
+
+EXPORT_C TInt RLogMan::StackInfo()
+{
+
+    TUint32 stack_pointer = 0;
+    stack_pointer = (TUint32)&stack_pointer;
+    RThread thread;
+    TThreadStackInfo stackinfo;
+    thread.StackInfo( stackinfo );
+    return this->Writef( KFmtStackInfo
+                    ,EFalse
+                    ,stack_pointer   - stackinfo.iLimit // Pointer value reduces->Base is larger than Limit( reverse your mind )
+                    ,stackinfo.iBase - stack_pointer
+                    ,stackinfo.iBase
+                    ,stackinfo.iLimit
+                    ,stack_pointer
+                    ,stackinfo.iBase - stackinfo.iLimit
+                    );
+
+}
+
+
+EXPORT_C TInt RLogMan::HeapInfo()
+{
+    RHeap& heap = User::Heap();
+    
+    TInt tmp;
+    TInt size = heap.Size();
+    TInt free = heap.Available(tmp);
+    TInt used = size - free;
+    
+    this->Writef( KFmtHeapInfo,
+                    EFalse,
+                  free, used, size );
+
+}
+
+EXPORT_C TInt RLogMan::MemoryInfo()
+{ 
+    TInt err;
+    err = StackInfo();
+    if( err != KErrNone ) return err;
+    
+    err = HeapInfo();    
+    return err;
+}
+
+

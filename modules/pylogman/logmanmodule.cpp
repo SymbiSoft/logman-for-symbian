@@ -76,6 +76,7 @@ static PyObject* LogMan_IsSerialConnected( Type_LogMan* self );
 static PyObject* LogMan_StopService( Type_LogMan* self );
 static PyObject* LogMan_DisconnectSerial( Type_LogMan* self );
 static PyObject* LogMan_BytesSent( Type_LogMan* self );
+static PyObject* LogMan_MemoryInfo( Type_LogMan* self );
 static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs );
 static PyObject* LogMan_Port( Type_LogMan* self );
 static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args );
@@ -92,6 +93,7 @@ static const PyMethodDef LogMan_methods[] = {
     {"StopService",    (PyCFunction)LogMan_StopService, METH_NOARGS},
     {"DisconnectSerial",    (PyCFunction)LogMan_DisconnectSerial, METH_NOARGS},
     {"BytesSent",    (PyCFunction)LogMan_BytesSent, METH_NOARGS},
+    {"MemoryInfo",    (PyCFunction)LogMan_MemoryInfo, METH_NOARGS},
 // Different name to work like standard Python stdout
     {"write",    (PyCFunction)LogMan_Write, METH_VARARGS | METH_KEYWORDS},
     {"Port",    (PyCFunction)LogMan_Port, METH_NOARGS},
@@ -212,6 +214,20 @@ static PyObject* LogMan_BytesSent( Type_LogMan* self ){
     return Py_BuildValue( "l", result );
     
 }
+/// Python wrapper for RLogMan.MemoryInfo
+static PyObject* LogMan_MemoryInfo( Type_LogMan* self ){
+        
+    PRINTF("MemoryInfo");
+    TInt result = self->iLogMan->MemoryInfo();
+    if( result == KErrNone ) {
+        Py_INCREF(Py_True);
+        return Py_True;
+    }
+    
+    return SPyErr_SetFromSymbianOSErr(result);
+    
+    
+}
 /// Python wrapper for RLogMan.Write
 static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs ){
         
@@ -283,16 +299,8 @@ static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args ){
 /// Python wrapper for RLogMan.PortName
 static PyObject* LogMan_PortName( Type_LogMan* self ){
         
-    TInt err = KErrNone;
-    //Py_BEGIN_ALLOW_THREADS;
+    
     TPortName result = self->iLogMan->PortName( );
-    //Py_END_ALLOW_THREADS;
-    
-    if (err)
-    {
-    	return SPyErr_SetFromSymbianOSErr(err);
-    }
-    
     PyObject* pyresult = Py_BuildValue("u#",result.Ptr(),result.Length());
     return pyresult;
     
@@ -350,23 +358,6 @@ static PyObject* pylogman_Log(PyObject* /*dummy*/, PyObject* args)
 	{
 		return SPyErr_SetFromSymbianOSErr(err);
 	}
-
-	Py_INCREF(Py_True);
-	return Py_True;
-}
-/** Python wrapper for RDebug::Printf. Implements pylogman.write.
-  */
-static PyObject* pylogman_RDebugPrintf(PyObject* /*dummy*/, PyObject* args)
-{
-	char* bytes      = NULL;
-	TInt length  = 0;
-
-	if (!PyArg_ParseTuple(args, "s#", &bytes, &length))
-	{
-		return 0;
-	}
-
-    RDebug::Printf( bytes );
 
 	Py_INCREF(Py_True);
 	return Py_True;
@@ -437,8 +428,7 @@ extern "C" {
 
   static const PyMethodDef logman_methods[] = {
     {"LogMan", (PyCFunction)Type_LogMan_Construct, METH_NOARGS},
-    {"Log", (PyCFunction)pylogman_Log, METH_VARARGS, "Send log message" },
-    {"write", (PyCFunction)pylogman_RDebugPrintf, METH_VARARGS, "Send log message using RDebug to epocwnd.out" },
+    {"Log", (PyCFunction)pylogman_Log, METH_VARARGS, "Send log message" },    
     {NULL,              NULL}           /* sentinel */
   };
 

@@ -75,8 +75,9 @@ class Gui:
     
     def mhTestMessage(self):
         print "Sending test log",                
-        self.LogMan.write( time.ctime().strip() + ": Testing message" )
+        self.LogMan.write( time.ctime().strip() + ": Testing message" )        
         self.LogMan.write( "\r\n" )
+        self.LogMan.MemoryInfo()
         print "Done"
     
     def mhTestMessageAsync(self):

@@ -268,7 +268,7 @@ EXPORT_C TInt RLogMan::SetPort( TInt& aData )
     return result;
 }
 
-_LIT8(KFmtStackInfo,"\nStackInfo\n  Free:%u, Used:%u, Base:%u, Limit:%u, Pointer:%u, Stack size:%u\n");
+_LIT8(KFmtStackInfo,"\nStackInfo\n  Free:%u, Used:%u, Size:%u\n");
 _LIT8(KFmtHeapInfo,"\nHeapInfo\n  Free:%u, Used:%u, Size:%u\n");
 
 EXPORT_C TInt RLogMan::StackInfo()
@@ -283,9 +283,9 @@ EXPORT_C TInt RLogMan::StackInfo()
                     ,EFalse
                     ,stack_pointer   - stackinfo.iLimit // Pointer value reduces->Base is larger than Limit( reverse your mind )
                     ,stackinfo.iBase - stack_pointer
-                    ,stackinfo.iBase
-                    ,stackinfo.iLimit
-                    ,stack_pointer
+                    //,stackinfo.iBase
+                    //,stackinfo.iLimit
+                    //,stack_pointer
                     ,stackinfo.iBase - stackinfo.iLimit
                     );
 

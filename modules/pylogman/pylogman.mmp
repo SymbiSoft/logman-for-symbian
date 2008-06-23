@@ -23,5 +23,3 @@ LIBRARY LogMan.lib
 
 source		logmanmodule.cpp
 
-NOSTRICTDEF
-

@@ -301,7 +301,7 @@ EXPORT_C TInt RLogMan::HeapInfo()
     TInt free = heap.Available(tmp);
     TInt used = size - free;
     
-    this->Writef( KFmtHeapInfo,
+    return this->Writef( KFmtHeapInfo,
                     EFalse,
                   free, used, size );
 

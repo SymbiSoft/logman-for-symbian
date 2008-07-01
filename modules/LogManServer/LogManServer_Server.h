@@ -11,6 +11,7 @@ class CLoggingServerMessageQueue;
 class RComm;
 class RCommServ;
 class CLoggingServerSession;
+class CLoggingServerCommandManager;
 
 /// Struct containing serial connection type strings and port number on server.
 struct SConnectionInfo {
@@ -93,8 +94,12 @@ private:
     void ConstructL();
 
 private:
+
     /// Holds and sends the asynchronous messages
     CLoggingServerMessageQueue* iMessageQueue;
+    /// Handles commands sent from PC
+    CLoggingServerCommandManager* iCommandManager;
+
     /// Serial comms
     RComm iSerialComm;
     /// True if the connection is active.

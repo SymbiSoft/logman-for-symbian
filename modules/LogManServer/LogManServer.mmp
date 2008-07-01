@@ -11,6 +11,7 @@ SOURCE        LogManServer_Server.cpp
 SOURCE        LogManServer_StartupCode.cpp
 SOURCE        LogManServer_Session.cpp
 SOURCE        LogManServer_MessageQueue.cpp
+SOURCE        LogManServer_CommandManager.cpp
 
 USERINCLUDE   .
 USERINCLUDE   ..\Common

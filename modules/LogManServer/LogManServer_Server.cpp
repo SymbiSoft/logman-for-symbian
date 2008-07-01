@@ -11,6 +11,7 @@ import cpptemplates
 #include "LogManServer_Server.h"
 #include "LogManServer_Session.h"
 #include "LogManServer_MessageQueue.h"
+#include "LogManServer_CommandManager.h"
 
 #include <f32file.h>
 #include <BADESCA.H>
@@ -93,7 +94,14 @@ void CLoggingServerServer::ConstructL()
 {
     // Creates message queue for asynchronous messaging
     this->iMessageQueue = new (ELeave) CLoggingServerMessageQueue(this);
+    CleanupStack::PushL(this->iMessageQueue);
     this->iMessageQueue->ConstructL();
+
+    this->iCommandManager = new (ELeave) CLoggingServerCommandManager(this);
+    CleanupStack::PushL(this->iCommandManager);
+    this->iCommandManager->ConstructL();
+
+    CleanupStack::Pop(2);
 
 // These require CommDD capability
 #ifdef __HAS_COMMDD__
@@ -184,6 +192,7 @@ TInt CLoggingServerServer::SendMessage(TDesC8& aBuffer )
     // else TODO: Should we set IsSerialConnected to EFalse?
     return sendstatus.Int();
 }
+
 
 void CLoggingServerServer::AddAsyncMessageL( TMessageBuffer8& aBuffer )
 {
@@ -282,6 +291,14 @@ TInt CLoggingServerServer::ConnectSerial()
     if( err != KErrNone) {
         // Don't try to write messages
         iIsSerialConnected = EFalse;
+    }
+    else
+    {
+        // Enable command handler
+        User::InfoPrint(_L("Enable notify"));
+        iCommandManager->iStatus = KRequestPending;
+        iSerialComm.NotifyDataAvailable( iCommandManager->iStatus );
+        iCommandManager->SetActive();
     }
     return err;
 }

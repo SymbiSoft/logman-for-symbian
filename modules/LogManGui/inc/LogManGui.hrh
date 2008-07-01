@@ -1,0 +1,21 @@
+#ifndef __LoggingServerGui_HRH__
+#define __LoggingServerGui_HRH__
+
+// LoggingServerGui enumerate command codes
+enum TLoggingServerGuiIds
+    {
+    ELogServCmdMenuMainConnect = 0x6001, // start value must not be 0
+    ELogServCmdMenuUpdateInfo,
+    ELogServCmdMenuMainDisconnect,
+    ELogServCmdMenuMainSendTest,
+    ELogServCmdMenuMainSendTestAsync,
+    ELogServCmdMenuMainLoadSerial,
+    ELogServCmdMenuMainSetPortName,
+    ELogServCmdMenuMainSetPort,
+    ELogServCmdMenuMainCloseService,
+    ELogServCmdMenuMainStartService,
+
+    KLoggingServerGuiIdsCount
+    };
+
+#endif // __LoggingServerGui_HRH__

@@ -1,0 +1,5 @@
+PRJ_MMPFILES
+modules\LogManServer\LogManServer.mmp
+modules\LogManClient\LogMan.mmp
+modules\pylogman\PyLogMan.mmp
+modules\LogManGui\group\LogManGui.mmp

@@ -9,23 +9,30 @@ class CDesC8Array;
 
 /// Handles commands sent from PC through serial connection
 /**
-  *
+ *
  */
 class CLoggingServerCommandManager : public CActive
-  {
+{
 
-  public:
-    /** Constructor */
+public:
+	/** Constructor */
 	CLoggingServerCommandManager(CLoggingServerServer* iLoggingServerServer);
 	/** Destructor */
 	~CLoggingServerCommandManager();
 
 	/** Second phase constructor */
 	void ConstructL();
-
-  protected:
-
-    /** Called by system when cancelling Active Object */
+	
+	void Start();
+	
+protected:
+	TInt HandleCmdListL( );
+	TInt HandleCmdLsL( RArray<RBuf8>& aPath );
+	
+	TInt HandleCommand( );
+	void HandleCommandL( );
+	
+	/** Called by system when cancelling Active Object */
 	void DoCancel();
 
 	/** Read serial line and execute command */
@@ -33,8 +40,10 @@ class CLoggingServerCommandManager : public CActive
 
 	/** Handle to the LogMan service holding serial connection */
 	CLoggingServerServer *iLoggingServerServer;
-    friend class CLoggingServerServer;
-  };
-#endif
 
+	RTimer iTimer;
+	RBuf8  iCommandBuffer;
+	friend class CLoggingServerServer;
+};
+#endif
 

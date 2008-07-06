@@ -1,3 +1,5 @@
+#!/usr/env/bin python
+
 import os
 import sys
 import glob
@@ -5,7 +7,9 @@ import glob
 import scons_symbian
 from scons_symbian import *
 
-COMMON_DEFINES = []#[ "__DEBUG_LOGGING__" ]
+COMMON_DEFINES = [
+    "__DEBUG_LOGGING__"
+]
 LOGGINGSERVER_INCLUDES  = [ r"modules\LogManServer", r"modules\LogManClient", r"modules\Common" ]
 
 def LogManServer():
@@ -17,7 +21,7 @@ def LogManServer():
     return SymbianProgram( 'LogMan', scons_symbian.TARGETTYPE_EXE,
                      sources, 
                      LOGGINGSERVER_INCLUDES,
-                     [ x + ".lib" for x in loggingserver_libraries ],
+                     loggingserver_libraries,
                      uid2 = '0x100039ce', uid3 = '0xe3195807',
                      capabilities = FREE_CAPS,
                      defines      = COMMON_DEFINES  )
@@ -25,7 +29,7 @@ def LogManServer():
 def LogManDll():
     "LogMan.dll defines ( client )"
     
-    logman_libraries = [ x + ".lib" for x in [ 'euser', 'efsrv', 'estlib' ] ]
+    logman_libraries = [ 'euser', 'efsrv', 'estlib' ]
     logman_sources   = glob.glob( r"modules\LogManClient\*.cpp" )
     
     
@@ -48,7 +52,7 @@ def PyLogManDll():
     return SymbianProgram( 'pylogman', scons_symbian.TARGETTYPE_PYD,
                     ["modules\\pylogman\\logmanmodule.cpp"],                     
                     pylogman_includes,
-                    [ x + ".lib" for x in ["python222", "euser", "LogMan"] ],                    
+                    ["python222", "euser", "LogMan"],                    
                     #definput = r"LoggingServer\\" + def_folder + r"\pylogmanU.DEF",
                     capabilities = FREE_CAPS,
                     defines = COMMON_DEFINES )
@@ -63,14 +67,13 @@ def LogManGui():
     resources.sort() # Because LogManGui_reg.reg depends on LogManGui.reg
     icons     = glob.glob( src_path + "gfx\\*.svg" )
     
-    libraries = [ x + ".lib" for x in 
-                             [ 
-                             "eikcore", "euser",        "apparc",  
-                             "avkon",   "commonengine", "efsrv",
-                             "estor",   "eikcoctl",     "eikdlg",
-                             "gdi",     "cone",         "LogMan"
-                             ] 
-                           ]
+    libraries = [ 
+	                "eikcore", "euser",        "apparc",  
+	                "avkon",   "commonengine", "efsrv",
+	                "estor",   "eikcoctl",     "eikdlg",
+	                "gdi",     "cone",         "LogMan"
+                ] 
+                           
                              
     includes  = [
                     r"modules\Common",

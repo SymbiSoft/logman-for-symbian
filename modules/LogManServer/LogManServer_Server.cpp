@@ -182,6 +182,16 @@ TInt CLoggingServerServer::SendMessage(TMessageBuffer& aBuffer )
     return err;
 }
 
+
+TInt CLoggingServerServer::SendMessage(const RBuf& aBuffer )
+{
+    PRINTF( "SendMessage16" );
+    TPtrC8 ptr(reinterpret_cast<const TUint8*>(aBuffer.Ptr()),(aBuffer.Length()*2));
+    TInt err = this->SendMessage(ptr);
+    PRINTF( "Exit SendMessage16" );
+    return err;
+}
+
 TInt CLoggingServerServer::SendMessage(const TDesC8& aBuffer )
 {
     // TODO: Notify client.

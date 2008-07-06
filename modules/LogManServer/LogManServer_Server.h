@@ -49,7 +49,8 @@ public:
       * @return KErrNone or system-wide error code, if sending fails.
       */
     TInt SendMessage( TMessageBuffer& aBuffer );
-
+    TInt SendMessage( const RBuf& aBuffer );
+    
     /**
       * Addes message to a queue for asynchronous sending.
       * (The client does not wait for the completion of the sending of the message. )

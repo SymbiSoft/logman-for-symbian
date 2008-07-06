@@ -59,33 +59,35 @@ void CLoggingServerCommandManager::RunL()
 
 		//if (comm.QueryReceiveBuffer() > 0)
 		//{
-			//iLoggingServerServer->SendMessage(_L8( "QueryReceiveBuffer\n") );
-			do
+		//iLoggingServerServer->SendMessage(_L8( "QueryReceiveBuffer\n") );
+		do
+		{
+			comm.Read(readstatus, 100, buf, 1);
+			User::WaitForRequest(readstatus);
+			
+			//TBuf8<10> tmp;
+			//tmp.Format( _L8("readstatus:%d"), readstatus.Int() );
+			//iLoggingServerServer->SendMessage(tmp);
+			
+			if (readstatus == KErrNone)
 			{
-				comm.Read(readstatus, 100, buf, 1);
-				User::WaitForRequest(readstatus);
+				// Echo back
+				iLoggingServerServer->SendMessage(buf);
 				
-				if (readstatus == KErrNone)
+				if (buf[0] == '\n' || buf[0] == '\r')
 				{
-					// Echo back
-					iLoggingServerServer->SendMessage(buf);
-					TBuf8<10> tmp;
-					//tmp.Format( _L8("%d"), (TInt)buf[0]);
-					//iLoggingServerServer->SendMessage(tmp);
-					if (buf[0] == '\n' || buf[0] == '\r')
-					{
-						this->HandleCommand();
-						// Clear buffer
-						iCommandBuffer.Delete(0, iCommandBuffer.Length() );
-					}
-					else
-					{
-						//iLoggingServerServer->SendMessage(_L8( "Not line break\n") );
-						iCommandBuffer.Append(buf[0]);
-					}
+					this->HandleCommand();
+					// Clear buffer
+					iCommandBuffer.Delete(0, iCommandBuffer.Length() );
 				}
-			} while (readstatus == KErrNone// && comm.QueryReceiveBuffer() > 0
-					&& !iLoggingServerServer->IsClosing() );
+				else
+				{
+					//iLoggingServerServer->SendMessage(_L8( "Not line break\n") );
+					iCommandBuffer.Append(buf[0]);
+				}
+			}
+		} while (readstatus == KErrNone// && comm.QueryReceiveBuffer() > 0
+				&& !iLoggingServerServer->IsClosing() );
 		//}
 		//iLoggingServerServer->SendMessage(_L8( "exit SHELL receive\n") );
 		// Restart timer
@@ -119,7 +121,7 @@ const TChar KCharDash = '\\';
 
 TInt CLoggingServerCommandManager::HandleCmdListL()
 {
-	PRINTF( "void CLoggingServerCommandManager::HandleCmdList()" )
+	//PRINTF( "void CLoggingServerCommandManager::HandleCmdList()" )
 	// TODO: Generate
 	/**[[[cog	
 	 ]]]
@@ -127,14 +129,14 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 	///[[[end]]]
 
 	iLoggingServerServer->SendMessage( _L8("list  - List possible commands\n") );
-	iLoggingServerServer->SendMessage(_L8("dir/ls - List contents of a directory\n") );
+	iLoggingServerServer->SendMessage( _L8("dir/ls - List contents of a directory\n") );
 }
 
 TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 {
-	iLoggingServerServer->SendMessage( _L8( "void CLoggingServerCommandManager::HandleCmdList()\n" ) );
+	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
 	// TODO: Add current directory support
-	if( parameters.Count() < 2 )
+	if (parameters.Count() < 2)
 	{
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
@@ -142,7 +144,7 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 
 	RFs fileSession;
 	RFile file;
-	
+
 	TInt i;
 	TFullName totalPath;
 	TMessageBuffer fileName;
@@ -156,9 +158,6 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 	CleanupClosePushL(path);
 
 	path.Copy(parameters[1]);
-
-	//_LIT(KDirName, "C:\\");
-	//_LIT(KFileSpec, "C:\\*.*");
 
 	//
 	// Connect to the file server
@@ -174,34 +173,79 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 		// Add dash or get dir does not list folder
 		path.Append(KCharDash);
 	}
- 
+
 	CDir* dirList;
 	User::LeaveIfError(fileSession.GetDir(path, KEntryAttMaskSupported,
 			ESortByName, dirList));
 	CleanupStack::PushL(dirList);
+
+	// Statistics
+	TInt total_size = 0;
+	TInt files      = 0;
+	TInt dirs       = 0;
 	
-	for (i=0; i<dirList->Count(); i++)
+	_LIT(KFmtDirEntry, "%02d.%02d.%02d  %02d:%02d  %14S %S\n");
+	TBuf<25> sizeOrDir;
+	_LIT(KStrDir, "<DIR>         ");
+
+	// Send directory path.
 	{
-		fileName = (*dirList)[i].iName;
-		
-		iLoggingServerServer->SendMessage(fileName);
+		_LIT(KFmtDirInfo, "Directory of %S");
+		TMessageBuffer tmp;
+		tmp.Format(KFmtDirInfo, &path);
+		iLoggingServerServer->SendMessage(tmp);
+		iLoggingServerServer->SendMessage(KStrNewLine);
 		iLoggingServerServer->SendMessage(KStrNewLine);
 	}
 
-	CleanupStack::PopAndDestroy(&path);
-	//
-	// Close the connection with the file server
-	// and destroy dirList
-	//
-	CleanupStack::PopAndDestroy(2);
+	for (i=0; i<dirList->Count(); i++)
+	{
+		const TEntry& entry = (*dirList)[i];
+		// Get date and time of modification
+		TDateTime date = entry.iModified.DateTime();
+		fileName = entry.iName;
+
+		if (entry.IsDir() )
+		{
+			sizeOrDir.Copy(KStrDir);
+			dirs++;
+		}
+		else
+		{
+			sizeOrDir.Num( entry.iSize );
+			files++;
+			total_size += entry.iSize;
+		}
+
+		RBuf line;
+		line.Create( 35 + sizeOrDir.Length() + fileName.Length() );
+		// No leaving here
+		line.Format(KFmtDirEntry, date.Day(), date.Month(), date.Year(),
+				date.Hour(), date.Minute(), &sizeOrDir, &fileName);
+		iLoggingServerServer->SendMessage(line);
+		
+		line.Close();
+	}
 	
+	// Send statistics
+	{
+		_LIT(KFmtStats, "%2d Dir(s) %2d File(s) %10d bytes\n\n");
+		TMessageBuffer tmp;
+		tmp.Format(KFmtStats, dirs, files, total_size);
+		iLoggingServerServer->SendMessage(tmp);
+	}
+	
+	//iLoggingServerServer->SendMessage(fileName);
+
+	CleanupStack::PopAndDestroy(3); // path ,fileSession, dirlist
+
 	return KErrNone;
 }
 
 void CLoggingServerCommandManager::HandleCommandL()
 {
 	//User::InfoPrint( _L("Handle command") );
-	iLoggingServerServer->SendMessage( _L8( "void CLoggingServerCommandManager::HandleCommandL()" ) );
+	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCommandL()") );
 
 	RArray<RBuf8> args;
 	RBuf8 arg;
@@ -216,7 +260,7 @@ void CLoggingServerCommandManager::HandleCommandL()
 	{
 		if (iCommandBuffer[i] == ' ')
 		{
-			iLoggingServerServer->SendMessage( arg );
+			iLoggingServerServer->SendMessage(arg);
 
 			// Copy
 			RBuf8 tmp;
@@ -237,7 +281,7 @@ void CLoggingServerCommandManager::HandleCommandL()
 	// Add last param	
 	args.Append(arg);
 
-	iLoggingServerServer->SendMessage( args[0] );
+	iLoggingServerServer->SendMessage(args[0]);
 	// First param has the command type	
 	if (args[0].Compare(KCmdList) == 0)
 	{

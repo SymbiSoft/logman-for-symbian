@@ -260,7 +260,7 @@ static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwar
     
     if (err)
     {
-    	return SPyErr_SetFromSymbianOSErr(err);
+        return SPyErr_SetFromSymbianOSErr(err);
     }
     
     Py_INCREF(Py_True);
@@ -398,14 +398,12 @@ static PyObject* Type_LogMan_Construct(PyObject* /*self*/, PyObject * /*args*/)
 /** Logman python destructor */
 static void dealloc_LogMan(Type_LogMan* self)
 {
-    RDebug::Printf("dealloc_LogMan");
 
     self->iLogMan->Close();
     delete self->iLogMan;
     self->iLogMan = NULL;
     PyObject_Del(self);
 
-    RDebug::Printf("Exit dealloc_LogMan");
 }
 
 

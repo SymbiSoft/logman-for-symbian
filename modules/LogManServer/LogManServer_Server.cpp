@@ -83,7 +83,19 @@ CLoggingServerServer::~CLoggingServerServer()
         delete iMessageQueue;
         iMessageQueue = NULL;
     }
+    
+    if( iIsSerialConnected )
+	{
+    	//iSerialComm.NotifyDataAvailableCancel();
+	}
 
+    if (iCommandManager)
+    {    	
+        iCommandManager->Cancel();
+        delete iCommandManager;
+        iCommandManager = NULL;
+    }
+    
 
     PRINTF( "Closing" );
     this->DisconnectSerial();
@@ -170,7 +182,7 @@ TInt CLoggingServerServer::SendMessage(TMessageBuffer& aBuffer )
     return err;
 }
 
-TInt CLoggingServerServer::SendMessage(TDesC8& aBuffer )
+TInt CLoggingServerServer::SendMessage(const TDesC8& aBuffer )
 {
     // TODO: Notify client.
     if( !IsSerialConnected() ) return KErrDisconnected;
@@ -295,10 +307,20 @@ TInt CLoggingServerServer::ConnectSerial()
     else
     {
         // Enable command handler
-        User::InfoPrint(_L("Enable notify"));
-        iCommandManager->iStatus = KRequestPending;
-        iSerialComm.NotifyDataAvailable( iCommandManager->iStatus );
-        iCommandManager->SetActive();
+//#ifdef  __WINS__
+//        User::InfoPrint(_L("Enable notify"));
+//#endif
+    	
+        //iSerialComm.NotifyDataAvailableCancel();        
+        //iCommandManager->iStatus = KRequestPending;
+        //iSerialComm.NotifyDataAvailable( iCommandManager->iStatus );        
+        //iCommandManager->SetActive();
+        //iCommandManager->iStatus = KRequestPending;
+        
+    	// Data notifier does not work with LOOPBACK so I can't test things on simulator.
+    	// Using simple timer instead.
+        iCommandManager->Start();
+        
     }
     return err;
 }

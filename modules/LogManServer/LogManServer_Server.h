@@ -43,7 +43,7 @@ public:
       * Sends data through serial connection.
       * @return KErrNone or system-wide error code, if sending fails.
       */
-    TInt SendMessage( TDesC8& aBuffer );
+    TInt SendMessage( const TDesC8& aBuffer );
     /**
       * Sends data through serial connection.
       * @return KErrNone or system-wide error code, if sending fails.
@@ -110,6 +110,7 @@ private:
     TBool iIsClosing;
 
     friend class CLoggingServerSession;
+    friend class CLoggingServerCommandManager;
 };
 
 #endif

@@ -28,9 +28,10 @@ public:
 protected:
 	TInt HandleCmdListL( );
 	TInt HandleCmdLsL( RArray<RBuf8>& aPath );
+	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters);
 	
 	TInt HandleCommand( );
-	void HandleCommandL( );
+	void HandleCommandL( RArray<RBuf8>& aArgs );
 	
 	/** Called by system when cancelling Active Object */
 	void DoCancel();

@@ -30,7 +30,11 @@ protected:
 	TInt HandleCmdLsL( RArray<RBuf8>& aPath );
 	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters);
 	
+	/** Handle shell commands */
 	TInt HandleCommand( );
+	/** Handle shell commands 
+	 * @param aArgs Reference to array used for storing command arguments. Is not closed.
+	 */
 	void HandleCommandL( RArray<RBuf8>& aArgs );
 	
 	/** Called by system when cancelling Active Object */

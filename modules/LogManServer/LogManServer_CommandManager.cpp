@@ -17,7 +17,8 @@ _LIT(KFmtCopyErr, "\nFailed to copy '%S', err:%d\n");
 _LIT(KStrDir, "<DIR>         ");
 _LIT8(KStrFileExistsQuery, "\nFile exists. Overwrite? n\\y\\a\\c:");
 _LIT8(KStrInvalidAnswer, "\nInvalid answer.\n");
-_LIT8(KStrPathNotFound, "\nThe system cannot find the path specified.\n");
+_LIT8(KStrPathNotFound, "\nThe system cannot find the path specified. Err:%d\n");
+_LIT8(KFmtErrDetected, "\nError:%d\n");
 
 // TODO: Generate
 _LIT8(KStrNewLine, "\n");
@@ -136,41 +137,58 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 	iLoggingServerServer->SendMessage(_L8("cp     - Copy files\n") );
 }
 
-TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
+
+TInt GetPathArgLC( RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex )
+{
+	User::LeaveIfError(aBuf.Create(aParameters[1].Length() + 1) );
+	CleanupClosePushL(aBuf);
+	aBuf.Copy(aParameters[aIndex]);
+	
+	// If folder, ensure there is dash at the end.
+	TBool isDir = EFalse;
+	BaflUtils::IsFolder(aFs, aBuf, isDir);
+	if ( !isDir) {
+		isDir = (aBuf[aBuf.Length() - 1 ] == KDoubleColon );
+	}
+	if ( (isDir || aBuf[aBuf.Length() - 1 ] == KDoubleColon ) && aBuf[aBuf.Length() - 1 ] != KCharDash)
+	{
+		// Add dash or get dir does not list folder
+		aBuf.Append(KCharDash);
+	}
+	
+	return isDir;
+}
+void CLoggingServerCommandManager::LeaveIfFailedL( TInt aErr )
+{
+	if( aErr != KErrNone )
+	{
+		TMessageBuffer8 tmp;
+		tmp.Format( KFmtErrDetected, aErr );
+		iLoggingServerServer->SendMessage(tmp);
+		User::Leave( aErr );
+	}
+}
+
+TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
 	// TODO: Add current directory support
-	if (parameters.Count() < 2)
+	if (aParameters.Count() < 2)
 	{
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
 	}
-
-	RFs fileSession;
-	RFile file;
 
 	TInt i;
 	TFullName totalPath;
 	TMessageBuffer fileName;
 	TInt err;
 	// Convert to unicode
-	RBuf path;
-	err = path.Create(parameters[1].Length() + 1);
-	if (err != KErrNone)
-		return err;
-
-	CleanupClosePushL(path);
-
-	path.Copy(parameters[1]);
-
-	//
-	// Connect to the file server
-	//
-	fileSession.Connect();
-	CleanupClosePushL(fileSession);
-
+	RBuf path;	
+	GetPathArgLC( aParameters, aFs, path, 1);
+	  
 	TBool isDir;
-	BaflUtils::IsFolder(fileSession, path, isDir);
+	BaflUtils::IsFolder(aFs, path, isDir);
 
 	if ( (isDir || path[path.Length() - 1 ] == KDoubleColon ) && path[path.Length() - 1 ] != KCharDash)
 	{
@@ -179,12 +197,9 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 	}
 
 	CDir* dirList;
-	err = fileSession.GetDir(path, KEntryAttMaskSupported, ESortByName, dirList);
-	if( err != KErrNone )
-	{
-		iLoggingServerServer->SendMessage(KStrPathNotFound);
-		User::Leave( err );
-	}
+	err = aFs.GetDir(path, KEntryAttMaskSupported, ESortByName, dirList);
+	LeaveIfFailedL( err );
+	
 	CleanupStack::PushL(dirList);
 
 	// Statistics
@@ -241,23 +256,22 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& parameters)
 
 	//iLoggingServerServer->SendMessage(fileName);
 
-	CleanupStack::PopAndDestroy(3); // path ,fileSession, dirlist
+	CleanupStack::PopAndDestroy(2); // path, dirlist
 
 	return KErrNone;
 }
 
-TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& parameters)
+
+TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs )
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
 	// TODO: Add current directory support
-	if (parameters.Count() < 3)
+	if (aParameters.Count() < 3)
 	{
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
 	}
-
-	RFs fileSession;
-	RFile file;
+ 
 
 	TInt i;
 	TFullName totalPath;
@@ -267,52 +281,20 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& parameters
 	// Convert to unicode
 	// Get source path
 	RBuf path_source;
-	User::LeaveIfError(path_source.Create(parameters[1].Length() + 1) );
-	CleanupClosePushL(path_source);
-	path_source.Copy(parameters[1]);
+	GetPathArgLC( aParameters, aFs, path_source, 1);
 
 	// Get target path
 	RBuf path_target;
-	User::LeaveIfError(path_target.Create(parameters[1].Length() + 1) );
-	CleanupClosePushL(path_target);
-	path_target.Copy(parameters[2]);
-
-	// File server
-	fileSession.Connect();
-	CleanupClosePushL(fileSession);
-
-	// Are we copying files from folder?
-	TBool isDir = EFalse;
-	BaflUtils::IsFolder(fileSession, path_source, isDir);
-	if ( !isDir)
-		isDir = (path_source[path_source.Length() - 1 ] == KDoubleColon );
-	if ( (isDir || path_source[path_source.Length() - 1 ] == KDoubleColon ) && path_source[path_source.Length() - 1 ] != KCharDash)
-	{
-		// Add dash or get dir does not list folder
-		path_source.Append(KCharDash);
-	}
-
-	isDir = EFalse;
-	// Is target path folder?	
-	BaflUtils::IsFolder(fileSession, path_target, isDir);
-	if ( !isDir)
-		isDir = (path_target[path_target.Length() - 1 ] == KDoubleColon );
-	if (isDir && path_target[path_target.Length() - 1 ] != KCharDash)
-	{
-		// Add dash 
-		path_target.Append(KCharDash);
-	}
-
+	TInt isDir = GetPathArgLC( aParameters, aFs, path_target, 2);	
+  
+	// Get directory listing
 	CDir* dirList;
-	err = fileSession.GetDir(path_source, KEntryAttMaskSupported, ESortByName, dirList);
-	if( err != KErrNone )
-	{
-		iLoggingServerServer->SendMessage(KStrPathNotFound);
-		User::Leave( err );
-	}
+	err = aFs.GetDir(path_source, KEntryAttMaskSupported, ESortByName, dirList);
+	LeaveIfFailedL( err );
 	CleanupStack::PushL(dirList);
+	
+	// Check each directory entry.
 	TInt copied = 0;
-
 	TBool doOverwriteAll = EFalse;
 	TBool doCopy = ETrue;
 	for (i=0; i<dirList->Count(); i++)
@@ -337,7 +319,7 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& parameters
 			}
 
 			// Check if file exists and query permission
-			if ( !doOverwriteAll && BaflUtils::FileExists(fileSession, full_target) )
+			if ( !doOverwriteAll && BaflUtils::FileExists(aFs, full_target) )
 			{
 				doCopy = EFalse;
 
@@ -396,7 +378,7 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& parameters
 			// Do the copying
 			if (doCopy)
 			{
-				err = BaflUtils::CopyFile(fileSession, path_source, full_target);
+				err = BaflUtils::CopyFile(aFs, path_source, full_target);
 				if (err != KErrNone)
 				{
 					TMessageBuffer tmp;
@@ -422,10 +404,8 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& parameters
 		tmp.Format(KFmtStats, copied);
 		iLoggingServerServer->SendMessage(tmp);
 	}
-
-	//iLoggingServerServer->SendMessage(fileName);
-
-	CleanupStack::PopAndDestroy(4); // path_source, path_target, fileSession, dirlist
+	
+	CleanupStack::PopAndDestroy(3); // path_source, path_target, dirlist
 
 	return KErrNone;
 }
@@ -485,7 +465,13 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	// Add last param
 	AddToList(aArgs, arg);
 	arg.Close();
+	
 
+	// Connect to the file server	
+	RFs fs;
+	fs.Connect();
+	CleanupClosePushL(fs);
+	
 	// First param has the command type	
 	if (aArgs[0].Compare(KCmdList) == 0)
 	{
@@ -493,15 +479,17 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	}
 	else if (aArgs[0].Compare(KCmdLs) == 0 || aArgs[0].Compare(KCmdDir) == 0)
 	{
-		HandleCmdLsL(aArgs);
+		HandleCmdLsL(aArgs, fs);
 	}
 	else if (aArgs[0].Compare(KCmdCopy) == 0)
 	{
-		HandleCmdCopyFilesL(aArgs);
+		HandleCmdCopyFilesL(aArgs, fs);
 	}
 	else
 	{
 		iLoggingServerServer->SendMessage(KStrUnknownCommand);
 	}
+	
+	CleanupStack::PopAndDestroy( &fs );
 }
 

@@ -6,7 +6,7 @@
 #include "LogManServer_Defines.h"
 class CLoggingServerServer;
 class CDesC8Array;
-
+class RFs;
 /// Handles commands sent from PC through serial connection
 /**
  *
@@ -27,8 +27,8 @@ public:
 	
 protected:
 	TInt HandleCmdListL( );
-	TInt HandleCmdLsL( RArray<RBuf8>& aPath );
-	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters);
+	TInt HandleCmdLsL( RArray<RBuf8>& aPath, RFs& aFs );
+	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters, RFs& aFs);
 	
 	/** Handle shell commands */
 	TInt HandleCommand( );
@@ -42,7 +42,10 @@ protected:
 
 	/** Read serial line and execute command */
 	void RunL();
-
+	
+	/** Send error message back and leave on error */
+	void LeaveIfFailedL( TInt aErr );
+	
 	/** Handle to the LogMan service holding serial connection */
 	CLoggingServerServer *iLoggingServerServer;
 

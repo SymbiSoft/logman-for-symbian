@@ -9,7 +9,7 @@
 #include "loggingdefs.h"
 
 // Constants
-_LIT8(KStrUnknownCommand, "Unknown command. Try 'list' or 'help'.\n");
+_LIT8(KStrUnknownCommand, "\nUnknown command. Try 'list' or 'help'.\n");
 _LIT8(KStrNotEnoughParameters, "Not enough parameters\n");
 _LIT(KFmtDirEntry, "%02d.%02d.%04d  %02d:%02d  %14S %S\n");
 _LIT(KFmtDirInfo, "\nDirectory of %S");
@@ -26,6 +26,7 @@ _LIT8(KCmdList, "list");
 _LIT8(KCmdCopy, "cp");
 _LIT8(KCmdLs, "ls");
 _LIT8(KCmdDir, "dir");
+_LIT8(KCmdExec, "exec");
 const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
 
@@ -128,26 +129,47 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 	//PRINTF( "void CLoggingServerCommandManager::HandleCmdList()" )
 	// TODO: Generate
 	/**[[[cog	
-	 ]]]
-	 */
+	 ]]]*/
 	///[[[end]]]
+	TBuf8<128> version;
+	_LIT8(KFmtVersionInfo, "LogMan Shell v.%d.%02d.%04d ("__DATE__ " " __TIME__ ") Rev:%d\n");
 
-	iLoggingServerServer->SendMessage(_L8("list   - List possible commands\n") );
-	iLoggingServerServer->SendMessage(_L8("dir/ls - List contents of a directory\n") );
-	iLoggingServerServer->SendMessage(_L8("cp     - Copy files\n") );
+	version.Format( KFmtVersionInfo, KLogServMajorVersionNumber, KLogServMinorVersionNumber,
+	KLogServBuildVersionNumber, KRevisionNumber );
+	iLoggingServerServer->SendMessage(version);
+
+	RBuf line;
+	line.Create( 80);
+	line.Fill( '=');
+	iLoggingServerServer->SendMessage(line);
+	iLoggingServerServer->SendMessage(KStrNewLine);
+	line.Close();
+
+	_LIT8( KStrHelpMsg,
+	"list                 - List possible commands\n"
+	"dir/ls <path>        - List contents of a directory\n"
+	"cp <source> <target> - Copy files\n"
+	"put <target>         - File transfer to device\n"
+	"get <source>         - File transfer from device\n"
+	"exec <target> <args> - Launch executable\n"			
+	"\n"
+	"NOTE: Wildcards are supported.\n"
+	);
+	iLoggingServerServer->SendMessage( KStrHelpMsg );
+	iLoggingServerServer->SendMessage(KStrNewLine);
 }
 
-
-TInt GetPathArgLC( RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex )
+TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 {
 	User::LeaveIfError(aBuf.Create(aParameters[1].Length() + 1) );
 	CleanupClosePushL(aBuf);
 	aBuf.Copy(aParameters[aIndex]);
-	
+
 	// If folder, ensure there is dash at the end.
 	TBool isDir = EFalse;
 	BaflUtils::IsFolder(aFs, aBuf, isDir);
-	if ( !isDir) {
+	if ( !isDir)
+	{
 		isDir = (aBuf[aBuf.Length() - 1 ] == KDoubleColon );
 	}
 	if ( (isDir || aBuf[aBuf.Length() - 1 ] == KDoubleColon ) && aBuf[aBuf.Length() - 1 ] != KCharDash)
@@ -156,19 +178,83 @@ TInt GetPathArgLC( RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex
 		aBuf.Append(KCharDash);
 	}
 	
+	aBuf.Trim();
 	return isDir;
 }
-void CLoggingServerCommandManager::LeaveIfFailedL( TInt aErr )
+
+void CLoggingServerCommandManager::LeaveIfFailedL(TInt aErr)
 {
-	if( aErr != KErrNone )
+	if (aErr != KErrNone)
 	{
 		TMessageBuffer8 tmp;
-		tmp.Format( KFmtErrDetected, aErr );
+		tmp.Format(KFmtErrDetected, aErr);
 		iLoggingServerServer->SendMessage(tmp);
-		User::Leave( aErr );
+		User::Leave(aErr);
 	}
 }
 
+
+TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs)
+{
+	if (aParameters.Count() < 2)
+	{
+		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
+		return KErrArgument;
+	}
+	
+	RBuf path;
+	GetPathArgLC(aParameters, aFs, path, 1);
+	
+    RBuf command;    
+    if (aParameters.Count() >= 3)
+    {
+        TInt size = 0;
+        // Determine size for the buffer;
+        for( TInt i = 2; i < aParameters.Count(); i++ )
+        {
+            size += aParameters[i].Length();
+        }
+        
+        // Create the buffer        
+        LeaveIfFailedL(command.Create(size + aParameters.Count() ));               
+        CleanupClosePushL(command);
+        
+        for( TInt i = 2; i < aParameters.Count(); i++ )
+        {
+            TFullName toUnicode;
+            toUnicode.Copy( aParameters[i] );
+            command.Append( toUnicode );
+            if( i < aParameters.Count() - 1 )
+                command.Append( _L( " " ) );
+        }        
+    }
+    else
+    {
+        LeaveIfFailedL(command.Create( 1 ) );               
+        CleanupClosePushL(command);
+    }
+    
+    RProcess process;	   
+	LeaveIfFailedL( process.Create(path, command) );	
+	CleanupClosePushL(process);	      
+    process.Resume();	    
+
+    
+    _LIT( KFmtProcessLaunchedMsg, "\'%S' started.\n" );
+    //TMessageBuffer8 tmp;
+    RBuf msg;
+    if( msg.Create( 128 + process.FileName().Length() ) == KErrNone )
+    {
+        msg.Format(KFmtProcessLaunchedMsg, &( process.FileName() ) );
+        iLoggingServerServer->SendMessage(msg);
+        msg.Close();
+    }
+         
+    CleanupStack::PopAndDestroy( &process );
+    CleanupStack::PopAndDestroy( &command );
+    CleanupStack::PopAndDestroy( &path );
+    
+}
 TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
@@ -183,23 +269,15 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs&
 	TFullName totalPath;
 	TMessageBuffer fileName;
 	TInt err;
+    
 	// Convert to unicode
-	RBuf path;	
-	GetPathArgLC( aParameters, aFs, path, 1);
-	  
-	TBool isDir;
-	BaflUtils::IsFolder(aFs, path, isDir);
-
-	if ( (isDir || path[path.Length() - 1 ] == KDoubleColon ) && path[path.Length() - 1 ] != KCharDash)
-	{
-		// Add dash or get dir does not list folder
-		path.Append(KCharDash);
-	}
+	RBuf path;
+	GetPathArgLC(aParameters, aFs, path, 1);
 
 	CDir* dirList;
 	err = aFs.GetDir(path, KEntryAttMaskSupported, ESortByName, dirList);
-	LeaveIfFailedL( err );
-	
+	LeaveIfFailedL(err);
+
 	CleanupStack::PushL(dirList);
 
 	// Statistics
@@ -261,8 +339,7 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs&
 	return KErrNone;
 }
 
-
-TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs )
+TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
 	// TODO: Add current directory support
@@ -271,7 +348,6 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
 	}
- 
 
 	TInt i;
 	TFullName totalPath;
@@ -281,18 +357,18 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 	// Convert to unicode
 	// Get source path
 	RBuf path_source;
-	GetPathArgLC( aParameters, aFs, path_source, 1);
+	GetPathArgLC(aParameters, aFs, path_source, 1);
 
 	// Get target path
 	RBuf path_target;
-	TInt isDir = GetPathArgLC( aParameters, aFs, path_target, 2);	
-  
+	TInt isDir = GetPathArgLC(aParameters, aFs, path_target, 2);
+
 	// Get directory listing
 	CDir* dirList;
 	err = aFs.GetDir(path_source, KEntryAttMaskSupported, ESortByName, dirList);
-	LeaveIfFailedL( err );
+	LeaveIfFailedL(err);
 	CleanupStack::PushL(dirList);
-	
+
 	// Check each directory entry.
 	TInt copied = 0;
 	TBool doOverwriteAll = EFalse;
@@ -337,7 +413,7 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 						// Echo back
 						iLoggingServerServer->SendMessage(buf);
 						iLoggingServerServer->SendMessage(KStrNewLine);
-						
+
 						doQuery = EFalse;
 						switch (buf[0])
 						{
@@ -389,7 +465,7 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 				{
 					copied++;
 				}
-				
+
 			}
 			// Cleanup
 			full_target.Close();
@@ -399,12 +475,12 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 	// Send statistics
 
 	{
-		_LIT(KFmtStats, "%d files copied.\n");
-		TMessageBuffer tmp;
+		_LIT8(KFmtStats, "%d files copied.\n");
+		TMessageBuffer8 tmp;
 		tmp.Format(KFmtStats, copied);
 		iLoggingServerServer->SendMessage(tmp);
 	}
-	
+
 	CleanupStack::PopAndDestroy(3); // path_source, path_target, dirlist
 
 	return KErrNone;
@@ -465,13 +541,12 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	// Add last param
 	AddToList(aArgs, arg);
 	arg.Close();
-	
 
 	// Connect to the file server	
 	RFs fs;
 	fs.Connect();
 	CleanupClosePushL(fs);
-	
+
 	// First param has the command type	
 	if (aArgs[0].Compare(KCmdList) == 0)
 	{
@@ -485,11 +560,16 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	{
 		HandleCmdCopyFilesL(aArgs, fs);
 	}
+	else if (aArgs[0].Compare(KCmdExec) == 0)
+	{
+		HandleCmdExecL(aArgs, fs);
+	}
+
 	else
 	{
 		iLoggingServerServer->SendMessage(KStrUnknownCommand);
 	}
-	
-	CleanupStack::PopAndDestroy( &fs );
+
+	CleanupStack::PopAndDestroy( &fs);
 }
 

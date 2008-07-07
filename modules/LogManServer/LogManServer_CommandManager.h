@@ -29,7 +29,8 @@ protected:
 	TInt HandleCmdListL( );
 	TInt HandleCmdLsL( RArray<RBuf8>& aPath, RFs& aFs );
 	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters, RFs& aFs);
-	
+	TInt HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs);
+    
 	/** Handle shell commands */
 	TInt HandleCommand( );
 	/** Handle shell commands 

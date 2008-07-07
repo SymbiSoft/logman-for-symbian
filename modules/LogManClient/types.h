@@ -25,17 +25,27 @@ data = """
 const TUint KLogServMajorVersionNumber=%d;
 const TUint KLogServMinorVersionNumber=%d;
 const TUint KLogServBuildVersionNumber=%d;
+const TUint KRevisionNumber=%d;
 """
 build = pkg_gen.get_build_number()
 build = [ int(x) for x in build ]
 vermaj, vermin, build = build
-
-cog.outl( data % ( vermaj, vermin, build ) )
+svnrev = 0
+try:
+    import pysvn
+    c=pysvn.Client()
+    e=c.info(".")
+    svnrev = e.data["commit_revision"].number
+except ImportError:
+    print "Unable to detect svn revision. Install pysvn."
+    
+cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 ]]]*/
 
 const TUint KLogServMajorVersionNumber=1;
 const TUint KLogServMinorVersionNumber=8;
-const TUint KLogServBuildVersionNumber=623;
+const TUint KLogServBuildVersionNumber=707;
+const TUint KRevisionNumber=11;
 
 ///[[[end]]]
 

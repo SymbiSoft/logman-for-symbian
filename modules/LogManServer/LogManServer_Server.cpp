@@ -156,8 +156,8 @@ CSession2* CLoggingServerServer::NewSessionL(const TVersion& aVersion,const RMes
     // Check that the version is OK
     // Compares two version objects and returns true if the test version
     // is less than the current version.
-    if (!User::QueryVersionSupported(v,aVersion))
-        User::Leave(KErrNotSupported);
+    //if (!User::QueryVersionSupported(v,aVersion))
+    //    User::Leave(KErrNotSupported);
 
     //the connect message is delivered via the RMessage2 object passed.
     //Create the session.

@@ -27,6 +27,20 @@ _LIT8(KCmdCopy, "cp");
 _LIT8(KCmdLs, "ls");
 _LIT8(KCmdDir, "dir");
 _LIT8(KCmdExec, "exec");
+_LIT8(KCmdKill, "kill");
+_LIT8(KCmdListProcess, "ps");
+
+_LIT8(KStrHelpMsg, "list                 - List possible commands\n"
+	"dir/ls <path>        - List contents of a directory\n"
+	"cp <source> <target> - Copy files\n"
+	"put <target>         - File transfer to device\n"
+	"get <source>         - File transfer from device\n"
+	"exec <target> <args> - Launch executable\n"
+	"kill <process>       - Kill process\n"
+	"ps <process>         - List processes( optional process pattern )\n"
+	"\n"
+	"NOTE: Wildcards are supported.\n");
+
 const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
 
@@ -145,18 +159,16 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 	iLoggingServerServer->SendMessage(KStrNewLine);
 	line.Close();
 
-	_LIT8( KStrHelpMsg,
-	"list                 - List possible commands\n"
-	"dir/ls <path>        - List contents of a directory\n"
-	"cp <source> <target> - Copy files\n"
-	"put <target>         - File transfer to device\n"
-	"get <source>         - File transfer from device\n"
-	"exec <target> <args> - Launch executable\n"			
-	"\n"
-	"NOTE: Wildcards are supported.\n"
-	);
 	iLoggingServerServer->SendMessage( KStrHelpMsg );
 	iLoggingServerServer->SendMessage(KStrNewLine);
+}
+
+void GetArgLC(RArray<RBuf8>& aParameters, RBuf& aBuf, TInt aIndex)
+{
+	User::LeaveIfError(aBuf.Create(aParameters[1].Length() ) );
+	CleanupClosePushL(aBuf);
+	aBuf.Copy(aParameters[aIndex]);
+	aBuf.Trim();
 }
 
 TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
@@ -177,7 +189,7 @@ TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 		// Add dash or get dir does not list folder
 		aBuf.Append(KCharDash);
 	}
-	
+
 	aBuf.Trim();
 	return isDir;
 }
@@ -193,7 +205,6 @@ void CLoggingServerCommandManager::LeaveIfFailedL(TInt aErr)
 	}
 }
 
-
 TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	if (aParameters.Count() < 2)
@@ -201,59 +212,58 @@ TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RF
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
 	}
-	
+
 	RBuf path;
 	GetPathArgLC(aParameters, aFs, path, 1);
-	
-    RBuf command;    
-    if (aParameters.Count() >= 3)
-    {
-        TInt size = 0;
-        // Determine size for the buffer;
-        for( TInt i = 2; i < aParameters.Count(); i++ )
-        {
-            size += aParameters[i].Length();
-        }
-        
-        // Create the buffer        
-        LeaveIfFailedL(command.Create(size + aParameters.Count() ));               
-        CleanupClosePushL(command);
-        
-        for( TInt i = 2; i < aParameters.Count(); i++ )
-        {
-            TFullName toUnicode;
-            toUnicode.Copy( aParameters[i] );
-            command.Append( toUnicode );
-            if( i < aParameters.Count() - 1 )
-                command.Append( _L( " " ) );
-        }        
-    }
-    else
-    {
-        LeaveIfFailedL(command.Create( 1 ) );               
-        CleanupClosePushL(command);
-    }
-    
-    RProcess process;	   
-	LeaveIfFailedL( process.Create(path, command) );	
-	CleanupClosePushL(process);	      
-    process.Resume();	    
 
-    
-    _LIT( KFmtProcessLaunchedMsg, "\'%S' started.\n" );
-    //TMessageBuffer8 tmp;
-    RBuf msg;
-    if( msg.Create( 128 + process.FileName().Length() ) == KErrNone )
-    {
-        msg.Format(KFmtProcessLaunchedMsg, &( process.FileName() ) );
-        iLoggingServerServer->SendMessage(msg);
-        msg.Close();
-    }
-         
-    CleanupStack::PopAndDestroy( &process );
-    CleanupStack::PopAndDestroy( &command );
-    CleanupStack::PopAndDestroy( &path );
-    
+	RBuf command;
+	if (aParameters.Count() >= 3)
+	{
+		TInt size = 0;
+		// Determine size for the buffer;
+		for (TInt i = 2; i < aParameters.Count(); i++)
+		{
+			size += aParameters[i].Length();
+		}
+
+		// Create the buffer        
+		LeaveIfFailedL(command.Create(size + aParameters.Count() ));
+		CleanupClosePushL(command);
+
+		for (TInt i = 2; i < aParameters.Count(); i++)
+		{
+			TFullName toUnicode;
+			toUnicode.Copy(aParameters[i]);
+			command.Append(toUnicode);
+			if (i < aParameters.Count() - 1)
+				command.Append(_L(" ") );
+		}
+	}
+	else
+	{
+		LeaveIfFailedL(command.Create( 1) );
+		CleanupClosePushL(command);
+	}
+
+	RProcess process;
+	LeaveIfFailedL(process.Create(path, command) );
+	CleanupClosePushL(process);
+	process.Resume();
+
+	_LIT(KFmtProcessLaunchedMsg, "\'%S' started.\n");
+	//TMessageBuffer8 tmp;
+	RBuf msg;
+	if (msg.Create( 128 + process.FileName().Length() ) == KErrNone)
+	{
+		msg.Format(KFmtProcessLaunchedMsg, &(process.FileName() ));
+		iLoggingServerServer->SendMessage(msg);
+		msg.Close();
+	}
+
+	CleanupStack::PopAndDestroy( &process);
+	CleanupStack::PopAndDestroy( &command);
+	CleanupStack::PopAndDestroy( &path);
+
 }
 TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
@@ -269,7 +279,7 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs&
 	TFullName totalPath;
 	TMessageBuffer fileName;
 	TInt err;
-    
+
 	// Convert to unicode
 	RBuf path;
 	GetPathArgLC(aParameters, aFs, path, 1);
@@ -337,6 +347,42 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs&
 	CleanupStack::PopAndDestroy(2); // path, dirlist
 
 	return KErrNone;
+}
+
+TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill)
+{
+	TFindProcess finder;
+	RBuf pattern;
+	if (aParameters.Count() >= 2)
+	{
+
+		GetArgLC(aParameters, pattern, 1);
+		finder.Find(pattern);
+	}
+
+	TFullName processname;
+	while (finder.Next(processname) == KErrNone)
+	{
+		iLoggingServerServer->SendMessage(processname);
+
+		RProcess process;
+		TInt err = process.Open( finder );
+		if (err == KErrNone)
+		{
+			if (aDoKill)
+			{
+				process.Kill(-1);
+				iLoggingServerServer->SendMessage(_L(" killed") );
+			}
+		}
+		iLoggingServerServer->SendMessage(KStrNewLine);
+	}
+
+	if (aParameters.Count() >= 2)
+	{
+		CleanupStack::PopAndDestroy(&pattern);
+	}
+
 }
 
 TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs)
@@ -564,7 +610,14 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	{
 		HandleCmdExecL(aArgs, fs);
 	}
-
+	else if (aArgs[0].Compare(KCmdKill) == 0)
+	{
+		HandleCmdKillAndFindL(aArgs, ETrue);
+	}
+	else if (aArgs[0].Compare(KCmdListProcess) == 0)
+	{
+		HandleCmdKillAndFindL(aArgs, EFalse);
+	}
 	else
 	{
 		iLoggingServerServer->SendMessage(KStrUnknownCommand);

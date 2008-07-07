@@ -173,17 +173,7 @@ void CLoggingServerServer::PanicServer(TLogServPanic aPanic)
     User::Panic(KTxtServerPanic,aPanic);
 }
 
-TInt CLoggingServerServer::SendMessage(TMessageBuffer& aBuffer )
-{
-    PRINTF( "SendMessage16" );
-    TPtrC8 ptr(reinterpret_cast<const TUint8*>(aBuffer.Ptr()),(aBuffer.Length()*2));
-    TInt err = this->SendMessage(ptr);
-    PRINTF( "Exit SendMessage16" );
-    return err;
-}
-
-
-TInt CLoggingServerServer::SendMessage(const RBuf& aBuffer )
+TInt CLoggingServerServer::SendMessage(const TDesC& aBuffer )
 {
     PRINTF( "SendMessage16" );
     TPtrC8 ptr(reinterpret_cast<const TUint8*>(aBuffer.Ptr()),(aBuffer.Length()*2));

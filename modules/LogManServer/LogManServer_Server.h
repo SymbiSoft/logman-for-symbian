@@ -48,8 +48,7 @@ public:
       * Sends data through serial connection.
       * @return KErrNone or system-wide error code, if sending fails.
       */
-    TInt SendMessage( TMessageBuffer& aBuffer );
-    TInt SendMessage( const RBuf& aBuffer );
+    TInt SendMessage( const TDesC& aBuffer );    
     
     /**
       * Addes message to a queue for asynchronous sending.

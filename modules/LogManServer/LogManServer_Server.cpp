@@ -227,9 +227,9 @@ TInt CLoggingServerServer::LoadModule( TFullName& aModuleName )
 
 TBool CLoggingServerServer::IsSerialConnected() {
 
-    PRINTF( "CLoggingServerServer::IsSerialConnected()" );
+    //PRINTF( "CLoggingServerServer::IsSerialConnected()" );
     if( !iIsSerialConnected ) {
-        PRINTF( "Not connected" );
+        //PRINTF( "Not connected" );
         return EFalse;
     }
 

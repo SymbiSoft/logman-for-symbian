@@ -31,6 +31,7 @@ protected:
 	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters, RFs& aFs);
 	TInt HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs);
     TInt HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill );
+    TInt HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs);
     
 	/** Handle shell commands */
 	TInt HandleCommand( );

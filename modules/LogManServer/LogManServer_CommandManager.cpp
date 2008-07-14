@@ -28,9 +28,11 @@ _LIT8(KCmdLs, "ls");
 _LIT8(KCmdDir, "dir");
 _LIT8(KCmdExec, "exec");
 _LIT8(KCmdKill, "kill");
+_LIT8(KCmdPut, "put");
 _LIT8(KCmdListProcess, "ps");
 
-_LIT8(KStrHelpMsg, "list                 - List possible commands\n"
+_LIT8(KStrHelpMsg, 
+    "list                 - List possible commands\n"
 	"dir/ls <path>        - List contents of a directory\n"
 	"cp <source> <target> - Copy files\n"
 	"put <target>         - File transfer to device\n"
@@ -361,19 +363,39 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(RArray<RBuf8>& aParamet
 	}
 
 	TFullName processname;
+    TMessageBuffer processinfo;
+    _LIT( KFmtProcessInfo, "%25S Priority:%d ExitType:%d ExitCategory:%S ExitReason:%d");
 	while (finder.Next(processname) == KErrNone)
 	{
-		iLoggingServerServer->SendMessage(processname);
-
+    
 		RProcess process;
 		TInt err = process.Open( finder );
 		if (err == KErrNone)
 		{
-			if (aDoKill)
-			{
-				process.Kill(-1);
-				iLoggingServerServer->SendMessage(_L(" killed") );
-			}
+            
+            if( process.ExitType() != EExitPending )
+            {
+                processinfo.Format( KFmtProcessInfo, 
+                                    &processname,
+                                    process.Priority(),
+                                    process.ExitType(),
+                                    &(process.ExitCategory()),
+                                    process.ExitReason()
+                                    );
+                                
+                iLoggingServerServer->SendMessage(processinfo);
+                
+                if (aDoKill)
+    			{
+    				process.Kill(-1);
+    				iLoggingServerServer->SendMessage(_L(" killed") );
+    			}
+                
+            }
+            else
+            {
+                iLoggingServerServer->SendMessage( processname );
+            }			
 		}
 		iLoggingServerServer->SendMessage(KStrNewLine);
 	}
@@ -383,6 +405,141 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(RArray<RBuf8>& aParamet
 		CleanupStack::PopAndDestroy(&pattern);
 	}
 
+}
+
+#define max(a,b) (b<a)?a:b
+#define min(a,b) (a<b)?a:b 
+#define BUFFER_SIZE 128   
+
+#define DEBUG( x ) iLoggingServerServer->SendMessage( _L8( x ) );
+TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs)
+{
+    if (aParameters.Count() < 2)
+	{
+		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
+		return KErrArgument;
+	}
+    
+    
+    RBuf path_target;
+	GetPathArgLC( aParameters, aFs, path_target, 1 );
+    
+    RFile targetfile;
+    LeaveIfFailedL( targetfile.Replace( aFs, path_target, EFileWrite) );
+    CleanupClosePushL( targetfile );
+    
+    RBuf8 line;
+    line.Create( BUFFER_SIZE );
+    CleanupClosePushL( line );
+    
+    TInt err;
+    RComm& comm   = iLoggingServerServer->iSerialComm;
+    TBool doQuery = ETrue;
+    // Get size of the file
+    while (doQuery)
+    {        
+        
+		TRequestStatus readstatus = KRequestPending;
+		RComm& comm = iLoggingServerServer->iSerialComm;
+		
+        TBuf8<1> buf;
+		comm.Read(readstatus, 1000, buf, 1);
+		User::WaitForRequest(readstatus);
+		if (readstatus == KErrNone)
+        {
+            if( buf[0] == ' ')
+            {
+                doQuery = EFalse;
+            }
+            else
+            {
+                TLex8 lexer( buf );
+                TInt isval = 0;
+                err = lexer.Val( isval );       
+                // Add if number
+                if( err == KErrNone )
+                {
+                    iLoggingServerServer->SendMessage( buf );
+                    line.Append( buf );
+                }
+            }
+        }
+    }
+    
+    
+    // Convert to number
+    TInt bytes = 0;
+    TLex8 lexer(line);
+    err = lexer.Val( bytes );       
+    LeaveIfFailedL( err );
+    
+    
+    TInt received  = 0;
+    TInt cancelled = 0;
+    TBuf8<BUFFER_SIZE> tmp;
+    while( received < bytes )
+    {
+        TRequestStatus readstatus = KRequestPending;
+        TInt buffersize = min( BUFFER_SIZE, bytes - received );
+        
+        comm.ReadOneOrMore(readstatus, tmp); 
+		User::WaitForRequest(readstatus);
+        
+		TBuf8<10> num;
+        num.Num(readstatus.Int());
+        iLoggingServerServer->SendMessage( num );
+        iLoggingServerServer->SendMessage( KStrNewLine );
+        //if (readstatus == KErrTimedOut)
+        //{            
+        if( tmp.Length() > 0 )
+        {
+            //iLoggingServerServer->SendMessage( line );
+            received += tmp.Length();
+            LeaveIfFailedL( targetfile.Write( tmp, tmp.Length()  ) );
+            
+            TBuf8<10> num;
+            num.Num(received);
+            iLoggingServerServer->SendMessage( num );
+            iLoggingServerServer->SendMessage( KStrNewLine );
+            
+            continue;            
+        }
+        //}
+        /*
+        else if( readstatus == KErrNone )
+        {
+        	//iLoggingServerServer->SendMessage( line );
+            received += tmp.Length();           
+            LeaveIfFailedL( targetfile.Write( tmp, tmp.Length()  ) );        
+
+            TBuf8<10> num;
+            num.Num(received);
+            iLoggingServerServer->SendMessage( num );
+            iLoggingServerServer->SendMessage( KStrNewLine );
+            
+        }
+        */
+        if( readstatus == KErrCancel )
+        {
+        	cancelled++;        	
+        	/*
+            TBuf8<10> num;
+            num.Num(KErrCancel);
+            iLoggingServerServer->SendMessage( num );
+            */
+            LeaveIfFailedL( readstatus.Int() );
+        }
+        else
+        {            
+        	LeaveIfFailedL( readstatus.Int() );
+            break;
+        }
+    }
+    
+    CleanupStack::PopAndDestroy( 3 );    
+    
+    //iLoggingServerServer->SendMessage( _L8( "\nFile successfully received\n") );
+    
 }
 
 TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs)
@@ -618,8 +775,12 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	{
 		HandleCmdKillAndFindL(aArgs, EFalse);
 	}
+    else if (aArgs[0].Compare(KCmdPut) == 0)
+	{           
+		HandleCmdPutL(aArgs, fs);
+	}
 	else
-	{
+	{        
 		iLoggingServerServer->SendMessage(KStrUnknownCommand);
 	}
 

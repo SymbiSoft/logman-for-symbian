@@ -12,19 +12,22 @@ COMMON_DEFINES = [
 ]
 LOGGINGSERVER_INCLUDES  = [ r"modules\LogManServer", r"modules\LogManClient", r"modules\Common" ]
 
+
 def LogManServer():
     "LogMan.exe (server ) defines"
         
     sources = glob.glob( r"Modules\LogManServer\*.cpp")
         
     loggingserver_libraries = [ 'euser', 'efsrv', 'c32', 'BAFL' ]
-    return SymbianProgram( 'LogMan', scons_symbian.TARGETTYPE_EXE,
-                     sources, 
-                     LOGGINGSERVER_INCLUDES,
-                     loggingserver_libraries,
-                     uid2 = '0x100039ce', uid3 = '0xe3195807',
-                     capabilities = FREE_CAPS,
-                     defines      = COMMON_DEFINES  )
+    return SymbianProgram(   'LogMan', scons_symbian.TARGETTYPE_EXE,
+                             sources,
+                             LOGGINGSERVER_INCLUDES,
+                             loggingserver_libraries,
+                             uid2 = '0x100039ce',
+                             uid3 = '0xe3195807',
+                             capabilities = FREE_CAPS,
+                             defines      = COMMON_DEFINES
+                     )
 
 def LogManDll():
     "LogMan.dll defines ( client )"
@@ -96,6 +99,7 @@ def LogManGui():
                     )
                     
 # TODO: Create sis file if not WINSCW
+
 LogManServer()
 LogManDll()
 PyLogManDll()

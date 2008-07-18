@@ -7,11 +7,15 @@ import glob
 import scons_symbian
 from scons_symbian import *
 
+import codegen
+
 COMMON_DEFINES = [
-    "__DEBUG_LOGGING__"
+    #"__DEBUG_LOGGING__"
 ]
 LOGGINGSERVER_INCLUDES  = [ r"modules\LogManServer", r"modules\LogManClient", r"modules\Common" ]
 
+LOGMAN_PACKAGE = "LogMan"
+LOGMAN_VERSION = ".".join( map(str, codegen.pkg_gen.get_build_number() ) )
 
 def LogManServer():
     "LogMan.exe (server ) defines"
@@ -26,7 +30,8 @@ def LogManServer():
                              uid2 = '0x100039ce',
                              uid3 = '0xe3195807',
                              capabilities = FREE_CAPS,
-                             defines      = COMMON_DEFINES
+                             defines      = COMMON_DEFINES,
+                             package      = LOGMAN_PACKAGE
                      )
 
 def LogManDll():
@@ -43,7 +48,8 @@ def LogManDll():
                     logman_libraries,    
                     #definput = r"LoggingServer\\" + def_folder + r"\LogManU.DEF",
                     capabilities = FREE_CAPS,
-                    defines = COMMON_DEFINES )
+                    defines = COMMON_DEFINES,
+                    package      = LOGMAN_PACKAGE )
                  
 def PyLogManDll():
     #-------------------------------------------- pylogman defines ( Python client )
@@ -58,7 +64,8 @@ def PyLogManDll():
                     ["python222", "euser", "LogMan"],                    
                     #definput = r"LoggingServer\\" + def_folder + r"\pylogmanU.DEF",
                     capabilities = FREE_CAPS,
-                    defines = COMMON_DEFINES )
+                    defines = COMMON_DEFINES,
+                    package      = LOGMAN_PACKAGE )
 
 #-------------------------------------- LogManGui defines ( tester and manager )
 def LogManGui():
@@ -90,22 +97,16 @@ def LogManGui():
                     sources,                     
                     includes,
                     libraries,    
-                    uid2 = '0x100039ce', uid3 = '0xAF111111',                    
+                    uid3 = '0xAF111111',                    
                     capabilities = FREE_CAPS,
                     resources = resources,
                     icons = icons,
-                    defines = [ ]
-                    
+                    defines = [ ],
+                    package      = LOGMAN_PACKAGE,
+                    ensymbleargs = { "version" : LOGMAN_VERSION }
                     )
-                    
-# TODO: Create sis file if not WINSCW
-
+                     
 LogManServer()
 LogManDll()
 PyLogManDll()
-
-# TODO: Create sis file if not WINSCW
-LogManGui()
-#print LogManGui()
-
-
+LogManGui() 

@@ -14,7 +14,7 @@ COMMON_DEFINES = [
 ]
 LOGGINGSERVER_INCLUDES  = [ r"modules\LogManServer", r"modules\LogManClient", r"modules\Common" ]
 
-LOGMAN_PACKAGE = "LogMan"
+LOGMAN_PACKAGE = "LogMan.sis"
 LOGMAN_VERSION = ".".join( map(str, codegen.pkg_gen.get_build_number() ) )
 
 def LogManServer():
@@ -91,19 +91,23 @@ def LogManGui():
                     r"modules\LogManGui\inc",
                     r"modules\LogManGui\data"                    
                 ]
-                
     
+    uid = '0xAF111111'
+    SymbianPackage( LOGMAN_PACKAGE,
+                    uid, 
+                    ensymbleargs = { "--version" : LOGMAN_VERSION }
+                  )
+                  
     return SymbianProgram( 'LogManGui', scons_symbian.TARGETTYPE_EXE,
                     sources,                     
                     includes,
                     libraries,    
-                    uid3 = '0xAF111111',                    
+                    uid3 = uid,                    
                     capabilities = FREE_CAPS,
                     resources = resources,
                     icons = icons,
                     defines = [ ],
                     package      = LOGMAN_PACKAGE,
-                    ensymbleargs = { "version" : LOGMAN_VERSION }
                     )
                      
 LogManServer()

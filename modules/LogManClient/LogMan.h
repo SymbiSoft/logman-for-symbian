@@ -2,7 +2,7 @@
 #define __LoggingServerClient_h__
 
 #include <e32std.h>
-#include <C32COMM.H> //TPortName
+#include <c32comm.h> //TPortName
 #include "types.h"
 
 _LIT(KLoggingServerExe,"LogMan.exe");

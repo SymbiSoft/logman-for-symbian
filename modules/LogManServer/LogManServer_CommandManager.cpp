@@ -43,6 +43,7 @@ _LIT8(KStrHelpMsg,
 	"\n"
 	"NOTE: Wildcards are supported.\n");
 
+
 const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
 
@@ -73,18 +74,10 @@ void CLoggingServerCommandManager::Start()
 
 void CLoggingServerCommandManager::RunL()
 {
-	//PRINTF( "void CLoggingServerCommandManager::RunL()" )
-	//#ifdef  __WINS__
-	//User::InfoPrint( _L( "CLoggingServerCommandManager" ) );
-	//#endif
 
-	//TBuf8<128> tmp;
-	//tmp.Copy(_L8("CLoggingServerCommandManager RunL") );
-	//iLoggingServerServer->SendMessage(tmp);
 	if (iLoggingServerServer->IsClosing())
 	{
 		PRINTF("CLoggingServerCommandManager stopping")
-		//Cancel();
 		return;
 	}
 	else
@@ -92,21 +85,12 @@ void CLoggingServerCommandManager::RunL()
 		TRequestStatus readstatus = KRequestPending;
 		RComm& comm = iLoggingServerServer->iSerialComm;
 		TBuf8<1> buf;
-
-		//iLoggingServerServer->SendMessage(_L8( "SHELL receive\n") );
-
-		//if (comm.QueryReceiveBuffer() > 0)
-		//{
-		//iLoggingServerServer->SendMessage(_L8( "QueryReceiveBuffer\n") );
+ 
 		do
 		{
 			comm.Read(readstatus, 100, buf, 1);
 			User::WaitForRequest(readstatus);
-
-			//TBuf8<10> tmp;
-			//tmp.Format( _L8("readstatus:%d"), readstatus.Int() );
-			//iLoggingServerServer->SendMessage(tmp);
-
+ 
 			if (readstatus == KErrNone)
 			{
 				// Echo back
@@ -120,18 +104,14 @@ void CLoggingServerCommandManager::RunL()
 				}
 				else
 				{
-					//iLoggingServerServer->SendMessage(_L8( "Not line break\n") );
 					iCommandBuffer.Append(buf[0]);
 				}
 			}
-		} while (readstatus == KErrNone// && comm.QueryReceiveBuffer() > 0
+		} while (readstatus == KErrNone
 				&& !iLoggingServerServer->IsClosing() );
-		//}
-		//iLoggingServerServer->SendMessage(_L8( "exit SHELL receive\n") );
-		// Restart timer
+		
 		Start();
 	}
-
 }
 
 CLoggingServerCommandManager::~CLoggingServerCommandManager()
@@ -140,31 +120,12 @@ CLoggingServerCommandManager::~CLoggingServerCommandManager()
 	iCommandBuffer.Close();
 }
 
-TInt CLoggingServerCommandManager::HandleCmdListL()
-{
-	//PRINTF( "void CLoggingServerCommandManager::HandleCmdList()" )
-	// TODO: Generate
-	/**[[[cog	
-	 ]]]*/
-	///[[[end]]]
-	TBuf8<128> version;
-	_LIT8(KFmtVersionInfo, "LogMan Shell v.%d.%02d.%04d ("__DATE__ " " __TIME__ ") Rev:%d\n");
 
-	version.Format( KFmtVersionInfo, KLogServMajorVersionNumber, KLogServMinorVersionNumber,
-	KLogServBuildVersionNumber, KRevisionNumber );
-	iLoggingServerServer->SendMessage(version);
-
-	RBuf line;
-	line.Create( 80);
-	line.Fill( '=');
-	iLoggingServerServer->SendMessage(line);
-	iLoggingServerServer->SendMessage(KStrNewLine);
-	line.Close();
-
-	iLoggingServerServer->SendMessage( KStrHelpMsg );
-	iLoggingServerServer->SendMessage(KStrNewLine);
-}
-
+/** Get parameter from parameter list
+ * @parameter aParameters Parameter array
+ * @parameter aBuf      Reference to a buffer to be filled with the path
+ * @parameter aIndex    Index in aParameters to read
+*/
 void GetArgLC(RArray<RBuf8>& aParameters, RBuf& aBuf, TInt aIndex)
 {
 	User::LeaveIfError(aBuf.Create(aParameters[1].Length() ) );
@@ -173,7 +134,15 @@ void GetArgLC(RArray<RBuf8>& aParameters, RBuf& aBuf, TInt aIndex)
 	aBuf.Trim();
 }
 
-TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
+/**
+ * Parse path argument.
+ * @param aParameters   Parameter array
+ * @param aFs           File server session( connected )
+ * @param aBuf          Reference to a buffer to be filled with the path
+ * @param aIndex        Index in aParameters to be read.
+ * @return ETrue if path is a directory.
+*/
+TBool GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 {
 	User::LeaveIfError(aBuf.Create(aParameters[1].Length() + 1) );
 	CleanupClosePushL(aBuf);
@@ -184,6 +153,7 @@ TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 	BaflUtils::IsFolder(aFs, aBuf, isDir);
 	if ( !isDir)
 	{
+        // BaflUtils says it's not directory if drive is given( ex. C: )
 		isDir = (aBuf[aBuf.Length() - 1 ] == KDoubleColon );
 	}
 	if ( (isDir || aBuf[aBuf.Length() - 1 ] == KDoubleColon ) && aBuf[aBuf.Length() - 1 ] != KCharDash)
@@ -196,6 +166,9 @@ TInt GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 	return isDir;
 }
 
+/** Send error message and Leave on error 
+ * @param aErr  Error code.
+*/
 void CLoggingServerCommandManager::LeaveIfFailedL(TInt aErr)
 {
 	if (aErr != KErrNone)
@@ -207,6 +180,7 @@ void CLoggingServerCommandManager::LeaveIfFailedL(TInt aErr)
 	}
 }
 
+/** Handle process starting command */
 TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	if (aParameters.Count() < 2)
@@ -252,7 +226,7 @@ TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RF
 	CleanupClosePushL(process);
 	process.Resume();
 
-	_LIT(KFmtProcessLaunchedMsg, "\'%S' started.\n");
+	_LIT(KFmtProcessLaunchedMsg, "'%S' started.\n");
 	//TMessageBuffer8 tmp;
 	RBuf msg;
 	if (msg.Create( 128 + process.FileName().Length() ) == KErrNone)
@@ -267,6 +241,33 @@ TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters, RF
 	CleanupStack::PopAndDestroy( &path);
 
 }
+
+/** Handle helper command */
+TInt CLoggingServerCommandManager::HandleCmdListL()
+{
+	// TODO: Generate
+	/**[[[cog	
+	 ]]]*/
+	///[[[end]]]
+	TBuf8<128> version;
+	_LIT8(KFmtVersionInfo, "LogMan Shell v.%d.%02d.%04d ("__DATE__ " " __TIME__ ") Rev:%d\n");
+
+	version.Format( KFmtVersionInfo, KLogServMajorVersionNumber, KLogServMinorVersionNumber,
+	KLogServBuildVersionNumber, KRevisionNumber );
+	iLoggingServerServer->SendMessage(version);
+
+	RBuf8 line;
+	line.Create( 80);
+	line.Fill( '=');
+	iLoggingServerServer->SendMessage(line);
+	iLoggingServerServer->SendMessage(KStrNewLine);
+	line.Close();
+
+	iLoggingServerServer->SendMessage( KStrHelpMsg );
+	iLoggingServerServer->SendMessage(KStrNewLine);
+}
+
+/** Handle file listing command */
 TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
@@ -351,6 +352,7 @@ TInt CLoggingServerCommandManager::HandleCmdLsL(RArray<RBuf8>& aParameters, RFs&
 	return KErrNone;
 }
 
+/** Handle process killing and listing */
 TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill)
 {
 	TFindProcess finder;
@@ -412,6 +414,10 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(RArray<RBuf8>& aParamet
 #define BUFFER_SIZE 128   
 
 #define DEBUG( x ) iLoggingServerServer->SendMessage( _L8( x ) );
+/** Handle file transfer to device 
+ * Using very simple method. Client sends the path to the file and its size.
+ * Then the given amount of data is received and written to the file.
+*/
 TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
     if (aParameters.Count() < 2)
@@ -419,7 +425,6 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs
 		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
 		return KErrArgument;
 	}
-    
     
     RBuf path_target;
 	GetPathArgLC( aParameters, aFs, path_target, 1 );
@@ -437,8 +442,7 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs
     TBool doQuery = ETrue;
     // Get size of the file
     while (doQuery)
-    {        
-        
+    {            
 		TRequestStatus readstatus = KRequestPending;
 		RComm& comm = iLoggingServerServer->iSerialComm;
 		
@@ -466,13 +470,11 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs
         }
     }
     
-    
     // Convert to number
     TInt bytes = 0;
     TLex8 lexer(line);
     err = lexer.Val( bytes );       
     LeaveIfFailedL( err );
-    
     
     TInt received  = 0;
     TInt cancelled = 0;
@@ -504,21 +506,7 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs
             
             continue;            
         }
-        //}
-        /*
-        else if( readstatus == KErrNone )
-        {
-        	//iLoggingServerServer->SendMessage( line );
-            received += tmp.Length();           
-            LeaveIfFailedL( targetfile.Write( tmp, tmp.Length()  ) );        
-
-            TBuf8<10> num;
-            num.Num(received);
-            iLoggingServerServer->SendMessage( num );
-            iLoggingServerServer->SendMessage( KStrNewLine );
-            
-        }
-        */
+        
         if( readstatus == KErrCancel )
         {
         	cancelled++;        	
@@ -538,13 +526,11 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters, RFs
     
     CleanupStack::PopAndDestroy( 3 );    
     
-    //iLoggingServerServer->SendMessage( _L8( "\nFile successfully received\n") );
-    
 }
 
+/** Handle file copying on device */
 TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameters, RFs& aFs)
 {
-	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCmdList()\n") );
 	// TODO: Add current directory support
 	if (aParameters.Count() < 3)
 	{
@@ -689,6 +675,17 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(RArray<RBuf8>& aParameter
 	return KErrNone;
 }
 
+/** Add argument to argument array */
+void AddToList(RArray<RBuf8>& aArgs, RBuf8& aArg)
+{
+	RBuf8 tmp;
+	// This should be Closed when closing the RArray
+	tmp.Create(aArg.Length() );
+	tmp.Copy(aArg);
+	aArgs.Append(tmp);
+	aArg.Delete( 0, aArg.Length() );
+}
+
 TInt CLoggingServerCommandManager::HandleCommand()
 {
 	RArray<RBuf8> args;
@@ -706,18 +703,7 @@ TInt CLoggingServerCommandManager::HandleCommand()
 
 	return err;
 }
-
-/** Add argument to argument array */
-void AddToList(RArray<RBuf8>& aArgs, RBuf8& aArg)
-{
-	RBuf8 tmp;
-	// This should be Closed when closing the RArray
-	tmp.Create(aArg.Length() );
-	tmp.Copy(aArg);
-	aArgs.Append(tmp);
-	aArg.Delete( 0, aArg.Length() );
-}
-
+ 
 void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 {
 	//iLoggingServerServer->SendMessage(_L8("void CLoggingServerCommandManager::HandleCommandL()") );	

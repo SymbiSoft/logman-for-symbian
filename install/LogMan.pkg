@@ -1,13 +1,13 @@
 ;[[[cog
 ;import pkg_gen
-;cog.outl( pkg_gen.get_pkg_prefix( "LogMan", "0xe3195807" ) )
+;cog.outl( pkg_gen.get_pkg_prefix( "LogMan", "0xAF111111" ) )
 ;]]]
 
 ;Languages
 &EN
 
 ;Localised package name
-#{"LogMan"},(0xe3195807),1,08,00623,TYPE=SISSYSTEM
+#{"LogMan"},(0xe3195807),1,08,00707,TYPE=SISSYSTEM
 
 ;Localised Vendor name
 %{"Jussi Toivola"}

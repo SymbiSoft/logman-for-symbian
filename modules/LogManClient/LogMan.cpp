@@ -1,9 +1,9 @@
 
-#include "..\Common\loggingdefs.h"
+#include "../Common/loggingdefs.h"
 
 #include "LogMan.h"
 #include "e32debug.h"
-#include <C32COMM.H> //TPortName
+#include <c32comm.h> //TPortName
 
 EXPORT_C RLogMan::RLogMan()
 {

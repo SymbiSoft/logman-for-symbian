@@ -14,7 +14,7 @@ enum TLoggingServerGuiIds
     ELogServCmdMenuMainSetPort,
     ELogServCmdMenuMainCloseService,
     ELogServCmdMenuMainStartService,
-
+    ELogManGui_CmdHelp,
     KLoggingServerGuiIdsCount
     };
 

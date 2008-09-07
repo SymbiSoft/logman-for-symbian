@@ -2,7 +2,7 @@
 #define LOGMANUTILS_H
 
 #if defined( __LOGMAN_ENABLED__ )
-    #include <LogMan.h>
+    #include <logman/LogMan.h>
 
     #pragma message( RLogMan logging enabled )
 
@@ -49,7 +49,7 @@
     // Easy one liner for logging information about thread's stack usage
     #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.StackInfo(); __logman.Close(); }
     // Easy one liner for logging information about thread's heap usage
-    #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
+    #define LOGMAN_SEND_HEAP_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
     // Easy one liner for logging information about thread's memory usage
     #define LOGMAN_SEND_MEMORY_INFO() { RLogMan __logman;__logman.Connect();__logman.MemoryInfo(); __logman.Close(); }
         

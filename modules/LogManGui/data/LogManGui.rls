@@ -20,5 +20,6 @@ rls_string str_r_menu_main_load_serial   "Load Serial Module"
 rls_string str_r_menu_main_service       "Service"
 rls_string str_r_menu_main_service_close "Close Service"
 rls_string str_r_menu_main_service_start "Start Service"
+rls_string str_r_menu_main_help          "Help"
 
 // End of File

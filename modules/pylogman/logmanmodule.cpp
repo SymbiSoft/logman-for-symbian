@@ -260,7 +260,7 @@ static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwar
     
     if (err)
     {
-        return SPyErr_SetFromSymbianOSErr(err);
+    	return SPyErr_SetFromSymbianOSErr(err);
     }
     
     Py_INCREF(Py_True);

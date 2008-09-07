@@ -151,9 +151,11 @@ RESOURCE MENU_PANE r_LoggingServerGui_menu
                 command = ELogServCmdMenuMainSendTestAsync;
                 txt = str_r_menu_main_test_async;
                 },
-
-
-
+        MENU_ITEM
+				{
+				command = ELogManGui_CmdHelp;
+				txt = str_r_menu_main_help;
+				},
         MENU_ITEM
                 {
                 command = EAknSoftkeyExit;

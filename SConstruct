@@ -34,7 +34,6 @@ def LogManServer():
                              sources,
                              LOGGINGSERVER_INCLUDES,
                              loggingserver_libraries,
-                             uid2 = '0x100039ce',
                              uid3 = '0xe3195807',
                              capabilities = FREE_CAPS,
                              defines      = COMMON_DEFINES,
@@ -52,8 +51,6 @@ def LogManDll():
                     logman_sources,                     
                     LOGGINGSERVER_INCLUDES,
                     logman_libraries,    
-                    #definput    = r"LoggingServer\\" + def_folder + r"\LogManU.DEF",
-                    capabilities = FREE_CAPS,
                     defines      = COMMON_DEFINES,
                     package      = LOGMAN_PACKAGE )
                  
@@ -67,8 +64,7 @@ def PyLogManDll():
     return SymbianProgram( 'pylogman', scons_symbian.TARGETTYPE_PYD,
                     [ join( "modules", "pylogman", "logmanmodule.cpp" )],                     
                     pylogman_includes,
-                    ["python222", "euser", "LogMan"],                    
-                    capabilities = FREE_CAPS,
+                    ["Python222", "euser", "LogMan"],                    
                     defines      = COMMON_DEFINES,
                     package      = LOGMAN_PACKAGE )
 
@@ -86,7 +82,8 @@ def LogManGui():
 	                "eikcore", "euser",        "apparc",  
 	                "avkon",   "commonengine", "efsrv",
 	                "estor",   "eikcoctl",     "eikdlg",
-	                "gdi",     "cone",         "LogMan"
+	                "gdi",     "cone",         "LogMan",
+                    "hlplch"
                 ] 
                            
                              
@@ -118,13 +115,13 @@ def LogManGui():
                     includes,
                     libraries,    
                     uid3         = uid,                    
-                    capabilities = FREE_CAPS,
                     resources    = resources,
                     icons        = icons,
                     defines      = [ ],
+                    help         = join( "modules", "LogManGui", "help", "LogManGui.cshlp" ), 
                     package      = LOGMAN_PACKAGE,
                     )
-                     
+
 LogManServer()
 LogManDll()
 PyLogManDll()

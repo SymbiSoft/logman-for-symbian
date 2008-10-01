@@ -1,11 +1,12 @@
 #ifndef __LoggingServerServer_h__
 #define __LoggingServerServer_h__
 
-#include <C32COMM.H>
+#include <c32comm.h>
 #include <e32base.h>
 
 #include "LogManServer_Session.h"
 #include "LogManServer_Defines.h"
+#include "../LogManClient/types.h"
 
 class CLoggingServerMessageQueue;
 class RComm;

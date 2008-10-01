@@ -14,9 +14,9 @@ import cpptemplates
 #include "LogManServer_CommandManager.h"
 
 #include <f32file.h>
-#include <BADESCA.H>
+#include <badesca.h>
 
-#include "..\Common\loggingdefs.h"
+#include "../Common/loggingdefs.h"
 
 //\Epoc32\release\winscw\udeb\ecacm.csy
 //\Epoc32\release\winscw\udeb\ecuart.csy

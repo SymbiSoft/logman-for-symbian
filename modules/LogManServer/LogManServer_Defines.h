@@ -11,7 +11,7 @@ import cpptemplates
 
 #include <e32base.h>
 
-#include "..\LogManClient\types.h"
+#include "../LogManClient/types.h"
 
 
 /// LogMan server's panic enumerations

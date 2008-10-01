@@ -2,7 +2,7 @@
 // INCLUDE FILES
 #include <coemain.h>
 #include <aknutils.h>
-#include "LogManGui_AppView.h"
+#include "LogManGui_Appview.h"
 
 _LIT( KPortNameTitle,   "Port name" );
 _LIT( KPortTitle,       "Port" );

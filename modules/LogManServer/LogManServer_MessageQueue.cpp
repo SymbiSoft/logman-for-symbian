@@ -1,6 +1,6 @@
 
 #include <e32debug.h>
-#include <BADESCA.H>
+#include <badesca.h>
 
 #include "LogManServer_MessageQueue.h"
 #include "LogManServer_Server.h"

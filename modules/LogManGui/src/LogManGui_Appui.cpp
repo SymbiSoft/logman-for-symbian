@@ -6,13 +6,13 @@
 #include <LogManGui.rsg>
 #include <f32file.h>
 #include <s32file.h>
-#include <HLPLCH.H> // Launch help
+#include <hlplch.h> // Launch help
 
-#include "LogManGui_0xAF111111.hlp.hrh"
+//#include "LogManGui_0xAF111111.hlp.hrh"
 #include "LogManGui.hrh"
 #include "LogManGui.pan"
-#include "LogManGui_AppUi.h"
-#include "LogManGui_AppView.h"
+#include "LogManGui_Appui.h"
+#include "LogManGui_Appview.h"
 #include "LogManGui_Application.h"
 #include "LogManGui_Utils.h"
 
@@ -318,11 +318,12 @@ CArrayFix<TCoeHelpContext>* CLoggingServerGuiAppUi::HelpContextL() const
 	// Once you get your official uid3 from Symbian Ltd. and find/replace
 	// all occurrences of uid3 in your project, the context help will
 	// work.
-	CArrayFixFlat<TCoeHelpContext>* array = new(ELeave)CArrayFixFlat<TCoeHelpContext>(1);
-	CleanupStack::PushL(array);
-	array->AppendL(TCoeHelpContext(KUidLoggingServerGuiApp, KGeneral_Information));
-	CleanupStack::Pop(array);
-	return array;
+	// CArrayFixFlat<TCoeHelpContext>* array = new(ELeave)CArrayFixFlat<TCoeHelpContext>(1);
+	// CleanupStack::PushL(array);
+	// array->AppendL(TCoeHelpContext(KUidLoggingServerGuiApp, KGeneral_Information));
+	// CleanupStack::Pop(array);
+	// return array;
+        return NULL;
 }
 
 // ============================ Construction ===============================

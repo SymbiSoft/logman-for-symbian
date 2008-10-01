@@ -1,6 +1,6 @@
 #include <e32debug.h>
-#include <BADESCA.H>
-#include <BAUTILS.H>
+#include <badesca.h>
+#include <bautils.h>
 #include <f32file.h>
 
 #include "LogManServer_CommandManager.h"

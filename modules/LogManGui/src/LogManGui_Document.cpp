@@ -1,6 +1,6 @@
 
 // INCLUDE FILES
-#include "LogManGui_AppUi.h"
+#include "LogManGui_Appui.h"
 #include "LogManGui_Document.h"
 
 CEikAppUi* CLoggingServerGuiDocument::CreateAppUiL()

@@ -1,6 +1,6 @@
 
 
-#include "..\Common\loggingdefs.h"
+#include "../Common/loggingdefs.h"
 
 #include "LogManServer_Defines.h"
 #include "LogManServer_Server.h"

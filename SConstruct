@@ -27,9 +27,9 @@ LOGMAN_PACKAGE = "LogMan_%s_%s_%s.sis" % ( COMPILER, RELEASE, LOGMAN_VERSION.rep
 def LogManServer():
     "LogMan.exe (server ) defines"
         
-    sources = glob.glob( join( "Modules","LogManServer","*.cpp") )
+    sources = glob.glob( join( "modules","LogManServer","*.cpp") )
         
-    loggingserver_libraries = [ 'euser', 'efsrv', 'c32', 'BAFL' ]
+    loggingserver_libraries = [ 'euser', 'efsrv', 'c32', 'bafl' ]
     return SymbianProgram(   'LogMan', scons_symbian.TARGETTYPE_EXE,
                              sources,
                              LOGGINGSERVER_INCLUDES,
@@ -89,7 +89,7 @@ def LogManGui():
                              
     includes  = [
                     join( "modules","Common"),
-                    join( "modules","LogManClient"),                    
+                    join( "modules","LogManClient"),
                     join( "modules","LogManGui","inc"),
                     join( "modules","LogManGui","data" )
                 ]
@@ -102,13 +102,13 @@ def LogManGui():
                   )
     
     # Just for testing scons-for-symbian
-    gui_only_sis  = SymbianPackage( "LogManGui.sis",
-                                    pkgfile = join( "install", "LogManGui.pkg" )
-                    )
+    #gui_only_sis  = SymbianPackage( "LogManGui.sis",
+    #                                pkgfile = join( "install", "LogManGui.pkg" )
+    #                )
     # With Ensymble method, the dependencies are generated automatically with the package
     # argument for SymbianProgram, but not for PKG files with different output sis.
     # So we need to do a small hack to put PKG-based sis in correct order.
-    Depends( gui_only_sis, main_sis )
+    #Depends( gui_only_sis, main_sis )
     
     return SymbianProgram( 'LogManGui', scons_symbian.TARGETTYPE_EXE,
                     sources,                     
@@ -118,7 +118,7 @@ def LogManGui():
                     resources    = resources,
                     icons        = icons,
                     defines      = [ ],
-                    help         = join( "modules", "LogManGui", "help", "LogManGui.cshlp" ), 
+#                    help         = join( "modules", "LogManGui", "help", "LogManGui.cshlp" ), 
                     package      = LOGMAN_PACKAGE,
                     )
 

@@ -28,7 +28,9 @@ void CLoggingServerGuiAppUi::HandleForegroundEventL (TBool aForeground)
 
 void CLoggingServerGuiAppUi::UpdateServiceInfoL( )
 {
-
+    
+    LOGMAN_SENDLOG( "UpdateServiceInfoL" )
+    
     // Check if LogMan service is running
     RProcess logginServerProcess;
     TFindServer findMyServer( KLoggingServer );
@@ -40,27 +42,31 @@ void CLoggingServerGuiAppUi::UpdateServiceInfoL( )
         iAppView->iLogManServiceInfo.iRunning = EFalse;
         iAppView->iLogManServiceInfo.iConnected = KErrUnknown;
         iAppView->iLogManServiceInfo.iPort = 0;
-        iAppView->iLogManServiceInfo.iPortName.Copy( KEmptyStr );
-        return;
+        iAppView->iLogManServiceInfo.iPortName.Copy( KEmptyStr );                
     }
-
-    RLogMan log;
-    User::LeaveIfError( log.Connect() );
-    CleanupClosePushL( log );
-
-    if ( iAppView->iLogManServiceInfo.iConnected == KErrNone )
+    else
     {
-        if ( !log.IsSerialConnected() )
+        RLogMan log;
+        User::LeaveIfError( log.Connect() );
+        CleanupClosePushL( log );
+    
+        if ( iAppView->iLogManServiceInfo.iConnected == KErrNone )
         {
-            iAppView->iLogManServiceInfo.iConnected = KErrDisconnected;
+            if ( !log.IsSerialConnected() )
+            {
+                iAppView->iLogManServiceInfo.iConnected = KErrDisconnected;
+            }
         }
+    
+        iAppView->iLogManServiceInfo.iRunning = ETrue;
+        iAppView->iLogManServiceInfo.iPort = log.Port();
+        iAppView->iLogManServiceInfo.iPortName.Copy( log.PortName() );
+        iAppView->iLogManServiceInfo.iBytesSent = log.BytesSent();
+        CleanupStack::PopAndDestroy( &log );
     }
-
-    iAppView->iLogManServiceInfo.iRunning = ETrue;
-    iAppView->iLogManServiceInfo.iPort = log.Port();
-    iAppView->iLogManServiceInfo.iPortName.Copy( log.PortName() );
-    iAppView->iLogManServiceInfo.iBytesSent = log.BytesSent();
-    CleanupStack::PopAndDestroy( &log );
+    
+    iAppView->DrawNow();
+                
 }
 
 void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
@@ -121,7 +127,8 @@ void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 
 }
 void CLoggingServerGuiAppUi::HandleCommandL( TInt aCommand )
-{
+{    
+    
     // Handle here to avoid connection to RLogMan unnecesarily
     if ( aCommand == ELogServCmdMenuUpdateInfo )
     {
@@ -305,6 +312,7 @@ void CLoggingServerGuiAppUi::HandleCommandL( TInt aCommand )
 void CLoggingServerGuiAppUi::HandleStatusPaneSizeChange()
 {
     iAppView->SetRect( ClientRect() );
+    iAppView->DrawNow();
 }
 
 

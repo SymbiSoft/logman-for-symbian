@@ -20,6 +20,21 @@ LOGGINGSERVER_INCLUDES  = [ join( "modules", x ) for x in [
                             ]
                           ]
 
+PACKAGE_DRIVE_MAP = { "C" : ".*[.](mif|rsc)" }
+
+opts = Options()
+opts.Add('pythonlib', 'Select correct Python library', "Python222")
+opts.Add('cert', 'Set signing certificate', None )
+opts.Add('key', 'Set certificate key', None )
+
+env = Environment(options = opts)
+Help(opts.GenerateHelpText(env))
+
+CERT = ARGUMENTS.get( "cert", None )
+KEY  = ARGUMENTS.get( "key", None )
+
+#: Select your Python library
+PYTHON_LIB = ARGUMENTS.get( "pythonlib", "Python222" )
 
 LOGMAN_VERSION = ".".join( map(str, codegen.pkg_gen.get_build_number() ) )
 LOGMAN_PACKAGE = "LogMan_%s_%s_%s.sis" % ( COMPILER, RELEASE, LOGMAN_VERSION.replace(".", "_") )
@@ -37,7 +52,8 @@ def LogManServer():
                              uid3 = '0xe3195807',
                              capabilities = FREE_CAPS,
                              defines      = COMMON_DEFINES,
-                             package      = LOGMAN_PACKAGE
+                             package      = LOGMAN_PACKAGE,
+                             package_drive_map = PACKAGE_DRIVE_MAP,
                      )
 
 def LogManDll():
@@ -52,7 +68,8 @@ def LogManDll():
                     LOGGINGSERVER_INCLUDES,
                     logman_libraries,    
                     defines      = COMMON_DEFINES,
-                    package      = LOGMAN_PACKAGE )
+                    package      = LOGMAN_PACKAGE,
+                    package_drive_map = PACKAGE_DRIVE_MAP, )
                  
 def PyLogManDll():
     #-------------------------------------------- pylogman defines ( Python client )
@@ -64,9 +81,10 @@ def PyLogManDll():
     return SymbianProgram( 'pylogman', scons_symbian.TARGETTYPE_PYD,
                     [ join( "modules", "pylogman", "logmanmodule.cpp" )],                     
                     pylogman_includes,
-                    ["Python222", "euser", "LogMan"],                    
+                    [PYTHON_LIB, "euser", "LogMan"],                    
                     defines      = COMMON_DEFINES,
-                    package      = LOGMAN_PACKAGE )
+                    package      = LOGMAN_PACKAGE,
+                    package_drive_map = PACKAGE_DRIVE_MAP, )
 
 #-------------------------------------- LogManGui defines ( tester and manager )
 def LogManGui():
@@ -97,8 +115,11 @@ def LogManGui():
     #: Create installer
     uid = '0xAF111111'
     main_sis = SymbianPackage(  LOGMAN_PACKAGE,
-                                ensymbleargs = { "--uid"     : uid,
-                                                 "--version" : LOGMAN_VERSION }
+                                pkgargs = { "uid"     : uid,
+                                            "version" : LOGMAN_VERSION.split("."),
+                                            "appname" : "LogMan",
+                                            "cert"    : CERT,
+                                            "key"     : KEY },
                   )
     
     # Just for testing scons-for-symbian
@@ -120,6 +141,7 @@ def LogManGui():
                     defines      = [ ],
 #                    help         = join( "modules", "LogManGui", "help", "LogManGui.cshlp" ), 
                     package      = LOGMAN_PACKAGE,
+                    package_drive_map = PACKAGE_DRIVE_MAP,
                     )
 
 LogManServer()

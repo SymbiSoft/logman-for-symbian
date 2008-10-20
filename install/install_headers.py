@@ -2,17 +2,25 @@
 import os
 import sys
 import shutil
+import glob
 
 def install():
-    epocroot    = os.environ["EPOCROOT"]
-    installpath = epocroot + r"EPOC32\include\logman\\" 
+    epocroot    = os.environ.get( "EPOCROOT", "\\")
+    
+    installpath = os.path.join( epocroot, "EPOC32" )
+    if not os.path.exists( installpath ):
+        raise Exception( "Invalid EPOCROOT")
+        
+    installpath = os.path.join( installpath, "include", "logman" ) 
     if not os.path.exists( installpath ):
         os.mkdir( installpath )
     
-    source = "..\modules\LogManClient\\"
-    for header in [ "LogMan.h", "logmanutils.h"]:
-        s = source + header
-        t = installpath + header
+    source = ( os.path.dirname(__file__), "..", "modules", "LogManClient" )
+    source = os.path.join( *source )
+    source = os.path.normpath( source )
+    for header in glob.glob( os.path.join( source, "*.h") ):
+        s = header
+        t = installpath + os.path.basename( header )
         print "Copying %s ==> %s" % ( s, t )
         shutil.copyfile( s, t )
     

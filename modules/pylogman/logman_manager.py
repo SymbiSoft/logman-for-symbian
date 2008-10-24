@@ -165,9 +165,17 @@ class Gui:
             appuifw.note( u"Serial port %s enabled" % selection, 'info')
             
         
+old_handler = appuifw.app.exit_key_handler        
 myGui = Gui()
 appuifw.app.exit_key_handler=myGui.script_lock.signal
 myGui.script_lock.wait()
-    
+
+print "Exiting..."
+appuifw.app.exit_key_handler = old_handler
+myGui.LogMan.close()    
+del myGui.LogMan
+del myGui.script_lock
+del myGui
+
 appuifw.app.body = OLD_BODY    
 print "LogMan manager exited"

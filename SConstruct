@@ -78,7 +78,12 @@ def PyLogManDll():
                           join( EPOCROOT, "epoc32", "include", "python" ),
                           join( "modules", "LogManClient" )
                         ]
-    return SymbianProgram( 'pylogman', scons_symbian.TARGETTYPE_PYD,
+    ToPackage( package = LOGMAN_PACKAGE, target = join( "python", "lib" ), 
+                source = join( "modules", "pylogman", "pylogman.py" ) )
+    ToPackage( package = LOGMAN_PACKAGE, target = join( "python" ), 
+                source = join( "modules", "pylogman", "logman_manager.py" ) ) 
+                                                        
+    return SymbianProgram( '_pylogman', scons_symbian.TARGETTYPE_PYD,
                     [ join( "modules", "pylogman", "logmanmodule.cpp" )],                     
                     pylogman_includes,
                     [PYTHON_LIB, "euser", "LogMan"],                    

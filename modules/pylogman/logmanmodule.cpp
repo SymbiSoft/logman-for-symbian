@@ -432,7 +432,7 @@ extern "C" {
 
   DL_EXPORT(void) initlogman(void)
   {
-    Py_InitModule("pylogman", (PyMethodDef*)logman_methods);
+    Py_InitModule("_pylogman", (PyMethodDef*)logman_methods);
 
 
     // Create LogMan class type

@@ -230,6 +230,18 @@ TInt RLogMan::RawSend(const TMessageBuffer8& aString, TBool aDoAsync )
     return SendReceive(ELogServSendMessage, args);
 }
 
+EXPORT_C TInt RLogMan::StartSocketServer( )
+{
+
+	TInt result;
+	TPckgBuf<TInt> pckg;
+	TIpcArgs args(&pckg);
+    SendReceive(EStartSocketServer, args);
+
+    result = pckg();
+    return result;
+
+}
 
 EXPORT_C TPortName RLogMan::PortName( )
 {
@@ -295,12 +307,12 @@ EXPORT_C TInt RLogMan::StackInfo()
 EXPORT_C TInt RLogMan::HeapInfo()
 {
     RHeap& heap = User::Heap();
-    
+
     TInt tmp;
     TInt size = heap.Size();
     TInt free = heap.Available(tmp);
     TInt used = size - free;
-    
+
     return this->Writef( KFmtHeapInfo,
                     EFalse,
                   free, used, size );
@@ -308,12 +320,12 @@ EXPORT_C TInt RLogMan::HeapInfo()
 }
 
 EXPORT_C TInt RLogMan::MemoryInfo()
-{ 
+{
     TInt err;
     err = StackInfo();
     if( err != KErrNone ) return err;
-    
-    err = HeapInfo();    
+
+    err = HeapInfo();
     return err;
 }
 

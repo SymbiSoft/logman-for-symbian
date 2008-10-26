@@ -26,7 +26,7 @@ class CLoggingServerMessageQueue : public CActive
     /** Add message to Queue
       * @param aMessage Message to add
       */
-    void AppendL(TMessageBuffer8& aMessage);
+    void AppendL( TDesC8& aMessage);
 
 	/** Starts sending messages in Queue */
 	void Start();

@@ -3,10 +3,16 @@
 
 #include <c32comm.h>
 #include <e32base.h>
+#include <in_sock.h>
+#include <CommDbConnPref.h>
 
 #include "LogManServer_Session.h"
 #include "LogManServer_Defines.h"
 #include "../LogManClient/types.h"
+//#include "LogManServer_SocketWriter.h"
+#include "LogManServer_SocketEngine.h"
+
+class RSocket;
 
 class CLoggingServerMessageQueue;
 class RComm;
@@ -20,6 +26,15 @@ struct SConnectionInfo {
     TPortName iPortName;
     /**Port number to open.*/
     TInt iPort;
+};
+
+/// Struct containing socket connection type info
+struct SSocketConnectionInfo {
+	TUint32 iApId;
+    // The remote address
+    TInetAddr   iAddress;
+
+
 };
 /// LogMan server class
 /** Service handling serial connection and sending of messages through it. */
@@ -36,9 +51,19 @@ public:
     static CLoggingServerServer* NewL();
 
     /** Create new session with the server */
-    CSession2* CLoggingServerServer::NewSessionL(const TVersion& aVersion,const RMessage2& /*aMessage*/) const;
+    CSession2* NewSessionL(const TVersion& aVersion,const RMessage2& /*aMessage*/) const;
     /** Panic LogMan service */
-    static void CLoggingServerServer::PanicServer(TLogServPanic aPanic);
+    static void PanicServer(TLogServPanic aPanic);
+
+    /** Create socket server and start listening for connections
+     * @return KErrNone or system-wide error code, if fails.
+     */
+    TInt InitializeSocketServer();
+
+    /**
+     * Send message through socket. If there is no connection, fails silently.
+     */
+    void SendSocketMessage( const TDesC8& aBuffer );
 
     /**
       * Sends data through serial connection.
@@ -49,13 +74,13 @@ public:
       * Sends data through serial connection.
       * @return KErrNone or system-wide error code, if sending fails.
       */
-    TInt SendMessage( const TDesC& aBuffer );    
-    
+    TInt SendMessage( const TDesC& aBuffer );
+
     /**
       * Addes message to a queue for asynchronous sending.
       * (The client does not wait for the completion of the sending of the message. )
       */
-    void AddAsyncMessageL( TMessageBuffer8& aBuffer );
+    void AddAsyncMessageL( const TDesC8& aBuffer );
 
     /**
       * Create serial connection.
@@ -81,6 +106,9 @@ public:
     /** Load given serial module */
     TInt LoadModule( TFullName& aModuleName );
 
+    /** Starts asynchronous socket read */
+    void ReadSocket();
+
 public:
     /// Holds data about the connection
     SConnectionInfo iConnectionInfo;
@@ -98,8 +126,11 @@ private:
 
     /// Holds and sends the asynchronous messages
     CLoggingServerMessageQueue* iMessageQueue;
+
     /// Handles commands sent from PC
     CLoggingServerCommandManager* iCommandManager;
+
+    CSocketEngine* iSocketEngine;
 
     /// Serial comms
     RComm iSerialComm;

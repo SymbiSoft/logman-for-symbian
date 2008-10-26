@@ -19,7 +19,7 @@ void CLoggingServerMessageQueue::ConstructL()
     iMessages = new (ELeave) CDesC8ArrayFlat(10);
 }
 
-void CLoggingServerMessageQueue::AppendL(TMessageBuffer8& aMessage) {
+void CLoggingServerMessageQueue::AppendL( TDesC8& aMessage) {
     iMessages->AppendL( aMessage );
 }
 

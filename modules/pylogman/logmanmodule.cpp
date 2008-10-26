@@ -82,6 +82,7 @@ static PyObject* LogMan_Port( Type_LogMan* self );
 static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args );
 static PyObject* LogMan_PortName( Type_LogMan* self );
 static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args );
+static PyObject* LogMan_StartSocketServer( Type_LogMan* self );
 
 static const PyMethodDef LogMan_methods[] = {
 // Different name to work like standard Python stdout
@@ -100,6 +101,7 @@ static const PyMethodDef LogMan_methods[] = {
     {"SetPort",    (PyCFunction)LogMan_SetPort, METH_VARARGS},
     {"PortName",    (PyCFunction)LogMan_PortName, METH_NOARGS},
     {"SetPortName",    (PyCFunction)LogMan_SetPortName, METH_VARARGS},
+    {"StartSocketServer",    (PyCFunction)LogMan_StartSocketServer, METH_NOARGS},
     {NULL, NULL}
 };
 
@@ -331,6 +333,20 @@ static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args ){
     
     Py_INCREF(Py_True);
     return Py_True;
+    
+}
+/// Python wrapper for RLogMan.StartSocketServer
+static PyObject* LogMan_StartSocketServer( Type_LogMan* self ){
+        
+    PRINTF("StartSocketServer");
+    TInt result = self->iLogMan->StartSocketServer();
+    if( result == KErrNone ) {
+        Py_INCREF(Py_True);
+        return Py_True;
+    }
+    
+    return SPyErr_SetFromSymbianOSErr(result);
+    
     
 }
 //[[[end]]]

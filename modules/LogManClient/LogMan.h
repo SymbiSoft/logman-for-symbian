@@ -39,12 +39,19 @@ public:
     IMPORT_C void StopService();
 
     /**
+     Create and start LogMan server's socket listening server.
+     @return KErrNone, if successful.
+             Otherwise a system-wide error code.
+    */
+    IMPORT_C TInt StartSocketServer( );
+
+    /**
      Connect LogMan server's serial connection using current Port and PortName settings.
      @return KErrNone, if successful.
              KErrTimeout if connection is not made soon enough. Connect the USB
              cable between device andd PC first.
              Otherwise a system-wide error code.
-     
+
     */
     IMPORT_C TInt ConnectSerial();
 
@@ -56,7 +63,7 @@ public:
 
     /**
      * Disconnect LogMan server's serial connection.
-     * @return A system-wide error code.     
+     * @return A system-wide error code.
     */
     IMPORT_C TInt DisconnectSerial();
 
@@ -70,13 +77,13 @@ public:
 
     /** Log information about stack usage */
     IMPORT_C TInt RLogMan::StackInfo();
-    
+
     /** Log information about heap usage */
     IMPORT_C TInt RLogMan::HeapInfo();
-    
+
     /** Utility to log both stack and heap usage */
     IMPORT_C TInt RLogMan::MemoryInfo();
-    
+
     /**
     High-level logging interface for simple one-line logging.
     Handles client init, message sending and closing.
@@ -157,14 +164,14 @@ public:
     IMPORT_C TInt WriteFormatList(const TDesC16& aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList );
 
     /** Used internally.
-     *  Split the data to suitable chunks and send using RawSend. 
+     *  Split the data to suitable chunks and send using RawSend.
      * If length of the message exceeds length of KLogServMessageSize, the message is
      * split into smaller chunks and sent separately.
      * @param aString  Data to send
      * @param aDoAsync True to write data asynchronously in server
      */
     TInt SendInChunks(const TDesC8& aString, TBool aDoAsync );
-    
+
     /**
     Send the data to server using fixed 8-bit buffer.
     Client must be connected before use.

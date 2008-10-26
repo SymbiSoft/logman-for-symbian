@@ -86,6 +86,19 @@ RESOURCE MENU_PANE r_service_sub_menu
         };
     }
 
+RESOURCE MENU_PANE r_socket_sub_menu
+    {
+    items =
+        {
+        MENU_ITEM
+            {
+            command = ELogServCmdMenuMainStartSocketServer;
+            txt = str_r_menu_main_connect;
+            }
+        };
+    }
+
+    
 RESOURCE MENU_PANE r_serial_sub_menu
     {
     items =
@@ -134,13 +147,20 @@ RESOURCE MENU_PANE r_LoggingServerGui_menu
                 txt     = str_r_menu_main_service;
                 cascade = r_service_sub_menu;
                 },
-
+                
+        MENU_ITEM
+                {
+                txt     = str_r_menu_main_socket;
+                cascade = r_socket_sub_menu;
+                },
+                
         MENU_ITEM
                 {
                 txt     = str_r_menu_main_serial;
                 cascade = r_serial_sub_menu;
                 },
-
+        
+        
         MENU_ITEM
                 {
                 command = ELogServCmdMenuMainSendTest;

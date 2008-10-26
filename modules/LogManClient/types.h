@@ -5,6 +5,7 @@ _LIT(KLoggingServer,   "LogManServ");
 _LIT(KNoArgs,"");
 
 const TInt KLogServMessageSize = 512;
+const TInt KSocketLoggingPort  = 23; // Telnet port. TODO: Allow configuration from outside.
 
 typedef TBuf16<KLogServMessageSize> TMessageBuffer16;
 typedef TBuf8<KLogServMessageSize> TMessageBuffer8;
@@ -38,13 +39,13 @@ try:
     svnrev = e.data["commit_revision"].number
 except ImportError:
     print "Unable to detect svn revision. Install pysvn."
-    
+
 cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 ]]]*/
 
 const TUint KLogServMajorVersionNumber=1;
 const TUint KLogServMinorVersionNumber=8;
-const TUint KLogServBuildVersionNumber=1020;
+const TUint KLogServBuildVersionNumber=1026;
 const TUint KRevisionNumber=26;
 
 ///[[[end]]]
@@ -79,6 +80,9 @@ enum TLogServRqst
     EGetPortName,
     EGetPort,
     //[[[end]]]
+
+    EStartSocketServer,
+
     KLogManMessageIdCount
 	};
 

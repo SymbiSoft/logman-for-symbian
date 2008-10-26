@@ -44,7 +44,7 @@ def LogManServer():
         
     sources = glob.glob( join( "modules","LogManServer","*.cpp") )
         
-    loggingserver_libraries = [ 'euser', 'efsrv', 'c32', 'bafl' ]
+    loggingserver_libraries = [ 'euser', 'efsrv', 'c32', 'bafl', 'esock', 'insock', 'commdb' ]
     return SymbianProgram(   'LogMan', scons_symbian.TARGETTYPE_EXE,
                              sources,
                              LOGGINGSERVER_INCLUDES,
@@ -78,8 +78,10 @@ def PyLogManDll():
                           join( EPOCROOT, "epoc32", "include", "python" ),
                           join( "modules", "LogManClient" )
                         ]
+    
     ToPackage( package = LOGMAN_PACKAGE, target = join( "python", "lib" ), 
                 source = join( "modules", "pylogman", "pylogman.py" ) )
+    
     ToPackage( package = LOGMAN_PACKAGE, target = join( "python" ), 
                 source = join( "modules", "pylogman", "logman_manager.py" ) ) 
                                                         

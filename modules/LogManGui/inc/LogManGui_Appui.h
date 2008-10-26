@@ -61,8 +61,13 @@ class CLoggingServerGuiAppUi : public CAknAppUi
         void HandleForegroundEventL (TBool aForeground);
         /** Connect server's serial connection */
         void ConnectSerial(RLogMan& aLogMan);
-        CArrayFix<TCoeHelpContext>* HelpContextL() const;
-        
+        /**
+         * Start server's socket server.
+         */
+        void StartSocketServer(RLogMan& aLogMan);
+
+        //CArrayFix<TCoeHelpContext>* HelpContextL() const;
+
     private: // Data
 
         /**

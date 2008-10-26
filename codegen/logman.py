@@ -260,7 +260,11 @@ class LogMan:
                             [ Attribute( "Type_LogMan*", "self"),
                               Attribute( "PyObject*", "args") ],
                           code = getStrSetter( "PortName", "TPortName" )
-                        )
+                        ),
+                Function( "static PyObject*", "LogMan_StartSocketServer",
+                            [ Attribute( "Type_LogMan*", "self") ],
+                          code = getErrorRaisingGetter( "StartSocketServer" )
+                        ),
               ]
 
 

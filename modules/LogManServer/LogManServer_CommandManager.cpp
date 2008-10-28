@@ -14,29 +14,34 @@ _LIT(KFmtCopyErr, "\nFailed to copy '%S', err:%d\n");
 _LIT(KStrDir, "<DIR>         ");
 _LIT8(KStrFileExistsQuery, "\nFile exists. Overwrite? n\\y\\a\\c:");
 _LIT8(KStrInvalidAnswer, "\nInvalid answer.\n");
-_LIT8(KStrPathNotFound, "\nThe system cannot find the path specified. Err:%d\n");
+_LIT8
+		(KStrPathNotFound,
+				"\nThe system cannot find the path specified. Err:%d\n");
 _LIT8(KFmtErrDetected, "\nError:%d\n");
 // TODO: Generate
 _LIT8(KStrNewLine, "\n");
 _LIT8(KCmdList, "list");
+_LIT8(KCmdHelp, "help");
 _LIT8(KCmdCopy, "cp");
 _LIT8(KCmdLs, "ls");
 _LIT8(KCmdDir, "dir");
 _LIT8(KCmdExec, "exec");
 _LIT8(KCmdKill, "kill");
 _LIT8(KCmdPut, "put");
+_LIT8(KCmdGet, "get");
 _LIT8(KCmdListProcess, "ps");
-_LIT8(KStrHelpMsg,
-		"list                 - List possible commands\n"
-		"dir/ls <path>        - List contents of a directory\n"
-		"cp <source> <target> - Copy files\n"
-		"put <target>         - File transfer to device\n"
-		"get <source>         - File transfer from device\n"
-		"exec <target> <args> - Launch executable\n"
-		"kill <process>       - Kill process\n"
-		"ps <process>         - List processes( optional process pattern )\n"
-		"\n"
-		"NOTE: Wildcards are supported.\n");
+_LIT8(KStrHelpMsg, ""
+	"list                   - List possible commands\n"
+	"dir/ls <path>          - List contents of a directory\n"
+	"cp <source> <target>   - Copy files in device.\n"
+	"put <target>           - File transfer to device\n"
+	"get <source>[startpos] - Echo file contents. If startpos is negative,\n"
+	"						  position is calculated from the end of file."
+	"exec <target>[<args>]  - Launch executable with given arguments.\n"
+	"kill <process>         - Kill process. Wildcard supported.\n"
+	"ps <process>           - List processes. Wildcard supported.\n"
+	"\n"
+	);
 
 const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
@@ -77,7 +82,8 @@ void CLoggingServerCommandManager::SocketData(TDesC8& aData)
 
 	for (TInt i = 0; i < aData.Length(); i++)
 	{
-		if ( aData[i] == '\r' ) continue;
+		if (aData[i] == '\r')
+			continue;
 
 		if (aData[i] == '\n')
 		{
@@ -99,43 +105,42 @@ void CLoggingServerCommandManager::RunL()
 
 	if (iLoggingServerServer->IsClosing())
 	{
-PRINTF	("CLoggingServerCommandManager stopping")
-	return;
-}
-else
-{
-	//iLoggingServerServer->ReadSocket();
-
-	TRequestStatus readstatus = KRequestPending;
-	RComm& comm = iLoggingServerServer->iSerialComm;
-	TBuf8<1> buf;
-
-	do
+		PRINTF ("CLoggingServerCommandManager stopping")
+		return;
+	}
+	else
 	{
-		comm.Read(readstatus, 100, buf, 1);
-		User::WaitForRequest(readstatus);
+		//iLoggingServerServer->ReadSocket();
 
-		if (readstatus == KErrNone)
+		TRequestStatus readstatus = KRequestPending;
+		RComm& comm = iLoggingServerServer->iSerialComm;
+		TBuf8<1> buf;
+
+		do
 		{
-			// Echo back
-			iLoggingServerServer->SendMessage(buf);
+			comm.Read(readstatus, 100, buf, 1);
+			User::WaitForRequest(readstatus);
 
-			if (buf[0] == '\n' || buf[0] == '\r')
+			if (readstatus == KErrNone)
 			{
-				this->HandleCommand();
-				// Clear buffer
-				iCommandBuffer.Delete(0, iCommandBuffer.Length() );
-			}
-			else
-			{
-				iCommandBuffer.Append(buf[0]);
-			}
-		}
-	}while (readstatus == KErrNone
-			&& !iLoggingServerServer->IsClosing() );
+				// Echo back
+				iLoggingServerServer->SendMessage(buf);
 
-	Start();
-}
+				if (buf[0] == '\n' || buf[0] == '\r')
+				{
+					this->HandleCommand();
+					// Clear buffer
+					iCommandBuffer.Delete(0, iCommandBuffer.Length() );
+				}
+				else
+				{
+					iCommandBuffer.Append(buf[0]);
+				}
+			}
+		} while (readstatus == KErrNone && !iLoggingServerServer->IsClosing() );
+
+		Start();
+	}
 }
 
 CLoggingServerCommandManager::~CLoggingServerCommandManager()
@@ -165,8 +170,7 @@ void GetArgLC(RArray<RBuf8>& aParameters, RBuf& aBuf, TInt aIndex)
  * @param aIndex        Index in aParameters to be read.
  * @return ETrue if path is a directory.
  */
-TBool GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf,
-		TInt aIndex)
+TBool GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf, TInt aIndex)
 {
 	User::LeaveIfError(aBuf.Create(aParameters[1].Length() + 1));
 	CleanupClosePushL(aBuf);
@@ -180,8 +184,7 @@ TBool GetPathArgLC(RArray<RBuf8>& aParameters, RFs& aFs, RBuf& aBuf,
 		// BaflUtils says it's not directory if drive is given( ex. C: )
 		isDir = (aBuf[aBuf.Length() - 1] == KDoubleColon);
 	}
-	if ((isDir || aBuf[aBuf.Length() - 1] == KDoubleColon)
-			&& aBuf[aBuf.Length() - 1] != KCharDash)
+	if ((isDir || aBuf[aBuf.Length() - 1] == KDoubleColon) && aBuf[aBuf.Length() - 1] != KCharDash)
 	{
 		// Add dash or get dir does not list folder
 		aBuf.Append(KCharDash);
@@ -278,8 +281,8 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 	_LIT8(KFmtVersionInfo, "LogMan Shell v.%d.%02d.%04d ("__DATE__ " " __TIME__ ") Rev:%d\n");
 
 	version.Format(KFmtVersionInfo, KLogServMajorVersionNumber,
-			KLogServMinorVersionNumber, KLogServBuildVersionNumber,
-			KRevisionNumber);
+	KLogServMinorVersionNumber, KLogServBuildVersionNumber,
+	KRevisionNumber);
 	iLoggingServerServer->SendMessage(version);
 
 	RBuf8 line;
@@ -394,7 +397,8 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 
 	TFullName processname;
 	TMessageBuffer processinfo;
-	_LIT( KFmtProcessInfo, "%25S Priority:%d ExitType:%d ExitCategory:%S ExitReason:%d");
+	_LIT(KFmtProcessInfo,
+			"%25S Priority:%d ExitType:%d ExitCategory:%S ExitReason:%d");
 	while (finder.Next(processname) == KErrNone)
 	{
 
@@ -438,6 +442,66 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 #define BUFFER_SIZE 128
 
 #define DEBUG( x ) iLoggingServerServer->SendMessage( _L8( x ) );
+
+/** Handle file transfer from device
+ *
+ */
+TInt CLoggingServerCommandManager::HandleCmdGetL(RArray<RBuf8>& aParameters,
+		RFs& aFs)
+{
+	TInt err;
+
+	if (aParameters.Count() < 2)
+	{
+		iLoggingServerServer->SendMessage(KStrNotEnoughParameters);
+		return KErrArgument;
+	}
+
+	RBuf path_target;
+	GetPathArgLC(aParameters, aFs, path_target, 1);
+
+	TInt startpos = 0;
+	if (aParameters.Count() > 2 )
+	{
+		RBuf _startpos;
+		GetArgLC(aParameters, _startpos, 2);
+		// Convert to number
+		//TInt bytes = 0;
+		TLex lexer(_startpos);
+		err = lexer.Val(startpos);
+		LeaveIfFailedL(err);
+
+		CleanupStack::PopAndDestroy(); // buf
+	}
+
+	RFile targetfile;
+	LeaveIfFailedL(targetfile.Open(aFs, path_target, EFileShareReadersOrWriters));
+	CleanupClosePushL(targetfile);
+	
+	TInt size = 0;
+	targetfile.Size(size);
+	TBuf8<BUFFER_SIZE> tmp;
+
+	// Set read position
+	if( startpos < 0 ){
+		// Get position from end if negative;
+		startpos = Max( 0, size+startpos);
+		size -= startpos;
+	}
+
+	targetfile.Seek(ESeekCurrent, startpos);
+	do
+	{
+		err = targetfile.Read(tmp, BUFFER_SIZE);
+		iLoggingServerServer->SendMessage(tmp);		
+		LeaveIfFailedL(err);
+	}
+	while( tmp.Length() > 0 );
+
+	CleanupStack::PopAndDestroy(2); // buf, targetfile
+
+}
+
 /** Handle file transfer to device
  * Using very simple method. Client sends the path to the file and its size.
  * Then the given amount of data is received and written to the file.
@@ -507,7 +571,7 @@ TInt CLoggingServerCommandManager::HandleCmdPutL(RArray<RBuf8>& aParameters,
 	while (received < bytes)
 	{
 		TRequestStatus readstatus = KRequestPending;
-		TInt buffersize = min( BUFFER_SIZE, bytes - received );
+		TInt buffersize= min( BUFFER_SIZE, bytes - received );
 
 		comm.ReadOneOrMore(readstatus, tmp);
 		User::WaitForRequest(readstatus);
@@ -658,8 +722,7 @@ TInt CLoggingServerCommandManager::HandleCmdCopyFilesL(
 						default:
 						{
 							iLoggingServerServer->SendMessage(KStrInvalidAnswer);
-							iLoggingServerServer->SendMessage(
-									KStrFileExistsQuery);
+							iLoggingServerServer->SendMessage(KStrFileExistsQuery);
 							doQuery = ETrue;
 							break;
 						}
@@ -755,16 +818,19 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	}
 
 	// Add last param
-	AddToList(aArgs, arg);
+	if (arg.Length() > 0)
+		AddToList(aArgs, arg);
 	arg.Close();
-
+	
+	if( aArgs.Count() == 0 ) return;
+	
 	// Connect to the file server
 	RFs fs;
 	fs.Connect();
 	CleanupClosePushL(fs);
 
 	// First param has the command type
-	if (aArgs[0].Compare(KCmdList) == 0)
+	if (aArgs[0].Compare(KCmdList) == 0 || aArgs[0].Compare(KCmdHelp) == 0)
 	{
 		HandleCmdListL();
 	}
@@ -791,6 +857,10 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	else if (aArgs[0].Compare(KCmdPut) == 0)
 	{
 		HandleCmdPutL(aArgs, fs);
+	}
+	else if (aArgs[0].Compare(KCmdGet) == 0)
+	{
+		HandleCmdGetL(aArgs, fs);
 	}
 	else
 	{

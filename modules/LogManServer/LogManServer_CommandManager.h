@@ -47,6 +47,7 @@ protected:
 	TInt HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs);
 	TInt HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill);
 	TInt HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs);
+	TInt HandleCmdGetL(RArray<RBuf8>& aParameters, RFs& aFs);
 
 	/** Handle shell commands */
 	TInt HandleCommand();

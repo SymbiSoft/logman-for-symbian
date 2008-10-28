@@ -96,12 +96,15 @@ CLoggingServerServer::~CLoggingServerServer()
 
 TInt CLoggingServerServer::InitializeSocketServer()
 {
+	if( iSocketEngine ) return KErrNone; // Already initialized
+
 	TRAPD( err,
 			iSocketEngine = CSocketEngine::NewL( *(this->iCommandManager) );
 			iSocketEngine->StartListeningL(0);
 	);
 	return err;
 }
+
 void CLoggingServerServer::ConstructL()
 {
 	// Make first sure that underlying interface is active

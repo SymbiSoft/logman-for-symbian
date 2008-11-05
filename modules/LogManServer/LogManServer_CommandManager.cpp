@@ -36,7 +36,7 @@ _LIT8(KStrHelpMsg, ""
 	"cp <source> <target>   - Copy files in device.\n"
 	"put <target>           - File transfer to device\n"
 	"get <source>[startpos] - Echo file contents. If startpos is negative,\n"
-	"						  position is calculated from the end of file."
+	"                         position is calculated from the end of file.\n"
 	"exec <target>[<args>]  - Launch executable with given arguments.\n"
 	"kill <process>         - Kill process. Wildcard supported.\n"
 	"ps <process>           - List processes. Wildcard supported.\n"
@@ -414,17 +414,16 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 						&(process.ExitCategory()), process.ExitReason());
 
 				iLoggingServerServer->SendMessage(processinfo);
+			}
+			else
+			{
+				iLoggingServerServer->SendMessage(processname);
 
 				if (aDoKill)
 				{
 					process.Kill(-1);
 					iLoggingServerServer->SendMessage(_L(" killed") );
 				}
-
-			}
-			else
-			{
-				iLoggingServerServer->SendMessage(processname);
 			}
 		}
 		iLoggingServerServer->SendMessage(KStrNewLine);
@@ -477,7 +476,7 @@ TInt CLoggingServerCommandManager::HandleCmdGetL(RArray<RBuf8>& aParameters,
 	RFile targetfile;
 	LeaveIfFailedL(targetfile.Open(aFs, path_target, EFileShareReadersOrWriters));
 	CleanupClosePushL(targetfile);
-	
+
 	TInt size = 0;
 	targetfile.Size(size);
 	TBuf8<BUFFER_SIZE> tmp;
@@ -493,7 +492,7 @@ TInt CLoggingServerCommandManager::HandleCmdGetL(RArray<RBuf8>& aParameters,
 	do
 	{
 		err = targetfile.Read(tmp, BUFFER_SIZE);
-		iLoggingServerServer->SendMessage(tmp);		
+		iLoggingServerServer->SendMessage(tmp);
 		LeaveIfFailedL(err);
 	}
 	while( tmp.Length() > 0 );
@@ -821,9 +820,9 @@ void CLoggingServerCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	if (arg.Length() > 0)
 		AddToList(aArgs, arg);
 	arg.Close();
-	
+
 	if( aArgs.Count() == 0 ) return;
-	
+
 	// Connect to the file server
 	RFs fs;
 	fs.Connect();

@@ -82,6 +82,13 @@ CLoggingServerServer::~CLoggingServerServer()
 		//iSerialComm.NotifyDataAvailableCancel();
 	}
 
+	if( iSocketEngine )
+	{
+		iSocketEngine->Stop();
+		delete iSocketEngine;
+		iSocketEngine = NULL;
+	}
+
 	if (iCommandManager)
 	{
 		iCommandManager->Cancel();

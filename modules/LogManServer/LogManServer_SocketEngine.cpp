@@ -51,7 +51,13 @@ CSocketEngine::~CSocketEngine()
 		iReader->Cancel();
 		delete iReader;
 	}
-
+	if( iTimer )
+	{
+		// Should be cancelled by Cancel() before.
+		delete iTimer;
+		iTimer = NULL;
+	}
+	
 	iListenSocket.Close();
 	iDataSocket.Close();
 	iConnection.Close();

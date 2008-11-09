@@ -8,7 +8,7 @@
 
 // UID for the application;
 // this should correspond to the uid defined in the mmp file
-const TUid KUidLoggingServerGuiApp = { 0xAF111111 };
+const TUid KUidLoggingServerGuiApp = { __UID3__ };
 
 /// Application class for LogManGui
 /**

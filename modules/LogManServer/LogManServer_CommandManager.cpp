@@ -397,8 +397,16 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 
 	TFullName processname;
 	TMessageBuffer processinfo;
-	_LIT(KFmtProcessInfo,
+	_LIT(KFmtDeadProcessInfo,
 			"%25S Priority:%d ExitType:%d ExitCategory:%S ExitReason:%d");
+	_LIT(KFmtAliveProcessInfo,
+				"%25S Priority:%d\n"
+			    "  MemoryInfo:\n"
+			    "   Code   base:%x size:%x\n"
+			    "   Data   base:%x size:%x\n"
+			    "   Init   base:%x size:%x\n"
+			    "   Uninit base:%x size:%x\n"
+			);
 	while (finder.Next(processname) == KErrNone)
 	{
 
@@ -409,22 +417,45 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 
 			if (process.ExitType() != EExitPending)
 			{
-				processinfo.Format(KFmtProcessInfo, &processname,
+				processinfo.Format(KFmtDeadProcessInfo, &processname,
 						process.Priority(), process.ExitType(),
 						&(process.ExitCategory()), process.ExitReason());
 
 				iLoggingServerServer->SendMessage(processinfo);
 			}
-			else
+			// Give more info only when process name is given as a parameter
+			else if ( aParameters.Count() >= 2 )
 			{
-				iLoggingServerServer->SendMessage(processname);
-
 				if (aDoKill)
 				{
+					iLoggingServerServer->SendMessage(processname);
 					process.Kill(-1);
 					iLoggingServerServer->SendMessage(_L(" killed") );
 				}
+				else
+				{
+					TProcessMemoryInfo info;
+					process.GetMemoryInfo( info );
+
+					processinfo.Format(KFmtAliveProcessInfo, &processname,
+									   process.Priority(),
+									   info.iCodeBase,
+									   info.iCodeSize,
+									   info.iConstDataBase,
+									   info.iConstDataSize,
+									   info.iInitialisedDataBase,
+									   info.iInitialisedDataSize,
+									   info.iUninitialisedDataBase,
+									   info.iUninitialisedDataSize
+									   );
+					iLoggingServerServer->SendMessage(processinfo);
+				}
 			}
+			else{
+				iLoggingServerServer->SendMessage(processname);
+			}
+			process.Close();
+
 		}
 		iLoggingServerServer->SendMessage(KStrNewLine);
 	}

@@ -141,6 +141,7 @@ public:
         return result;
     }
 
+
     /** Send testing log to server for writing.
     <PRE>
     Example:
@@ -150,6 +151,7 @@ public:
     @param aDoAsync True to write data asynchronously in server
     @return KErrNone or one of the system-wide error codes.
     */
+    IMPORT_C TInt Write( const char* aString, TBool aDoAsync = EFalse );
     IMPORT_C TInt Write(const TDesC8& aString, TBool aDoAsync = EFalse );
     IMPORT_C TInt Write(const TDesC16& aString, TBool aDoAsync = EFalse );
 
@@ -160,6 +162,7 @@ public:
     @param aList A pointer to an argument list.
     @return KErrNone or one of the system-wide error codes.
     */
+    IMPORT_C TInt WriteFormatList(const char* aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList );
     IMPORT_C TInt WriteFormatList(const TDesC8& aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList );
     IMPORT_C TInt WriteFormatList(const TDesC16& aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList );
 

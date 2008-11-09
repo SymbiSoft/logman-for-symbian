@@ -3,7 +3,7 @@
 #include <LogManGui.rsg>
 
 UID2 KUidAppRegistrationResourceFile
-UID3 0xAF111111
+UID3 __UID3__
 
 RESOURCE APP_REGISTRATION_INFO
   {

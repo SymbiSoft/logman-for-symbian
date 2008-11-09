@@ -190,14 +190,17 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		_LIT(KTestMsg16, "This is 16-bit test message\n");
 		log.Write(KTestMsg8);
 		log.Write(KTestMsg16);
+
 		_LIT8(KTestFormattedMsg8, "This is %d-bit formatted message\n" );
 		_LIT( KTestFormattedMsg16, "This is %d-bit formatted message\n" );
 		log.Writef(KTestFormattedMsg8, EFalse, 8);
 		log.Writef(KTestFormattedMsg16, EFalse, 16);
+
 		_LIT( KTestStaticMsg8, "This is 8-bit message sent using static Log\n" );
 		_LIT( KTestStaticMsg16, "This is 16-bit message sent using static Log\n" );
 		RLogMan::Log(KTestStaticMsg8);
 		RLogMan::Log(KTestStaticMsg16);
+
 		_LIT8(KTestStaticFormattedMsg8, "This is %d-bit formatted message sent using static Log\n" );
 		_LIT( KTestStaticFormattedMsg16, "This is %d-bit formatted message sent using static Log\n" );
 		RLogMan::Log(KTestStaticFormattedMsg8, EFalse, 8);
@@ -223,6 +226,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		_LIT(KTestMsg16Async, "This is 16-bit asynchronous test message\n");
 		log.Write(KTestMsg8Async, ETrue);
 		log.Write(KTestMsg16Async, ETrue);
+
 		_LIT8( KAsynchronous8, "asynchronous" );
 		_LIT16( KAsynchronous16, "asynchronous" );
 		_LIT8(KTestFormattedMsg8Async, "This is %d-bit %S formatted message\n" );
@@ -234,10 +238,11 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		_LIT16( KTestStaticMsg16, "This is 16-bit asynchronous message sent using static Log\n" );
 		RLogMan::Log(KTestStaticMsg8);
 		RLogMan::Log(KTestStaticMsg16);
+
 		_LIT8(KTestStaticFormattedMsg8, "This is %d-bit %S formatted message sent using static Log\n" );
 		_LIT16( KTestStaticFormattedMsg16, "This is %d-bit %S formatted message sent using static Log\n" );
-		RLogMan::Log(KTestStaticFormattedMsg8, EFalse, 8, &KAsynchronous8);
-		RLogMan::Log(KTestStaticFormattedMsg16, EFalse, 16, &KAsynchronous16);
+		RLogMan::Log(KTestStaticFormattedMsg8, ETrue, 8, &KAsynchronous8);
+		RLogMan::Log(KTestStaticFormattedMsg16, ETrue, 16, &KAsynchronous16);
 	}
 		break;
 

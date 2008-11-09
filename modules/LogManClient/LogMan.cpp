@@ -4,9 +4,12 @@
 #include "LogMan.h"
 #include "e32debug.h"
 #include <c32comm.h> //TPortName
+#include <string.h> // For strlen
 
+//void __cyg_profile_func_exit(void *this_fn, void *call_site);
 EXPORT_C RLogMan::RLogMan()
 {
+	//__cyg_profile_func_exit(NULL,NULL);
 }
 
 EXPORT_C RLogMan::~RLogMan()
@@ -136,6 +139,12 @@ EXPORT_C TInt RLogMan::LoadModule( TFullName& aModuleName )
 
 }
 
+EXPORT_C TInt RLogMan::WriteFormatList(const char* aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList )
+{
+	TPtrC8 fmt((TUint8*)aFmt, strlen( aFmt ) );
+	return WriteFormatList(fmt, aSize, aDoAsync, aList );
+}
+
 EXPORT_C TInt RLogMan::WriteFormatList(const TDesC16& aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList )
 {
 
@@ -167,6 +176,13 @@ EXPORT_C TInt RLogMan::WriteFormatList(const TDesC8& aFmt, TInt aSize, TBool aDo
         string.Close();
     }
     return result;
+}
+
+// Convert to symbian 8-bit descriptor
+EXPORT_C TInt RLogMan::Write( const char* aString, TBool aDoAsync )
+{
+	TPtrC8 string((TUint8*)aString, strlen( aString ) );
+	return Write(string, aDoAsync );
 }
 
 EXPORT_C TInt RLogMan::Write(const TDesC16& aString, TBool aDoAsync )

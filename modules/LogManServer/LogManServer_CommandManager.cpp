@@ -19,7 +19,8 @@ _LIT8
 				"\nThe system cannot find the path specified. Err:%d\n");
 _LIT8(KFmtErrDetected, "\nError:%d\n");
 // TODO: Generate
-_LIT8(KStrNewLine, "\n");
+#define NL "\r\n"
+_LIT8(KStrNewLine, NL);
 _LIT8(KCmdList, "list");
 _LIT8(KCmdHelp, "help");
 _LIT8(KCmdCopy, "cp");
@@ -398,14 +399,22 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 	TFullName processname;
 	TMessageBuffer processinfo;
 	_LIT(KFmtDeadProcessInfo,
-			"%25S Priority:%d ExitType:%d ExitCategory:%S ExitReason:%d");
+			"%S Priority:%d" NL " ExitType:%d ExitCategory:%S(%d)");
 	_LIT(KFmtAliveProcessInfo,
-				"%25S Priority:%d\n"
-			    "  MemoryInfo:\n"
-			    "   Code   base:%x size:%x\n"
-			    "   Data   base:%x size:%x\n"
-			    "   Init   base:%x size:%x\n"
-			    "   Uninit base:%x size:%x\n"
+				"%S Priority:%d" NL
+				" SID:%x" NL
+			    " MemoryInfo:" NL
+			    "  Code   base:%x size:%x" NL
+			    "  Data   base:%x size:%x" NL
+			    "  Init   base:%x size:%x" NL
+			    "  Uninit base:%x size:%x" NL
+			    " Threads:" NL
+			);
+
+	_LIT(KFmtThreadInfo, "  %S\r\n"
+						 "   StackInfo:" NL
+						 "    size:%x" NL
+						 "    base:%x limit:%x expand:%x" NL
 			);
 	while (finder.Next(processname) == KErrNone)
 	{
@@ -434,11 +443,15 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 				}
 				else
 				{
+
 					TProcessMemoryInfo info;
 					process.GetMemoryInfo( info );
 
+					TUid sid = process.SecureId();
+
 					processinfo.Format(KFmtAliveProcessInfo, &processname,
 									   process.Priority(),
+									   sid.iUid,
 									   info.iCodeBase,
 									   info.iCodeSize,
 									   info.iConstDataBase,
@@ -449,6 +462,37 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 									   info.iUninitialisedDataSize
 									   );
 					iLoggingServerServer->SendMessage(processinfo);
+
+					// Get threads
+					TFindThread tfinder;
+					TFullName threadname;
+					while( tfinder.Next(threadname) == KErrNone ) {
+
+						RThread thread;
+						RProcess owner;
+
+						if( thread.Open( tfinder ) == KErrNone )
+						{
+							TInt getProErr =  thread.Process( owner );
+
+							if( owner.Id() == process.Id() )
+							{
+								TThreadStackInfo sinfo;
+								thread.StackInfo(sinfo);
+
+								processinfo.Format( KFmtThreadInfo, &threadname,
+									( sinfo.iBase - sinfo.iLimit ),
+									sinfo.iBase,
+									sinfo.iLimit,
+									sinfo.iExpandLimit
+								);
+
+								iLoggingServerServer->SendMessage(processinfo);
+							}
+							owner.Close();
+							thread.Close();
+						}
+					}
 				}
 			}
 			else{
@@ -459,7 +503,61 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 		}
 		iLoggingServerServer->SendMessage(KStrNewLine);
 	}
+/*
+	TFindLibrary findLib;
+	TFullName libName;
+	iLoggingServerServer->SendMessage(_L("Finding libs"));
+	while (findLib.Next(libName)==KErrNone)
+	{
+		iLoggingServerServer->SendMessage( _L("Library") );
+		iLoggingServerServer->SendMessage( libName );
+		iLoggingServerServer->SendMessage(KStrNewLine);
 
+		RLibrary lib;
+		if( lib.Load( libName ) == KErrNone )
+		{
+			TInt ordinal = 1;
+			TLibraryFunction func = lib.Lookup(ordinal);
+			while( func != NULL )
+			{
+				TBuf<128> tmp;
+				tmp.Format( _L("ordinal: %x" NL ), ordinal );
+				iLoggingServerServer->SendMessage( tmp );
+
+				ordinal += 1;
+				func = lib.Lookup(ordinal);
+			}
+
+			TInt codesize = 0, datasize = 0;
+			if( lib.GetRamSizes(codesize, datasize) )
+			{
+				TBuf<128> tmp;
+				tmp.Format( _L("codesize:%x datasize:%x" NL ), codesize, datasize );
+				iLoggingServerServer->SendMessage( tmp );
+			}
+
+		}
+	}
+
+	TFindChunk findChunk;
+	findChunk.Find(_L("*"));
+
+	TFullName chunkName;
+	while (findChunk.Next(chunkName)!=KErrNone)
+	{
+		iLoggingServerServer->SendMessage( _L("Chunk") );
+		iLoggingServerServer->SendMessage( chunkName );
+		iLoggingServerServer->SendMessage(KStrNewLine);
+
+		RChunk chunk;
+		if (chunk.Open(findChunk)!=KErrNone)
+			continue;
+
+		TUint8* base=chunk.Base();
+		TInt size=chunk.Size();
+		chunk.Close();
+	}
+*/
 	if (aParameters.Count() >= 2)
 	{
 		CleanupStack::PopAndDestroy(&pattern);

@@ -69,6 +69,25 @@
     #define LOGMAN_SEND_HEAP_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
     // Easy one liner for logging information about thread's memory usage
     #define LOGMAN_SEND_MEMORY_INFO() { RLogMan __logman;__logman.Connect();__logman.MemoryInfo(); __logman.Close(); }
+
+     // Easy one liner for leaves monitoring
+    #define LOGMAN_SENDLEAVEIFERROR( cmd ) { TInt _Cmd_Err = cmd ; if (_Cmd_Err != KErrNone) { LOGMAN_SENDLOGF("Leave: %d", _Cmd_Err); User::Leave(_Cmd_Err);}; }
+    #define LOGMAN_SENDTRAPD( err, cmd ) TRAPD(err, cmd) ; if ( err != KErrNone) { LOGMAN_SENDLOGF("TRAPD err: %d", err );} else {}
+
+    // Other helpul stuff
+    // Print descriptor in hex format
+    template <class TDescriptor>
+    void LOGMAN_SENDDESC_HEX(const TDescriptor &aDes)
+	{
+	RBuf content;
+	CleanupClosePushL(content);
+	content.Create(KMaxFormatBufferSize);
+	for (TInt i=0; i < aDes.Length(); ++i)
+		content.AppendFormat(_L("%x "), aDes[i]);
+	LOGMAN_SENDDESC(content);LOGMAN_SENDDESC(_L("\n"));
+	CleanupStack::PopAndDestroy(1);
+	};
+
         
     // =========================================================================================
     // Using RLogMan as a member
@@ -95,12 +114,18 @@
     #define LOGMAN_STACK_INFO()  LOGMAN_MEMBER_VARIABLE->StackInfo();
     #define LOGMAN_HEAP_INFO()   LOGMAN_MEMBER_VARIABLE->HeapInfo();
     #define LOGMAN_MEMORY_INFO() LOGMAN_MEMBER_VARIABLE->MemoryInfo();
+
     
     // Log line of code before executing it.
     #define LOGMAN_LINE( line ) LOGMAN_LOG( #line ); line
 
     // This goes to class's destructor
     #define LOGMAN_CLOSE  if( LOGMAN_MEMBER_VARIABLE ) { LOGMAN_MEMBER_VARIABLE->Close(); delete LOGMAN_MEMBER_VARIABLE; }
+
+     // For leaves monitoring
+    #define LOGMAN_LEAVEIFERROR( cmd ) { TInt _Cmd_Err = cmd ; if (_Cmd_Err != KErrNone) { LOGMAN_LOGF("Leave: %d", _Cmd_Err); User::Leave(_Cmd_Err);}; }
+    #define LOGMAN_TRAPD( err, cmd ) TRAPD(err, cmd) ; if ( err != KErrNone) { LOGMAN_LOGF("TRAPD err: %d", err );} else {}
+
 
 #else // not __LOGMAN_ENABLED__
     #pragma message( RLogMan logging disabled )
@@ -118,6 +143,10 @@
     #define LOGMAN_SEND_STACK_INFO()
     #define LOGMAN_SEND_HEAP_INFO()
     #define LOGMAN_SEND_MEMORY_INFO()
+
+    #define LOGMAN_SENDLEAVEIFERROR( cmd ) User::LeaveIfError( cmd )
+    #define LOGMAN_SENDTRAPD( err, cmd ) TRAPD(err, cmd)
+    #define LOGMAN_SENDDESC_HEX( desc )
     
     #define LOGMAN_MEMBER
     #define LOGMAN_INIT
@@ -132,9 +161,13 @@
     #define LOGMAN_STACK_INFO() 
     #define LOGMAN_HEAP_INFO()  
     #define LOGMAN_MEMORY_INFO()
+
+    #define LOGMAN_LEAVEIFERROR( cmd ) User::LeaveIfError( cmd )
+    #define LOGMAN_TRAPD( err, cmd ) TRAPD(err, cmd)
     
     #define LOGMAN_CLOSE
     #define LOGMAN_LINE( line ) line
+
 
 #endif // __LOGMAN_ENABLED__
 

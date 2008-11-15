@@ -5,6 +5,13 @@
 #include <c32comm.h> //TPortName
 #include "types.h"
 
+#if !defined( __WINSCW__ )
+	#define __NON_INSTRUMENT_FUNCTION__   __attribute__((__no_instrument_function__))
+	#define PTRACE_OFF        __NON_INSTRUMENT_FUNCTION__
+#else
+	#define PTRACE_OFF
+#endif
+
 _LIT(KLoggingServerExe,"LogMan.exe");
 
 /// Increase if panics with text formatting.
@@ -98,22 +105,8 @@ public:
     @param aDoAsync True to send asynchronously
     @param ... List of format data
     */
-    template<class TFmt> static TInt Log( const TFmt& aFmt, TBool aDoAsync = EFalse, ... )
-    {
-        VA_LIST ap;
-        VA_START( ap, aDoAsync );
-
-        RLogMan logman;
-
-        TInt result = logman.Connect();
-        if ( result == KErrNone) {
-            logman.WriteFormatList( aFmt, KMaxFormatBufferSize, aDoAsync, ap );
-            logman.Close();
-        }
-        VA_END(ap);
-
-        return result;
-    };
+    template<class TFmt>
+    static PTRACE_OFF TInt Log( const TFmt& aFmt, TBool aDoAsync = EFalse, ... );
 
     /**
     Format data and send.
@@ -129,17 +122,8 @@ public:
     @param ... List of format data
     */
     template<class TFmt>
-    TInt Writef(const TFmt& aFmt, TBool aDoAsync = EFalse, ... ) {
+    TInt PTRACE_OFF Writef(const TFmt& aFmt, TBool aDoAsync = EFalse, ... );
 
-        VA_LIST ap;
-        VA_START( ap, aDoAsync );
-
-        TInt result = this->WriteFormatList( aFmt, KMaxFormatBufferSize, aDoAsync, ap );
-
-        VA_END( ap );
-
-        return result;
-    }
 
 
     /** Send testing log to server for writing.
@@ -195,6 +179,37 @@ public:
     IMPORT_C TInt SetPort( TInt& aPort );
 
 };
+
+template<class TFmt> TInt RLogMan::Log( const TFmt& aFmt, TBool aDoAsync, ... )
+{
+	VA_LIST ap;
+	VA_START( ap, aDoAsync );
+
+	RLogMan logman;
+
+	TInt result = logman.Connect();
+	if ( result == KErrNone) {
+		logman.WriteFormatList( aFmt, KMaxFormatBufferSize, aDoAsync, ap );
+		logman.Close();
+	}
+	VA_END(ap);
+
+	return result;
+}
+
+template<class TFmt>
+TInt RLogMan::Writef(const TFmt& aFmt, TBool aDoAsync, ...)
+{
+
+	VA_LIST ap;
+	VA_START( ap, aDoAsync );
+
+	TInt result = this->WriteFormatList(aFmt, KMaxFormatBufferSize, aDoAsync, ap);
+
+	VA_END( ap );
+
+	return result;
+}
 
 #endif
 

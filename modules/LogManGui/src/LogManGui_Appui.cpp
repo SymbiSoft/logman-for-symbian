@@ -19,8 +19,8 @@
 
 void CLoggingServerGuiAppUi::HandleForegroundEventL(TBool aForeground)
 {
-LOGMAN_SENDLOGF( "HandleForegroundEventL %d", aForeground )
-UpdateServiceInfoL( );
+	LOGMAN_SENDLOGF( "HandleForegroundEventL %d", aForeground )
+	UpdateServiceInfoL( );
 }
 
 void CLoggingServerGuiAppUi::UpdateServiceInfoL()
@@ -80,17 +80,17 @@ void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 
 	if (err != KErrNone)
 	{
-		_LIT( KConnectFailed, "Service failed to connect serial." );
+		_LIT(KConnectFailed, "Service failed to connect serial.");
 
 		// Stringify the error code.
 		TName errcode;
-		_LIT( KStrErrNotFound, "KErrNotFound");
-		_LIT( KStrErrTimedOut, "KErrTimedOut");
-		_LIT( KStrErrInUse, "KErrInUse");
-		_LIT( KStrErrNotSupported, "KErrNotSupported");
-		_LIT( KStrErrAccessDenied, "KErrAccessDenied");
-		_LIT( KStrPermissionDenied,"KErrPermissionDenied");
-		_LIT( KStrErrLocked, "KErrLocked");
+		_LIT(KStrErrNotFound, "KErrNotFound");
+		_LIT(KStrErrTimedOut, "KErrTimedOut");
+		_LIT(KStrErrInUse, "KErrInUse");
+		_LIT(KStrErrNotSupported, "KErrNotSupported");
+		_LIT(KStrErrAccessDenied, "KErrAccessDenied");
+		_LIT(KStrPermissionDenied, "KErrPermissionDenied");
+		_LIT(KStrErrLocked, "KErrLocked");
 
 		switch (err)
 		{
@@ -119,7 +119,7 @@ void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 			// Not mapped, show the numeric code then.
 			errcode.Num(err);
 		}
-		_LIT( KErrorFmt, "Error:%S" );
+		_LIT(KErrorFmt, "Error:%S");
 		TName tmp;
 		tmp.Format(KErrorFmt, &errcode);
 		CEikonEnv::Static()->InfoWinL(KConnectFailed, tmp);
@@ -191,30 +191,32 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		log.Write(KTestMsg8);
 		log.Write(KTestMsg16);
 
-		_LIT8(KTestFormattedMsg8, "This is %d-bit formatted message\n" );
-		_LIT( KTestFormattedMsg16, "This is %d-bit formatted message\n" );
+		_LIT8(KTestFormattedMsg8, "This is %d-bit formatted message\n");
+		_LIT(KTestFormattedMsg16, "This is %d-bit formatted message\n");
 		log.Writef(KTestFormattedMsg8, EFalse, 8);
 		log.Writef(KTestFormattedMsg16, EFalse, 16);
 
-		_LIT( KTestStaticMsg8, "This is 8-bit message sent using static Log\n" );
-		_LIT( KTestStaticMsg16, "This is 16-bit message sent using static Log\n" );
+		_LIT(KTestStaticMsg8, "This is 8-bit message sent using static Log\n");
+		_LIT(KTestStaticMsg16, "This is 16-bit message sent using static Log\n");
 		RLogMan::Log(KTestStaticMsg8);
 		RLogMan::Log(KTestStaticMsg16);
 
-		_LIT8(KTestStaticFormattedMsg8, "This is %d-bit formatted message sent using static Log\n" );
-		_LIT( KTestStaticFormattedMsg16, "This is %d-bit formatted message sent using static Log\n" );
+		_LIT8(KTestStaticFormattedMsg8,
+				"This is %d-bit formatted message sent using static Log\n");
+		_LIT(KTestStaticFormattedMsg16,
+				"This is %d-bit formatted message sent using static Log\n");
 		RLogMan::Log(KTestStaticFormattedMsg8, EFalse, 8);
 		RLogMan::Log(KTestStaticFormattedMsg16, EFalse, 16);
 
-		log.Log(_L( "Testing memory info logging\n" ));
+		log.Log(_L("Testing memory info logging\n"));
 
-		log.Log(_L( "StackInfo\n" ));
+		log.Log(_L("StackInfo\n"));
 		log.StackInfo();
 
-		log.Log(_L( "HeapInfo\n" ));
+		log.Log(_L("HeapInfo\n"));
 		log.HeapInfo();
 
-		log.Log(_L( "MemoryInfo\n" ));
+		log.Log(_L("MemoryInfo\n"));
 		log.MemoryInfo();
 
 	}
@@ -227,20 +229,25 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		log.Write(KTestMsg8Async, ETrue);
 		log.Write(KTestMsg16Async, ETrue);
 
-		_LIT8( KAsynchronous8, "asynchronous" );
-		_LIT16( KAsynchronous16, "asynchronous" );
-		_LIT8(KTestFormattedMsg8Async, "This is %d-bit %S formatted message\n" );
-		_LIT16( KTestFormattedMsg16Async, "This is %d-bit %S formatted message\n" );
+		_LIT8(KAsynchronous8, "asynchronous");
+		_LIT16(KAsynchronous16, "asynchronous");
+		_LIT8(KTestFormattedMsg8Async, "This is %d-bit %S formatted message\n");
+		_LIT16(KTestFormattedMsg16Async,
+				"This is %d-bit %S formatted message\n");
 
 		log.Writef(KTestFormattedMsg8Async, ETrue, 8, &KAsynchronous8);
 		log.Writef(KTestFormattedMsg16Async, ETrue, 16, &KAsynchronous16);
-		_LIT8( KTestStaticMsg8, "This is 8-bit asynchronous message sent using static Log\n" );
-		_LIT16( KTestStaticMsg16, "This is 16-bit asynchronous message sent using static Log\n" );
+		_LIT8(KTestStaticMsg8,
+				"This is 8-bit asynchronous message sent using static Log\n");
+		_LIT16(KTestStaticMsg16,
+				"This is 16-bit asynchronous message sent using static Log\n");
 		RLogMan::Log(KTestStaticMsg8);
 		RLogMan::Log(KTestStaticMsg16);
 
-		_LIT8(KTestStaticFormattedMsg8, "This is %d-bit %S formatted message sent using static Log\n" );
-		_LIT16( KTestStaticFormattedMsg16, "This is %d-bit %S formatted message sent using static Log\n" );
+		_LIT8(KTestStaticFormattedMsg8,
+				"This is %d-bit %S formatted message sent using static Log\n");
+		_LIT16(KTestStaticFormattedMsg16,
+				"This is %d-bit %S formatted message sent using static Log\n");
 		RLogMan::Log(KTestStaticFormattedMsg8, ETrue, 8, &KAsynchronous8);
 		RLogMan::Log(KTestStaticFormattedMsg16, ETrue, 16, &KAsynchronous16);
 	}
@@ -248,7 +255,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 
 	case ELogServCmdMenuMainLoadSerial:
 	{
-		_LIT( KModuleQueryTxt, "Give serial module to load" );
+		_LIT(KModuleQueryTxt, "Give serial module to load");
 		TFullName module;
 		if (GenericTextQueryL(KModuleQueryTxt, module))
 		{
@@ -259,7 +266,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 
 	case ELogServCmdMenuMainSetPortName:
 	{
-		_LIT( KModuleQueryTxt, "Enable serial port" );
+		_LIT(KModuleQueryTxt, "Enable serial port");
 		TPortName portname = log.PortName();
 		if (GenericTextQueryL(KModuleQueryTxt, portname))
 		{
@@ -272,7 +279,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		break;
 	case ELogServCmdMenuMainSetPort:
 	{
-		_LIT( KModuleQueryTxt, "Set port" );
+		_LIT(KModuleQueryTxt, "Set port");
 		TInt port = log.Port();
 		if (GenericNumberQueryL(KModuleQueryTxt, port))
 		{

@@ -4,8 +4,8 @@ UID        0x0 0x0
 
 MACRO       __UID3__=0x0
 MACRO       __SERIES60__
-MACRO       __SYMBIAN_OS_VERSION__=94
-MACRO       __UI_VERSION__=50
+MACRO       __SYMBIAN_OS_VERSION__=92
+MACRO       __UI_VERSION__=31
 
 SYSTEMINCLUDE \epoc32\include\libc
 SYSTEMINCLUDE \epoc32\include

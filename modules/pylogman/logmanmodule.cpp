@@ -123,13 +123,7 @@ static PyObject* LogMan_Connect( Type_LogMan* self ){
         
     PRINTF("Connect");
     TInt result = self->iLogMan->Connect();
-    if( result == KErrNone ) {
-        Py_INCREF(Py_True);
-        return Py_True;
-    }
-    
-    return SPyErr_SetFromSymbianOSErr(result);
-    
+    return Py_BuildValue( "i", result );
     
 }
 /// Python wrapper for RLogMan.LoadModule
@@ -151,13 +145,7 @@ static PyObject* LogMan_LoadModule( Type_LogMan* self, PyObject* args ){
     
     //Py_END_ALLOW_THREADS;
     
-    if (err)
-    {
-    	return SPyErr_SetFromSymbianOSErr(err);
-    }
-    
-    Py_INCREF(Py_True);
-    return Py_True;
+    return Py_BuildValue( "i", err );
     
 }
 /// Python wrapper for RLogMan.ConnectSerial
@@ -165,13 +153,7 @@ static PyObject* LogMan_ConnectSerial( Type_LogMan* self ){
         
     PRINTF("ConnectSerial");
     TInt result = self->iLogMan->ConnectSerial();
-    if( result == KErrNone ) {
-        Py_INCREF(Py_True);
-        return Py_True;
-    }
-    
-    return SPyErr_SetFromSymbianOSErr(result);
-    
+    return Py_BuildValue( "i", result );
     
 }
 /// Python wrapper for RLogMan.IsSerialConnected
@@ -221,12 +203,12 @@ static PyObject* LogMan_MemoryInfo( Type_LogMan* self ){
         
     PRINTF("MemoryInfo");
     TInt result = self->iLogMan->MemoryInfo();
-    if( result == KErrNone ) {
+    if( result == (int)ETrue ) {
         Py_INCREF(Py_True);
         return Py_True;
     }
-    
-    return SPyErr_SetFromSymbianOSErr(result);
+    Py_INCREF(Py_False);
+    return Py_False;
     
     
 }
@@ -326,13 +308,7 @@ static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args ){
     
     //Py_END_ALLOW_THREADS;
     
-    if (err)
-    {
-    	return SPyErr_SetFromSymbianOSErr(err);
-    }
-    
-    Py_INCREF(Py_True);
-    return Py_True;
+    return Py_BuildValue( "i", err );
     
 }
 /// Python wrapper for RLogMan.StartSocketServer
@@ -340,13 +316,7 @@ static PyObject* LogMan_StartSocketServer( Type_LogMan* self ){
         
     PRINTF("StartSocketServer");
     TInt result = self->iLogMan->StartSocketServer();
-    if( result == KErrNone ) {
-        Py_INCREF(Py_True);
-        return Py_True;
-    }
-    
-    return SPyErr_SetFromSymbianOSErr(result);
-    
+    return Py_BuildValue( "i", result );
     
 }
 //[[[end]]]

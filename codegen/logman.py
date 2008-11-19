@@ -22,13 +22,7 @@ TInt err = self->iLogMan->%(FNAME)s( tmp );
 
 //Py_END_ALLOW_THREADS;
 
-if (err)
-{
-	return SPyErr_SetFromSymbianOSErr(err);
-}
-
-Py_INCREF(Py_True);
-return Py_True;
+return Py_BuildValue( "i", err );
 """
 def getStrSetter( fname, type, prefix = "Set" ):
     code = PYTHON_STRING_SETTER_TEMPLATE_CODE % { "FNAME" : prefix + fname,
@@ -76,6 +70,9 @@ return Py_False;
 def getBoolGetter( fname ):
     return BOOL_RETURNING_TEMPLATE % {"FNAME" : fname }
 
+def getIntGetter(fname):
+    return getSimpleGetter( fname, "TInt", "i" )
+
 ERROR_RAISING_GETTER_TEMPLATE = """
 PRINTF("%(FNAME)s");
 TInt result = self->iLogMan->%(FNAME)s();
@@ -91,8 +88,8 @@ def getErrorRaisingGetter( fname ):
     return ERROR_RAISING_GETTER_TEMPLATE % {"FNAME" : fname }
 
 
-CONNECT_IMPLEMENTATION              = getErrorRaisingGetter("Connect" )
-CONNECTSERIAL_IMPLEMENTATION        = getErrorRaisingGetter("ConnectSerial" )
+CONNECT_IMPLEMENTATION              = getIntGetter("Connect" )
+CONNECTSERIAL_IMPLEMENTATION        = getIntGetter("ConnectSerial" )
 IS_SERIAL_CONNECTED_IMPLEMENTATION  = getBoolGetter("IsSerialConnected")
 
 PYTHON_INT_SETTER_TEMPLATE_CODE = """
@@ -225,7 +222,7 @@ class LogMan:
                         
                 Function( "static PyObject*", "LogMan_MemoryInfo",
                             SELF,
-                            code = getErrorRaisingGetter( "MemoryInfo" ) 
+                            code = getBoolGetter( "MemoryInfo" ) 
                         ),
                 
                 Function( "static PyObject*", "LogMan_Write",
@@ -263,7 +260,7 @@ class LogMan:
                         ),
                 Function( "static PyObject*", "LogMan_StartSocketServer",
                             [ Attribute( "Type_LogMan*", "self") ],
-                          code = getErrorRaisingGetter( "StartSocketServer" )
+                          code = getIntGetter( "StartSocketServer" )
                         ),
               ]
 

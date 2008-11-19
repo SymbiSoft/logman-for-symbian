@@ -20,7 +20,7 @@ def install():
     source = os.path.normpath( source )
     for header in glob.glob( os.path.join( source, "*.h") ):
         s = header
-        t = installpath + os.path.basename( header )
+        t = os.path.join( installpath, os.path.basename( header ) )
         print "Copying %s ==> %s" % ( s, t )
         shutil.copyfile( s, t )
     

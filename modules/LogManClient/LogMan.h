@@ -3,7 +3,7 @@
 
 #include <e32std.h>
 #include <C32COMM.H> //TPortName
-#include "types.h"
+#include <logman/types.h>
 
 _LIT(KLoggingServerExe,"LogMan.exe");
 
@@ -52,11 +52,11 @@ public:
     IMPORT_C TBool IsSerialConnected();
 
     /** @return The amount of bytes sent by the server */
-    IMPORT_C TUint32 RLogMan::BytesSent();
+    IMPORT_C TUint32 BytesSent();
 
     /**
      * Disconnect LogMan server's serial connection.
-     * @return A system-wide error code.     
+     * @return A system-wide error code.
     */
     IMPORT_C TInt DisconnectSerial();
 
@@ -69,13 +69,13 @@ public:
     IMPORT_C TInt LoadModule( TFullName& aModuleName );
 
     /** Log information about stack usage */
-    IMPORT_C TInt RLogMan::StackInfo();
-    
+    IMPORT_C TInt StackInfo();
+
     /** Log information about heap usage */
-    IMPORT_C TInt RLogMan::HeapInfo();
-    
+    IMPORT_C TInt HeapInfo();
+
     /** Utility to log both stack and heap usage */
-    IMPORT_C TInt RLogMan::MemoryInfo();
+    IMPORT_C TInt MemoryInfo();
     
     /**
     High-level logging interface for simple one-line logging.

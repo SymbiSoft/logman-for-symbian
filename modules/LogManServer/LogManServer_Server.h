@@ -4,7 +4,7 @@
 #include <c32comm.h>
 #include <e32base.h>
 #include <in_sock.h>
-#include <CommDbConnPref.h>
+#include <commdbconnpref.h>
 
 #include "LogManServer_Session.h"
 #include "LogManServer_Defines.h"

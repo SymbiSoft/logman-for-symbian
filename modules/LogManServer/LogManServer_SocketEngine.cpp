@@ -1,6 +1,6 @@
 // System
 #include    <e32svr.h>
-#include    <CommDbConnPref.h>
+#include    <commdbconnpref.h>
 
 // Local
 #include    "LogManServer_SocketEngine.h"

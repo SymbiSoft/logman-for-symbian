@@ -116,13 +116,14 @@ def LogManDll():
                  
 def PyLogManDll():
     global USE_OPENC
+    global PYMODPREFIX
     #-------------------------------------------- pylogman defines ( Python client )
     def_folder = { COMPILER_WINSCW : "BWINS", COMPILER_GCCE : "EABI"}[COMPILER]
     
     name = "_pylogman"
     
     if PYTHON_LIB == "python25":
-        USE_OPENC=True
+        USE_OPENC   = True
         PYMODPREFIX = "251_"
         
     if PYTHON_LIB != "python222":

@@ -1,6 +1,7 @@
 PRJ_MMPFILES
 modules\LogManServer\LogManServer.mmp
 modules\LogManClient\LogMan.mmp
+modules\LogManClient\LogManStatic.mmp
 modules\pylogman\PyLogMan.mmp
 modules\LogManGui\group\LogManGui.mmp
 modules\PTrace\PTrace.mmp

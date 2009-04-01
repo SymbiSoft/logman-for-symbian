@@ -4,7 +4,7 @@
 // INCLUDES
 #include <coecntrl.h>
 
-#include <logmanutils.h>
+#include "logmanutils.h"
 
 /// Container holding LogMan service information on UI.
 class SLogManInformation {

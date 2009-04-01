@@ -22,7 +22,7 @@ LOGGINGSERVER_INCLUDES = [ join("modules", x) for x in [
 
 PACKAGE_DRIVE_MAP = { "C" : ".*[.](mif|rsc)" }
 
-opts = Options()
+opts = Variables()
 opts.Add('pythonlib', 'Select correct Python library', "Python222")
 opts.Add('cert', 'Set signing certificate', None)
 opts.Add('key', 'Set certificate key', None)
@@ -40,8 +40,15 @@ LOGMAN_VERSION = ".".join(map(str, codegen.pkg_gen.get_build_number()))
 LOGMAN_PACKAGE = "LogMan_%s_%s_%s.sis" % (COMPILER, RELEASE, LOGMAN_VERSION.replace(".", "_"))
 
 PYTHON_LIB = ARGUMENTS.get("pythonlib", "python222")
-Help("pythonlib - Python library to link pylogman with: default=Python222\n")
- 
+Help("pythonlib - Python library to link pylogman with. python25 sets pymodprefix and openc settings automatically: default=Python222\n")
+
+PYMODPREFIX = ARGUMENTS.get("pymodprefix", "")
+Help("pymodprefix - Prefix required at beginning of dynamic extension's filename: default=''\n")
+
+USE_OPENC = ARGUMENTS.get("openc", "false")
+Help("openc - Use OpenC: default=false\n")
+
+  
 PACKAGE_UID  = 0xe3195807
 SERVER_UID   = PACKAGE_UID + 1
 GUI_UID      = SERVER_UID + 1
@@ -91,45 +98,67 @@ def LogManDll():
     #logman_sources += glob.glob(join("modules", "Common", "ptrace_logman.cpp"))
      
     logman_libraries = [ 'euser', 'efsrv', 'estlib' ]
-    logman_sources = glob.glob(join("modules", "LogManClient", "*.cpp"))    
-     
+    logman_sources = Glob(join("modules", "LogManClient", "*.cpp"))        
+    
     def_folder = { COMPILER_WINSCW : "BWINS", COMPILER_GCCE : "EABI"}[COMPILER]
-    return SymbianProgram('LogMan', TARGETTYPE_DLL,
-                    logman_sources,
-                    includes = logManDllIncludes,
-                    sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
-                    libraries   = logman_libraries,
-                    uid3 = CLIENT_UID,
-                    defines=COMMON_DEFINES,
-                    package=LOGMAN_PACKAGE,
-                    package_drive_map=PACKAGE_DRIVE_MAP,
-                    mmpexport = join( "modules", "LogManClient", "LogMan.mmp" ),
-                    )
+    for name, type in [('LogMan', TARGETTYPE_DLL),('LogManStatic', TARGETTYPE_LIB)]:
+          SymbianProgram(name, type,
+                        logman_sources,
+                        includes = logManDllIncludes,
+                        sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
+                        libraries   = logman_libraries,
+                        uid3 = CLIENT_UID,
+                        defines=COMMON_DEFINES,
+                        package=LOGMAN_PACKAGE,
+                        package_drive_map=PACKAGE_DRIVE_MAP,
+                        mmpexport = join( "modules", "LogManClient", name + ".mmp" ),
+                        )        
                  
 def PyLogManDll():
+    global USE_OPENC
     #-------------------------------------------- pylogman defines ( Python client )
     def_folder = { COMPILER_WINSCW : "BWINS", COMPILER_GCCE : "EABI"}[COMPILER]
-    pylogman_sysincludes = [ join(EPOCROOT, "epoc32", "include", "libc"),
-                             join(EPOCROOT, "epoc32", "include", "python"),
-                          #join("modules", "LogManClient")
-                        ]
     
+    name = "_pylogman"
+    
+    if PYTHON_LIB == "python25":
+        USE_OPENC=True
+        PYMODPREFIX = "251_"
+        
+    if PYTHON_LIB != "python222":
+        name = PYMODPREFIX + name
+                
+        sysincludes = [ 
+                        join(EPOC32_INCLUDE, PYTHON_LIB),
+                      ] 
+    else:        
+        
+        sysincludes = [
+                        join(EPOC32_INCLUDE, "python"),
+                      ]
+        
+    if USE_OPENC:
+        sysincludes.append( join(EPOC32_INCLUDE, "stdapis") )
+    else:
+        sysincludes.append( join(EPOC32_INCLUDE, "libc") )
+        
     ToPackage(package=LOGMAN_PACKAGE, target=join("python", "lib"),
                 source=join("modules", "pylogman", "pylogman.py"))
     
     ToPackage(package=LOGMAN_PACKAGE, target=join("python"),
                 source=join("modules", "pylogman", "logman_manager.py")) 
                                                         
-    return SymbianProgram('_pylogman', TARGETTYPE_PYD,
+    return SymbianProgram(name, TARGETTYPE_PYD,
                     [ join("modules", "pylogman", "logmanmodule.cpp")],
                     includes = [join("modules", "LogManClient")],
-                    sysincludes = pylogman_sysincludes,
-                    libraries = [PYTHON_LIB, "euser", "LogMan"],
+                    sysincludes = sysincludes,
+                    libraries = [PYTHON_LIB, "euser", "LogManStatic.lib"],
                     uid3   = PYCLIENT_UID, 
                     defines=COMMON_DEFINES,
                     package=LOGMAN_PACKAGE,
                     package_drive_map=PACKAGE_DRIVE_MAP,
-                    mmpexport = join( "modules", "pylogman", "pylogman.mmp" )
+                    mmpexport = join( "modules", "pylogman", "pylogman.mmp" ),
+                    winscw_options = "-w noempty",
                     )
 
 #-------------------------------------- LogManGui defines ( tester and manager )

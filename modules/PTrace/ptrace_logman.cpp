@@ -42,7 +42,7 @@
 	TODO: Find out why 0x8000
 
 	Example of compiling your application with call trace enabled using scons-for-symbian:
-		scons compiler=gcce gcce_options=-finstrument-functions extra_libs=ptrace.lib,logman,estlib dosis=true
+		scons compiler=gcce gcce_options=-finstrument-functions extra_libs=logman_ptrace.lib,logman,estlib dosis=true
 
 	For MMP:
 		OPTION GCCE -finstrument-functions

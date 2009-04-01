@@ -11,7 +11,7 @@ import logman
 #include <Python.h>
 #include <symbian_python_ext_util.h>
 
-#include "..\Common\loggingdefs.h"
+#include "../Common/loggingdefs.h"
 #include "LogMan.h" //RLogMan
 
 
@@ -397,14 +397,33 @@ static const PyTypeObject type_template_LogMan = {
   /*******************************************************/
   PyObject_HEAD_INIT(0)    /* initialize to 0 to ensure Win32 portability */
   0,                 /*ob_size*/
-  "pylogman.LogMan",            /*tp_name*/
+  "_pylogman.LogMan",            /*tp_name*/
   sizeof(Type_LogMan), /*tp_basicsize*/
   0,                 /*tp_itemsize*/
   /* methods */
   (destructor)dealloc_LogMan, /*tp_dealloc*/
   0, /*tp_print*/
   (getattrfunc)getattr_LogMan, /*tp_getattr*/
-
+  
+  0,                                        /*tp_setattr*/
+  0,                                        /*tp_compare*/
+  0,                                        /*tp_repr*/
+  0,                                        /*tp_as_number*/
+  0,                                        /*tp_as_sequence*/
+  0,                                        /*tp_as_mapping*/   
+  0,                                        /*tp_hash */
+  0,                                        /*tp_call*/
+  0,                                        /*tp_str*/
+  0,                                        /*tp_getattro*/
+  0,                                        /*tp_setattro*/
+  0,                                        /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT,                       /*tp_flags*/
+  "",                                       /*tp_doc */
+  0,                                        /*tp_traverse */
+  0,                                        /*tp_clear */
+  0,                                        /*tp_richcompare */
+  0,                                        /*tp_weaklistoffset */
+  0,                                        /*tp_iter */
   /* implied by ISO C: all zeros thereafter */
 };
 

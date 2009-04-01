@@ -14,8 +14,8 @@
 #include "LogManGui_Application.h"
 #include "LogManGui_Utils.h"
 
-#include <LogMan.h>
-#include <logmanutils.h>
+#include "LogMan.h"
+#include "logmanutils.h"
 
 void CLoggingServerGuiAppUi::HandleForegroundEventL(TBool aForeground)
 {

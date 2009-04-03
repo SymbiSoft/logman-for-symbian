@@ -26,12 +26,14 @@ opts = Variables()
 opts.Add('pythonlib', 'Select correct Python library', "Python222")
 opts.Add('cert', 'Set signing certificate', None)
 opts.Add('key', 'Set certificate key', None)
+opts.Add('passwd', 'Set certificate password', None)
 
 env = Environment(options=opts)
 Help(opts.GenerateHelpText(env))
 
-CERT = ARGUMENTS.get("cert", None)
-KEY = ARGUMENTS.get("key", None)
+CERT     = ARGUMENTS.get("cert", None)
+KEY     = ARGUMENTS.get("key", None)
+PASSWD  = ARGUMENTS.get("passwd", "" )
 
 #: Select your Python library
 PYTHON_LIB = ARGUMENTS.get("pythonlib", "Python222")
@@ -84,7 +86,6 @@ def LogManServer():
                              LOGGINGSERVER_INCLUDES,
                              loggingserver_libraries,
                              uid3=SERVER_UID,
-                             capabilities=FREE_CAPS,
                              defines=COMMON_DEFINES,
                              package=LOGMAN_PACKAGE,
                              package_drive_map=PACKAGE_DRIVE_MAP,
@@ -222,7 +223,8 @@ def LogManGui():
                             "version" : LOGMAN_VERSION.split("."),
                             "appname" : "LogMan",
                             "cert"    : CERT,
-                            "key"     : KEY },
+                            "key"     : KEY,
+                            "passwd"  : PASSWD, },
     )
 
 def PTraceLib():

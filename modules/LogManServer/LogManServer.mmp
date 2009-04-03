@@ -36,5 +36,5 @@ LIBRARY     esock.lib
 LIBRARY     insock.lib
 LIBRARY     commdb.lib
 
-CAPABILITY  ReadUserData WriteUserData NetworkServices UserEnvironment LocalServices
+CAPABILITY  NetworkServices LocalServices ReadUserData WriteUserData Location UserEnvironment PowerMgmt ProtServ SwEvent SurroundingsDD ReadDeviceData WriteDeviceData TrustedUI
 EXPORTUNFROZEN

@@ -89,6 +89,7 @@ def LogManServer():
                              defines=COMMON_DEFINES,
                              package=LOGMAN_PACKAGE,
                              package_drive_map=PACKAGE_DRIVE_MAP,
+                             capabilities = CAPS_DEV_CERT,
                              mmpexport = join( "modules", "LogManServer", "LogManServer.mmp" ),
                      )
 

@@ -1,9 +1,12 @@
 #ifndef LOGMANUTILS_H
 #define LOGMANUTILS_H
 
-#if defined( __LOGMAN_ENABLED__ )
-    #include <logman/LogMan.h>
 
+#if defined( __LOGMAN_ENABLED__ )
+    #ifndef __LOGMAN_INCLUDED__
+        #include <logman/LogMan.h>
+    #endif
+    
     #pragma message( RLogMan logging enabled )
 
     #define __LOGMAN_TOSTR2(a) #a
@@ -43,51 +46,59 @@
         #define __LOGMAN_SEND_ASYNC__ EFalse
 
     #endif
+    
+    #ifdef __cplusplus
+        // =========================================================================================
+        // Using static RLogMan functions( a bit slower than using member instance )
+        // =========================================================================================
+        // Easy one line logging
+        #define LOGMAN_SENDLOG( x )  RLogMan::Log( LOGMAN_GETMSG8(x), __LOGMAN_SEND_ASYNC__ );
+        // Easy one line logging, specify async mode explicitly
+        #define LOGMAN_SENDLOG2( x, async )  RLogMan::Log( LOGMAN_GETMSG8(x), async );
+        // Easy one line logging with formatting
+        #define LOGMAN_SENDLOGF( x, args... )  RLogMan::Log( LOGMAN_GETMSG(x), __LOGMAN_SEND_ASYNC__, args );
+        #define LOGMAN_SENDLOGF8( x, args... )  RLogMan::Log( LOGMAN_GETMSG8(x), __LOGMAN_SEND_ASYNC__, args );
+        #define LOGMAN_SENDLOGF16( x, args... )  RLogMan::Log( LOGMAN_GETMSG16(x), __LOGMAN_SEND_ASYNC__, args );
+        // Easy one line logging with formatting, specify async mode explicitly
+        #define LOGMAN_SENDLOGF2( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
+        #define LOGMAN_SENDLOGF28( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
+        #define LOGMAN_SENDLOGF216( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
+        // Log line of code before executing it.
+        #define LOGMAN_SENDLINE( line ) LOGMAN_SENDLOG( #line ); line
+        // Write descriptor directly
+        #define LOGMAN_SENDDESC( desc ) RLogMan::Log( desc );
+        // Easy one liner for logging information about thread's stack usage
+        #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.StackInfo(); __logman.Close(); }
+        // Easy one liner for logging information about thread's heap usage
+        #define LOGMAN_SEND_HEAP_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
+        // Easy one liner for logging information about thread's memory usage
+        #define LOGMAN_SEND_MEMORY_INFO() { RLogMan __logman;__logman.Connect();__logman.MemoryInfo(); __logman.Close(); }
 
-    // =========================================================================================
-    // Using static RLogMan functions( a bit slower than using member instance )
-    // =========================================================================================
-    // Easy one line logging
-    #define LOGMAN_SENDLOG( x )  RLogMan::Log( LOGMAN_GETMSG8(x), __LOGMAN_SEND_ASYNC__ );
-    // Easy one line logging, specify async mode explicitly
-    #define LOGMAN_SENDLOG2( x, async )  RLogMan::Log( LOGMAN_GETMSG8(x), async );
-    // Easy one line logging with formatting
-    #define LOGMAN_SENDLOGF( x, args... )  RLogMan::Log( LOGMAN_GETMSG(x), __LOGMAN_SEND_ASYNC__, args );
-    #define LOGMAN_SENDLOGF8( x, args... )  RLogMan::Log( LOGMAN_GETMSG8(x), __LOGMAN_SEND_ASYNC__, args );
-    #define LOGMAN_SENDLOGF16( x, args... )  RLogMan::Log( LOGMAN_GETMSG16(x), __LOGMAN_SEND_ASYNC__, args );
-    // Easy one line logging with formatting, specify async mode explicitly
-    #define LOGMAN_SENDLOGF2( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
-    #define LOGMAN_SENDLOGF28( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
-    #define LOGMAN_SENDLOGF216( x, async, args... )  RLogMan::Log( LOGMAN_GETMSG(x), async, args );
-    // Log line of code before executing it.
-    #define LOGMAN_SENDLINE( line ) LOGMAN_SENDLOG( #line ); line
-    // Write descriptor directly
-    #define LOGMAN_SENDDESC( desc ) RLogMan::Log( desc );
-    // Easy one liner for logging information about thread's stack usage
-    #define LOGMAN_SEND_STACK_INFO() { RLogMan __logman;__logman.Connect();__logman.StackInfo(); __logman.Close(); }
-    // Easy one liner for logging information about thread's heap usage
-    #define LOGMAN_SEND_HEAP_INFO() { RLogMan __logman;__logman.Connect();__logman.HeapInfo(); __logman.Close(); }
-    // Easy one liner for logging information about thread's memory usage
-    #define LOGMAN_SEND_MEMORY_INFO() { RLogMan __logman;__logman.Connect();__logman.MemoryInfo(); __logman.Close(); }
+         // Easy one liner for leaves monitoring
+        #define LOGMAN_SENDLEAVEIFERROR( cmd ) { TInt _Cmd_Err = cmd ; if (_Cmd_Err != KErrNone) { LOGMAN_SENDLOGF("Leave: %d", _Cmd_Err); User::Leave(_Cmd_Err);}; }
+        #define LOGMAN_SENDTRAPD( err, cmd ) TRAPD(err, cmd) ; if ( err != KErrNone) { LOGMAN_SENDLOGF("TRAPD err: %d", err );} else {}
 
-     // Easy one liner for leaves monitoring
-    #define LOGMAN_SENDLEAVEIFERROR( cmd ) { TInt _Cmd_Err = cmd ; if (_Cmd_Err != KErrNone) { LOGMAN_SENDLOGF("Leave: %d", _Cmd_Err); User::Leave(_Cmd_Err);}; }
-    #define LOGMAN_SENDTRAPD( err, cmd ) TRAPD(err, cmd) ; if ( err != KErrNone) { LOGMAN_SENDLOGF("TRAPD err: %d", err );} else {}
+        // Other helpul stuff
+        // Print descriptor in hex format
+        
+        template <class TDescriptor>
+        void LOGMAN_SENDDESC_HEX(const TDescriptor &aDes)
+        {
+        RBuf content;
+        CleanupClosePushL(content);
+        content.Create(KMaxFormatBufferSize);
+        for (TInt i=0; i < aDes.Length(); ++i)
+            content.AppendFormat(_L("%x "), aDes[i]);
+        LOGMAN_SENDDESC(content);LOGMAN_SENDDESC(_L("\n"));
+        CleanupStack::PopAndDestroy(1);
+        };
 
-    // Other helpul stuff
-    // Print descriptor in hex format
-    template <class TDescriptor>
-    void LOGMAN_SENDDESC_HEX(const TDescriptor &aDes)
-	{
-	RBuf content;
-	CleanupClosePushL(content);
-	content.Create(KMaxFormatBufferSize);
-	for (TInt i=0; i < aDes.Length(); ++i)
-		content.AppendFormat(_L("%x "), aDes[i]);
-	LOGMAN_SENDDESC(content);LOGMAN_SENDDESC(_L("\n"));
-	CleanupStack::PopAndDestroy(1);
-	};
-
+    #else
+        #define ETrue 1
+        #define EFalse 0
+        #define LOGMAN_SENDLOG( x )  LogMan_Log( x, __LOGMAN_SEND_ASYNC__ );
+        #define LOGMAN_SENDLOGF( x, args... )  LogMan_Log( x, __LOGMAN_SEND_ASYNC__, args );
+    #endif
         
     // =========================================================================================
     // Using RLogMan as a member

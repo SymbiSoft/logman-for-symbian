@@ -100,7 +100,7 @@ def LogManDll():
     #logman_sources += glob.glob(join("modules", "Common", "ptrace_logman.cpp"))
      
     logman_libraries = [ 'euser', 'efsrv', 'estlib' ]
-    logman_sources = Glob(join("modules", "LogManClient", "*.cpp"))        
+    logman_sources = Glob(join("modules", "LogManClient", "Log*.cpp"))        
     
     def_folder = { COMPILER_WINSCW : "BWINS", COMPILER_GCCE : "EABI"}[COMPILER]
     for name, type in [('LogMan', TARGETTYPE_DLL),('LogManStatic', TARGETTYPE_LIB)]:
@@ -114,7 +114,14 @@ def LogManDll():
                         package=LOGMAN_PACKAGE,
                         package_drive_map=PACKAGE_DRIVE_MAP,
                         mmpexport = join( "modules", "LogManClient", name + ".mmp" ),
-                        )        
+                        )      
+    
+    SymbianProgram("test_CAPI", TARGETTYPE_EXE, 
+        Glob( join( "modules", "LogManClient", "test*.*")),
+        includes = logManDllIncludes,
+        libraries = ["euser", "efsrv", "estlib", "LogMan"],
+        sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
+        )
                  
 def PyLogManDll():
     global USE_OPENC

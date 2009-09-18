@@ -1,5 +1,14 @@
-#ifndef __LoggingServerClient_h__
-#define __LoggingServerClient_h__
+#ifndef __LOGMAN_INCLUDED__
+#define __LOGMAN_INCLUDED__
+
+// For C-API
+typedef int BOOL;
+
+struct TLogMan {
+    void* cppInstance;
+};
+
+#ifdef __cplusplus
 
 #include <e32std.h>
 #include <c32comm.h> //TPortName
@@ -210,6 +219,13 @@ TInt RLogMan::Writef(const TFmt& aFmt, TBool aDoAsync, ...)
 
 	return result;
 }
+#else
+// Declare C-API
+BOOL LogMan_Log(const char * aString, BOOL aAsync, ...);
 
 #endif
+
+
+// __LOGMAN_INCLUDED__
+#endif 
 

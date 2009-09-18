@@ -38,6 +38,13 @@ def get_build_number():
     build = ( month + day ).zfill(5)
     
     return VERMAJ, year, build
+
+def get_repo_revision():
+    # see http://mercurial.selenic.com/wiki/DeveloperBasics
+    from mercurial import hg, ui
+    r = hg.repository( ui = ui.ui(), path="." )
+    c = r.changectx("tip")
+    return c.rev()
     
 def get_pkg_prefix( appname, uid ):
     pkg_data = {}

@@ -26,12 +26,12 @@ def add(globexpr, exclude = ""):
         if doadd:
             FILES.append( x )
 
-add( r"modules\LogManGui\src\*.*" )
-add( r"modules\LogManGui\inc\*.*" )
-add( r"modules\LogManClient\*.*" )
-add( r"modules\LogManServer\*.*" )
-add( r"modules\pylogman\*.*" )
-add( r"install\*.*" )
+add( r"modules/LogManGui/src/*.*" )
+add( r"modules/LogManGui/inc/*.*" )
+add( r"modules/LogManClient/*.*" )
+add( r"modules/LogManServer/*.*" )
+add( r"modules/pylogman/*.*" )
+add( r"install/*.*" )
 
 if __name__ == "__main__":
     ret = Cog().main( FILES )

@@ -31,22 +31,15 @@ const TUint KRevisionNumber=%d;
 build = pkg_gen.get_build_number()
 build = [ int(x) for x in build ]
 vermaj, vermin, build = build
-svnrev = 0
-try:
-    import pysvn
-    c=pysvn.Client()
-    e=c.info(".")
-    svnrev = e.data["commit_revision"].number
-except ImportError:
-    print "Unable to detect svn revision. Install pysvn."
+svnrev = pkg_gen.get_repo_revision()
 
 cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 ]]]*/
 
 const TUint KLogServMajorVersionNumber=1;
-const TUint KLogServMinorVersionNumber=8;
-const TUint KLogServBuildVersionNumber=1119;
-const TUint KRevisionNumber=41;
+const TUint KLogServMinorVersionNumber=9;
+const TUint KLogServBuildVersionNumber=918;
+const TUint KRevisionNumber=49;
 
 ///[[[end]]]
 

@@ -139,7 +139,7 @@ EXPORT_C TInt RLogMan::LoadModule( TFullName& aModuleName )
 
 }
 
-EXPORT_C TInt RLogMan::WriteFormatList(const char* aFmt, TInt aSize, TBool aDoAsync, VA_LIST aList )
+EXPORT_C TInt RLogMan::WriteFormatList(const char* aFmt, const TInt aSize, TBool aDoAsync, VA_LIST aList )
 {
 	TPtrC8 fmt((TUint8*)aFmt, strlen( aFmt ) );
 	return WriteFormatList(fmt, aSize, aDoAsync, aList );

@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "LogMan.h"
 #include "string.h"
@@ -23,12 +24,40 @@ EXPORT_C void LogMan_Destroy(TLogMan *aLogMan)
     free( aLogMan );
 }
 
+EXPORT_C void LogMan_Write(TLogMan *aLogMan, const char *aString, BOOL aAsync, ...)
+{
+	VA_LIST ap;
+    VA_START(ap, aAsync );
+	static_cast<RLogMan*>(aLogMan->cppInstance)->WriteFormatList( aString, KMaxFormatBufferSize, aAsync, ap );
+    VA_END(ap);	
+}
+
+/** Log information about stack usage */
+EXPORT_C int LogMan_StackInfo(TLogMan * aLogMan)
+{
+	return static_cast<RLogMan*>(aLogMan->cppInstance)->StackInfo();
+}
+
+/** Log information about heap usage */
+EXPORT_C int LogMan_HeapInfo(TLogMan * aLogMan)
+{
+	return static_cast<RLogMan*>(aLogMan->cppInstance)->HeapInfo();
+}
+
+/** Utility to log both stack and heap usage */
+EXPORT_C int LogMan_MemoryInfo(TLogMan * aLogMan)
+{
+	return static_cast<RLogMan*>(aLogMan->cppInstance)->MemoryInfo();
+}
+
 EXPORT_C BOOL LogMan_Log( const char * aString, BOOL aAsync, ...)
 {
-    va_list ap;
-    va_start(ap, aAsync );
-    RLogMan::Log( aString, aAsync, ap );
-    va_end(ap);
+    VA_LIST ap;
+    VA_START(ap, aAsync );
+    BOOL res = RLogMan::Log( aString, aAsync, ap );
+    VA_END(ap);
+    
+    return res;
 }
 
 }

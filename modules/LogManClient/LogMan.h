@@ -4,9 +4,9 @@
 // For C-API
 typedef int BOOL;
 
-struct TLogMan {
+typedef struct {
     void* cppInstance;
-};
+} TLogMan;
 
 #ifdef __cplusplus
 
@@ -222,6 +222,9 @@ TInt RLogMan::Writef(const TFmt& aFmt, TBool aDoAsync, ...)
 #else
 // Declare C-API
 BOOL LogMan_Log(const char * aString, BOOL aAsync, ...);
+int LogMan_StackInfo(TLogMan * aLogMan);
+int LogMan_HeapInfo(TLogMan * aLogMan);
+int LogMan_MemoryInfo(TLogMan * aLogMan);
 
 #endif
 

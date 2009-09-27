@@ -96,8 +96,8 @@
     #else
         #define ETrue 1
         #define EFalse 0
-        #define LOGMAN_SENDLOG( x )  LogMan_Log( x, __LOGMAN_SEND_ASYNC__ );
-        #define LOGMAN_SENDLOGF( x, args... )  LogMan_Log( x, __LOGMAN_SEND_ASYNC__, args );
+        #define LOGMAN_SENDLOG( x )  LogMan_Log( x "\n", __LOGMAN_SEND_ASYNC__ );
+        #define LOGMAN_SENDLOGF( x, args... )  LogMan_Log( x "\n", __LOGMAN_SEND_ASYNC__, args );
     #endif
         
     // =========================================================================================

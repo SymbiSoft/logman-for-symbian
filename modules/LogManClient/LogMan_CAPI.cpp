@@ -24,12 +24,18 @@ EXPORT_C void LogMan_Destroy(TLogMan *aLogMan)
     free( aLogMan );
 }
 
-EXPORT_C void LogMan_Write(TLogMan *aLogMan, const char *aString, BOOL aAsync, ...)
+EXPORT_C void LogMan_Write(TLogMan *aLogMan, const char *aFmt, BOOL aAsync, ...)
 {
-	VA_LIST ap;
-    VA_START(ap, aAsync );
-	static_cast<RLogMan*>(aLogMan->cppInstance)->WriteFormatList( aString, KMaxFormatBufferSize, aAsync, ap );
-    VA_END(ap);	
+	char buf[KMaxFormatBufferSize] = {0};
+	
+	va_list ap;
+    va_start(ap, aAsync );
+    
+    vsprintf( buf, aFmt, ap);
+	
+    static_cast<RLogMan*>(aLogMan->cppInstance)->Write(buf, aAsync );
+	
+    va_end(ap);	
 }
 
 /** Log information about stack usage */
@@ -50,14 +56,26 @@ EXPORT_C int LogMan_MemoryInfo(TLogMan * aLogMan)
 	return static_cast<RLogMan*>(aLogMan->cppInstance)->MemoryInfo();
 }
 
-EXPORT_C BOOL LogMan_Log( const char * aString, BOOL aAsync, ...)
+EXPORT_C BOOL LogMan_Log( const char * aFmt, BOOL aDoAsync, ...)
 {
-    VA_LIST ap;
-    VA_START(ap, aAsync );
-    BOOL res = RLogMan::Log( aString, aAsync, ap );
-    VA_END(ap);
-    
-    return res;
+	RLogMan logman;
+	TLogMan wlogman;
+	char buf[KMaxFormatBufferSize] = {0};
+	
+	va_list ap;
+	va_start( ap, aDoAsync );
+	
+	vsprintf( buf, aFmt, ap);
+	
+	TInt result = logman.Connect();
+	if ( result == KErrNone) {
+		wlogman.cppInstance = &logman;
+		LogMan_Write(&wlogman, buf, aDoAsync);
+		logman.Close();
+	}
+	va_end(ap);
+ 
+	return result;
 }
 
 }

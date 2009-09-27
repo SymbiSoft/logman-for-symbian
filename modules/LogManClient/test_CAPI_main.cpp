@@ -1,6 +1,7 @@
 // Includes
 #include <e32base.h>
 #include <e32cons.h>
+#include <libc/sys/reent.h>
 
 _LIT(KTxtExampleCode,"LogMan C-API test");
 _LIT(KTxtSAMPLES,"SAMPLES");
@@ -25,11 +26,6 @@ LOCAL_C void runApplication()       // initialize and do main task with cleanup 
 
     TRAPD(error,Go());
 
-    if (error)
-        console->Printf(KFormatFailed, error);
-        else console->Printf(KTxtOK);
-    console->Printf(KTxtPressAnyKey);
-    console->Getch();               // get and ignore character
     CleanupStack::PopAndDestroy();  // close console
 }
 
@@ -40,9 +36,9 @@ GLDEF_C TInt E32Main()                          // main function called by E32, 
     CTrapCleanup* cleanup=CTrapCleanup::New();  // get clean-up stack
 
     TRAPD(error,runApplication());              // init stack and do main task
-    __ASSERT_ALWAYS(!error,User::Panic(KTxtSAMPLES,error));
-
+    
     delete cleanup;                             // destroy clean-up stack
+    CloseSTDLIB();
     __UHEAP_MARKEND;
 
     return 0;

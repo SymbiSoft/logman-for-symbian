@@ -35,6 +35,10 @@ CERT     = ARGUMENTS.get("cert", None)
 KEY     = ARGUMENTS.get("key", None)
 PASSWD  = ARGUMENTS.get("passwd", "" )
 
+#: Enable test compilation
+HAVE_TESTS = ARGUMENTS.get("have-tests", "False" )
+HAVE_TESTS = eval( HAVE_TESTS )
+
 #: Select your Python library
 PYTHON_LIB = ARGUMENTS.get("pythonlib", "Python222")
 
@@ -56,6 +60,7 @@ SERVER_UID   = PACKAGE_UID + 1
 GUI_UID      = SERVER_UID + 1
 CLIENT_UID   = GUI_UID + 1
 PYCLIENT_UID = CLIENT_UID + 1
+TESTER_UID = CLIENT_UID + 1
 
 def ZModemLib():
     """Module for ZModem file transfer"""
@@ -116,12 +121,14 @@ def LogManDll():
                         mmpexport = join( "modules", "LogManClient", name + ".mmp" ),
                         )      
     
-    SymbianProgram("test_CAPI", TARGETTYPE_EXE, 
-        Glob( join( "modules", "LogManClient", "test*.*")),
-        includes = logManDllIncludes,
-        libraries = ["euser", "efsrv", "estlib", "LogMan"],
-        sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
-        )
+    if HAVE_TESTS:
+	    SymbianProgram("LogManTestCAPI", TARGETTYPE_EXE, 
+	        Glob( join( "modules", "LogManClient", "test*.*")),
+	        includes = logManDllIncludes,
+	        libraries = ["euser", "efsrv", "estlib", "LogManStatic"],
+	        sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
+	        uid3 = TESTER_UID,
+	        )
                  
 def PyLogManDll():
     global USE_OPENC

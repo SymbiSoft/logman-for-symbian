@@ -18,6 +18,11 @@ EXPORT_C TLogMan* LogMan_New(void)
     return logman;
 }
 
+EXPORT_C BOOL LogMan_Connect(TLogMan *aLogMan)
+{
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->Connect();
+}
+
 EXPORT_C void LogMan_Destroy(TLogMan *aLogMan)
 {
     delete (RLogMan*)aLogMan->cppInstance;

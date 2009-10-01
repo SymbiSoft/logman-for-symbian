@@ -1,13 +1,15 @@
 #ifndef __LOGMAN_INCLUDED__
 #define __LOGMAN_INCLUDED__
 
-// For C-API
+// Declare C API
 typedef int BOOL;
 
 typedef struct {
     void* cppInstance;
 } TLogMan;
 
+
+// Declare C++ API
 #ifdef __cplusplus
 
 #include <e32std.h>
@@ -219,14 +221,20 @@ TInt RLogMan::Writef(const TFmt& aFmt, TBool aDoAsync, ...)
 
 	return result;
 }
-#else
-// Declare C-API
-BOOL LogMan_Log(const char * aString, BOOL aAsync, ...);
-int LogMan_StackInfo(TLogMan * aLogMan);
-int LogMan_HeapInfo(TLogMan * aLogMan);
-int LogMan_MemoryInfo(TLogMan * aLogMan);
 
+#define _EXTERN extern "C"
+#else
+#define _EXTERN
 #endif
+
+_EXTERN BOOL LogMan_Log(const char * aString, BOOL aAsync, ...);
+_EXTERN int LogMan_StackInfo(TLogMan * aLogMan);
+_EXTERN int LogMan_HeapInfo(TLogMan * aLogMan);
+_EXTERN int LogMan_MemoryInfo(TLogMan * aLogMan);
+_EXTERN TLogMan* LogMan_New(void);
+_EXTERN BOOL LogMan_Connect(TLogMan *aLogMan);
+#undef _EXTERN 
+
 
 
 // __LOGMAN_INCLUDED__

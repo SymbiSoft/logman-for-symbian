@@ -181,84 +181,84 @@ SELF = [ Attribute( "Type_LogMan*", "self") ]
 
 
 class LogMan:
-    Methods = [ Function( "static PyObject*", "LogMan_Close",
+    Methods = [ Function( "static PyObject*", "PyLogMan_Close",
                             SELF,
                           code = CLOSE_IMPLEMENTATION
                         ),
-                Function( "static PyObject*", "LogMan_Connect",
+                Function( "static PyObject*", "PyLogMan_Connect",
                             SELF,
                           code = CONNECT_IMPLEMENTATION
                         ),
-#                 Function( "static PyObject*", "LogMan_PortRange",
+#                 Function( "static PyObject*", "PyLogMan_PortRange",
 #                             SELF,
 #                           code = PORT_RANGE_IMPLEMENTATION
 #                         ),
-                Function( "static PyObject*", "LogMan_LoadModule",
+                Function( "static PyObject*", "PyLogMan_LoadModule",
                             [ Attribute( "Type_LogMan*", "self"),
                               Attribute( "PyObject*", "args") ],
                           code = LOADMODULE_IMPLEMENTATION
                         ),
-                Function( "static PyObject*", "LogMan_ConnectSerial",
+                Function( "static PyObject*", "PyLogMan_ConnectSerial",
                             SELF,
                           code = CONNECTSERIAL_IMPLEMENTATION
                         ),
-                Function( "static PyObject*", "LogMan_IsSerialConnected",
+                Function( "static PyObject*", "PyLogMan_IsSerialConnected",
                             SELF,
                           code = IS_SERIAL_CONNECTED_IMPLEMENTATION
                         ),
-                Function( "static PyObject*", "LogMan_StopService",
+                Function( "static PyObject*", "PyLogMan_StopService",
                             SELF,
                           code = STOPSERVICE_IMPLEMENTATION
                         ),
-                Function( "static PyObject*", "LogMan_DisconnectSerial",
+                Function( "static PyObject*", "PyLogMan_DisconnectSerial",
                             SELF,
                           code = DISCONNECT_SERIAL_IMPLEMENTATION
                         ),
 
-                Function( "static PyObject*", "LogMan_BytesSent",
+                Function( "static PyObject*", "PyLogMan_BytesSent",
                             SELF,
                           code = getSimpleGetter( "BytesSent", "TUint32", "l" )
                         ),
                         
-                Function( "static PyObject*", "LogMan_MemoryInfo",
+                Function( "static PyObject*", "PyLogMan_MemoryInfo",
                             SELF,
                             code = getBoolGetter( "MemoryInfo" ) 
                         ),
                 
-                Function( "static PyObject*", "LogMan_Write",
+                Function( "static PyObject*", "PyLogMan_Write",
                             [ Attribute( "Type_LogMan*", "self"),
                               Attribute( "PyObject*", "args"),
                               Attribute( "PyObject*", "kwargs") ],
                           code = SEND_IMPLEMENTATION
                         ),
-                #Function( "static PyObject*", "LogMan_ModuleName",
+                #Function( "static PyObject*", "PyLogMan_ModuleName",
                 #           [ Attribute( "Type_LogMan*", "self" ) ],
                 #          code = getStrGetter( "ModuleName", "TFullName" )
                 #        ),
-                #Function( "static PyObject*", "LogMan_SetModuleName",
+                #Function( "static PyObject*", "PyLogMan_SetModuleName",
                 #            [ Attribute( "Type_LogMan*", "self"),
                 #              Attribute( "PyObject*", "args") ],
                 #          code = getStrSetter( "ModuleName", "TFullName" )
                 #        ),
-                Function( "static PyObject*", "LogMan_Port",
+                Function( "static PyObject*", "PyLogMan_Port",
                             [ Attribute( "Type_LogMan*", "self") ],
                           code = getSimpleGetter( "Port", "TInt", "i" )
                         ),
-                Function( "static PyObject*", "LogMan_SetPort",
+                Function( "static PyObject*", "PyLogMan_SetPort",
                             [ Attribute( "Type_LogMan*", "self"),
                               Attribute( "PyObject*", "args") ],
                           code = getIntSetter( "Port" )
                         ),
-                Function( "static PyObject*", "LogMan_PortName",
+                Function( "static PyObject*", "PyLogMan_PortName",
                             [ Attribute( "Type_LogMan*", "self")],
                             code = getStrGetter( "PortName", "TPortName" )
                         ),
-                Function( "static PyObject*", "LogMan_SetPortName",
+                Function( "static PyObject*", "PyLogMan_SetPortName",
                             [ Attribute( "Type_LogMan*", "self"),
                               Attribute( "PyObject*", "args") ],
                           code = getStrSetter( "PortName", "TPortName" )
                         ),
-                Function( "static PyObject*", "LogMan_StartSocketServer",
+                Function( "static PyObject*", "PyLogMan_StartSocketServer",
                             [ Attribute( "Type_LogMan*", "self") ],
                           code = getIntGetter( "StartSocketServer" )
                         ),

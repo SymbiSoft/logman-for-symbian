@@ -68,40 +68,40 @@ for method in logman.LogMan.Methods:
     cog.outl( method.Implementation() )
 
 ]]]*/
-static PyObject* LogMan_Close( Type_LogMan* self );
-static PyObject* LogMan_Connect( Type_LogMan* self );
-static PyObject* LogMan_LoadModule( Type_LogMan* self, PyObject* args );
-static PyObject* LogMan_ConnectSerial( Type_LogMan* self );
-static PyObject* LogMan_IsSerialConnected( Type_LogMan* self );
-static PyObject* LogMan_StopService( Type_LogMan* self );
-static PyObject* LogMan_DisconnectSerial( Type_LogMan* self );
-static PyObject* LogMan_BytesSent( Type_LogMan* self );
-static PyObject* LogMan_MemoryInfo( Type_LogMan* self );
-static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs );
-static PyObject* LogMan_Port( Type_LogMan* self );
-static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args );
-static PyObject* LogMan_PortName( Type_LogMan* self );
-static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args );
-static PyObject* LogMan_StartSocketServer( Type_LogMan* self );
+static PyObject* PyLogMan_Close( Type_LogMan* self );
+static PyObject* PyLogMan_Connect( Type_LogMan* self );
+static PyObject* PyLogMan_LoadModule( Type_LogMan* self, PyObject* args );
+static PyObject* PyLogMan_ConnectSerial( Type_LogMan* self );
+static PyObject* PyLogMan_IsSerialConnected( Type_LogMan* self );
+static PyObject* PyLogMan_StopService( Type_LogMan* self );
+static PyObject* PyLogMan_DisconnectSerial( Type_LogMan* self );
+static PyObject* PyLogMan_BytesSent( Type_LogMan* self );
+static PyObject* PyLogMan_MemoryInfo( Type_LogMan* self );
+static PyObject* PyLogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs );
+static PyObject* PyLogMan_Port( Type_LogMan* self );
+static PyObject* PyLogMan_SetPort( Type_LogMan* self, PyObject* args );
+static PyObject* PyLogMan_PortName( Type_LogMan* self );
+static PyObject* PyLogMan_SetPortName( Type_LogMan* self, PyObject* args );
+static PyObject* PyLogMan_StartSocketServer( Type_LogMan* self );
 
 static const PyMethodDef LogMan_methods[] = {
 // Different name to work like standard Python stdout
-    {"close",    (PyCFunction)LogMan_Close, METH_NOARGS},
-    {"Connect",    (PyCFunction)LogMan_Connect, METH_NOARGS},
-    {"LoadModule",    (PyCFunction)LogMan_LoadModule, METH_VARARGS},
-    {"ConnectSerial",    (PyCFunction)LogMan_ConnectSerial, METH_NOARGS},
-    {"IsSerialConnected",    (PyCFunction)LogMan_IsSerialConnected, METH_NOARGS},
-    {"StopService",    (PyCFunction)LogMan_StopService, METH_NOARGS},
-    {"DisconnectSerial",    (PyCFunction)LogMan_DisconnectSerial, METH_NOARGS},
-    {"BytesSent",    (PyCFunction)LogMan_BytesSent, METH_NOARGS},
-    {"MemoryInfo",    (PyCFunction)LogMan_MemoryInfo, METH_NOARGS},
+    {"close",    (PyCFunction)PyLogMan_Close, METH_NOARGS},
+    {"Connect",    (PyCFunction)PyLogMan_Connect, METH_NOARGS},
+    {"LoadModule",    (PyCFunction)PyLogMan_LoadModule, METH_VARARGS},
+    {"ConnectSerial",    (PyCFunction)PyLogMan_ConnectSerial, METH_NOARGS},
+    {"IsSerialConnected",    (PyCFunction)PyLogMan_IsSerialConnected, METH_NOARGS},
+    {"StopService",    (PyCFunction)PyLogMan_StopService, METH_NOARGS},
+    {"DisconnectSerial",    (PyCFunction)PyLogMan_DisconnectSerial, METH_NOARGS},
+    {"BytesSent",    (PyCFunction)PyLogMan_BytesSent, METH_NOARGS},
+    {"MemoryInfo",    (PyCFunction)PyLogMan_MemoryInfo, METH_NOARGS},
 // Different name to work like standard Python stdout
-    {"write",    (PyCFunction)LogMan_Write, METH_VARARGS | METH_KEYWORDS},
-    {"Port",    (PyCFunction)LogMan_Port, METH_NOARGS},
-    {"SetPort",    (PyCFunction)LogMan_SetPort, METH_VARARGS},
-    {"PortName",    (PyCFunction)LogMan_PortName, METH_NOARGS},
-    {"SetPortName",    (PyCFunction)LogMan_SetPortName, METH_VARARGS},
-    {"StartSocketServer",    (PyCFunction)LogMan_StartSocketServer, METH_NOARGS},
+    {"write",    (PyCFunction)PyLogMan_Write, METH_VARARGS | METH_KEYWORDS},
+    {"Port",    (PyCFunction)PyLogMan_Port, METH_NOARGS},
+    {"SetPort",    (PyCFunction)PyLogMan_SetPort, METH_VARARGS},
+    {"PortName",    (PyCFunction)PyLogMan_PortName, METH_NOARGS},
+    {"SetPortName",    (PyCFunction)PyLogMan_SetPortName, METH_VARARGS},
+    {"StartSocketServer",    (PyCFunction)PyLogMan_StartSocketServer, METH_NOARGS},
     {NULL, NULL}
 };
 
@@ -109,7 +109,7 @@ static const PyMethodDef LogMan_methods[] = {
 
 
 /// Python wrapper for RLogMan.Close
-static PyObject* LogMan_Close( Type_LogMan* self ){
+static PyObject* PyLogMan_Close( Type_LogMan* self ){
         
     PRINTF("Close");
     self->iLogMan->Close();
@@ -119,7 +119,7 @@ static PyObject* LogMan_Close( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.Connect
-static PyObject* LogMan_Connect( Type_LogMan* self ){
+static PyObject* PyLogMan_Connect( Type_LogMan* self ){
         
     PRINTF("Connect");
     TInt result = self->iLogMan->Connect();
@@ -127,7 +127,7 @@ static PyObject* LogMan_Connect( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.LoadModule
-static PyObject* LogMan_LoadModule( Type_LogMan* self, PyObject* args ){
+static PyObject* PyLogMan_LoadModule( Type_LogMan* self, PyObject* args ){
         
     char* bytes      = NULL;
     TInt length  = 0;
@@ -149,7 +149,7 @@ static PyObject* LogMan_LoadModule( Type_LogMan* self, PyObject* args ){
     
 }
 /// Python wrapper for RLogMan.ConnectSerial
-static PyObject* LogMan_ConnectSerial( Type_LogMan* self ){
+static PyObject* PyLogMan_ConnectSerial( Type_LogMan* self ){
         
     PRINTF("ConnectSerial");
     TInt result = self->iLogMan->ConnectSerial();
@@ -157,7 +157,7 @@ static PyObject* LogMan_ConnectSerial( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.IsSerialConnected
-static PyObject* LogMan_IsSerialConnected( Type_LogMan* self ){
+static PyObject* PyLogMan_IsSerialConnected( Type_LogMan* self ){
         
     PRINTF("IsSerialConnected");
     TInt result = self->iLogMan->IsSerialConnected();
@@ -171,7 +171,7 @@ static PyObject* LogMan_IsSerialConnected( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.StopService
-static PyObject* LogMan_StopService( Type_LogMan* self ){
+static PyObject* PyLogMan_StopService( Type_LogMan* self ){
         
     PRINTF("StopService");
     self->iLogMan->StopService();
@@ -181,7 +181,7 @@ static PyObject* LogMan_StopService( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.DisconnectSerial
-static PyObject* LogMan_DisconnectSerial( Type_LogMan* self ){
+static PyObject* PyLogMan_DisconnectSerial( Type_LogMan* self ){
         
     PRINTF("DisconnectSerial");
     self->iLogMan->DisconnectSerial();
@@ -191,7 +191,7 @@ static PyObject* LogMan_DisconnectSerial( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.BytesSent
-static PyObject* LogMan_BytesSent( Type_LogMan* self ){
+static PyObject* PyLogMan_BytesSent( Type_LogMan* self ){
         
     PRINTF("BytesSent");
     TUint32 result = self->iLogMan->BytesSent();
@@ -199,7 +199,7 @@ static PyObject* LogMan_BytesSent( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.MemoryInfo
-static PyObject* LogMan_MemoryInfo( Type_LogMan* self ){
+static PyObject* PyLogMan_MemoryInfo( Type_LogMan* self ){
         
     PRINTF("MemoryInfo");
     TInt result = self->iLogMan->MemoryInfo();
@@ -213,7 +213,7 @@ static PyObject* LogMan_MemoryInfo( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.Write
-static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs ){
+static PyObject* PyLogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs ){
         
     
     PRINTF( "Write" )
@@ -252,7 +252,7 @@ static PyObject* LogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwar
     
 }
 /// Python wrapper for RLogMan.Port
-static PyObject* LogMan_Port( Type_LogMan* self ){
+static PyObject* PyLogMan_Port( Type_LogMan* self ){
         
     PRINTF("Port");
     TInt result = self->iLogMan->Port();
@@ -260,7 +260,7 @@ static PyObject* LogMan_Port( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.SetPort
-static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args ){
+static PyObject* PyLogMan_SetPort( Type_LogMan* self, PyObject* args ){
         
     TInt number = 0;
     
@@ -281,7 +281,7 @@ static PyObject* LogMan_SetPort( Type_LogMan* self, PyObject* args ){
     
 }
 /// Python wrapper for RLogMan.PortName
-static PyObject* LogMan_PortName( Type_LogMan* self ){
+static PyObject* PyLogMan_PortName( Type_LogMan* self ){
         
     
     TPortName result = self->iLogMan->PortName( );
@@ -290,7 +290,7 @@ static PyObject* LogMan_PortName( Type_LogMan* self ){
     
 }
 /// Python wrapper for RLogMan.SetPortName
-static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args ){
+static PyObject* PyLogMan_SetPortName( Type_LogMan* self, PyObject* args ){
         
     char* bytes      = NULL;
     TInt length  = 0;
@@ -312,7 +312,7 @@ static PyObject* LogMan_SetPortName( Type_LogMan* self, PyObject* args ){
     
 }
 /// Python wrapper for RLogMan.StartSocketServer
-static PyObject* LogMan_StartSocketServer( Type_LogMan* self ){
+static PyObject* PyLogMan_StartSocketServer( Type_LogMan* self ){
         
     PRINTF("StartSocketServer");
     TInt result = self->iLogMan->StartSocketServer();
@@ -324,8 +324,13 @@ static PyObject* LogMan_StartSocketServer( Type_LogMan* self ){
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 /** Python wrapper for RLogMan::Log */
+
+IMPORT_C BOOL LogMan_Log( const char * aFmt, BOOL aDoAsync, ...);
+
 static PyObject* pylogman_Log(PyObject* /*dummy*/, PyObject* args)
 {
+	
+	
 	char* bytes      = NULL;
 	TInt length  = 0;
     TInt aDoAsync = 0;
@@ -335,10 +340,9 @@ static PyObject* pylogman_Log(PyObject* /*dummy*/, PyObject* args)
 		return 0;
 	}
 
-    TInt err = KErrNone;
-
-    TPtrC8 buf((TUint8*)bytes, length);
-    err = RLogMan::Log( buf, aDoAsync );
+    TInt err = KErrNone;   
+    bytes[length] = 0;
+    err = LogMan_Log(bytes, aDoAsync);
 
 	if (err)
 	{

@@ -41,10 +41,14 @@ def get_build_number():
 
 def get_repo_revision():
     # see http://mercurial.selenic.com/wiki/DeveloperBasics
-    from mercurial import hg, ui
-    r = hg.repository( ui = ui.ui(), path="." )
-    c = r.changectx("tip")
-    return c.rev()
+    try:
+        from mercurial import hg, ui
+        r = hg.repository( ui = ui.ui(), path="." )
+        c = r.changectx("tip")
+        return c.rev()
+    except ImportError, msg:
+        print "Mercurial error", msg
+        return 0
     
 def get_pkg_prefix( appname, uid ):
     pkg_data = {}

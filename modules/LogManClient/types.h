@@ -38,8 +38,8 @@ cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 
 const TUint KLogServMajorVersionNumber=1;
 const TUint KLogServMinorVersionNumber=9;
-const TUint KLogServBuildVersionNumber=918;
-const TUint KRevisionNumber=49;
+const TUint KLogServBuildVersionNumber=1001;
+const TUint KRevisionNumber=0;
 
 ///[[[end]]]
 

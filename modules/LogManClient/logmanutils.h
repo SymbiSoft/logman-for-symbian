@@ -98,6 +98,19 @@
         #define EFalse 0
         #define LOGMAN_SENDLOG( x )  LogMan_Log( x "\n", __LOGMAN_SEND_ASYNC__ );
         #define LOGMAN_SENDLOGF( x, args... )  LogMan_Log( x "\n", __LOGMAN_SEND_ASYNC__, args );
+		#define LOGMAN_SEND_STACK_INFO()  { TLogMan* __logman = LogMan_New(); \
+											LogMan_Connect(__logman); 		  \
+											LogMan_StackInfo(__logman);      \
+											LogMan_Destroy(__logman); }
+		#define LOGMAN_SEND_HEAP_INFO()   { TLogMan* __logman = LogMan_New(); \
+											LogMan_Connect(__logman); 		  \
+											LogMan_HeapInfo(__logman);      \
+											LogMan_Destroy(__logman); }
+		#define LOGMAN_SEND_MEMORY_INFO() { TLogMan* __logman = LogMan_New(); \
+											LogMan_Connect(__logman); 		  \
+											LogMan_MemoryInfo(__logman);      \
+											LogMan_Destroy(__logman); }
+        
     #endif
         
     // =========================================================================================

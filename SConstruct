@@ -27,6 +27,7 @@ opts.Add('pythonlib', 'Select correct Python library', "Python222")
 opts.Add('cert', 'Set signing certificate', None)
 opts.Add('key', 'Set certificate key', None)
 opts.Add('passwd', 'Set certificate password', None)
+opts.Add('withtests', 'Include tests', False)
 
 env = Environment(options=opts)
 Help(opts.GenerateHelpText(env))
@@ -36,7 +37,7 @@ KEY     = ARGUMENTS.get("key", None)
 PASSWD  = ARGUMENTS.get("passwd", "" )
 
 #: Enable test compilation
-HAVE_TESTS = ARGUMENTS.get("have-tests", "False" )
+HAVE_TESTS = ARGUMENTS.get("withtests", "False" )
 HAVE_TESTS = eval( HAVE_TESTS )
 
 #: Select your Python library
@@ -125,7 +126,7 @@ def LogManDll():
 	    SymbianProgram("LogManTestCAPI", TARGETTYPE_EXE, 
 	        Glob( join( "modules", "LogManClient", "test*.*")),
 	        includes = logManDllIncludes,
-	        libraries = ["euser", "efsrv", "estlib", "LogManStatic"],
+	        libraries = ["euser", "efsrv", "estlib", "LogManStatic.lib"],
 	        sysincludes = [join(EPOCROOT, "epoc32", "include", "libc")],
 	        uid3 = TESTER_UID,
 	        )
@@ -140,7 +141,7 @@ def PyLogManDll():
     
     if PYTHON_LIB == "python25":
         USE_OPENC   = True
-        PYMODPREFIX = "251_"
+        PYMODPREFIX = "kf_"
         
     if PYTHON_LIB != "python222":
         name = PYMODPREFIX + name
@@ -169,7 +170,7 @@ def PyLogManDll():
                     [ join("modules", "pylogman", "logmanmodule.cpp")],
                     includes = [join("modules", "LogManClient")],
                     sysincludes = sysincludes,
-                    libraries = [PYTHON_LIB, "euser", "LogManStatic.lib"],
+                    libraries = [PYTHON_LIB, "euser", "LogMan", "libc"],
                     uid3   = PYCLIENT_UID, 
                     defines=COMMON_DEFINES,
                     package=LOGMAN_PACKAGE,

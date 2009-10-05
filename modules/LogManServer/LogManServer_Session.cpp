@@ -6,7 +6,7 @@
  import symbiantypes
  ]]]*/
 //[[[end]]]
-
+#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
 
 #include "LogManServer_Defines.h"
@@ -35,7 +35,7 @@ void CLoggingServerSession::DispatchMessageL(const RMessage2& aMessage)
 		TInt err = LoggingServer().ConnectSerial();
 		User::LeaveIfError(err);
 		return;
-
+/*
 	case EIsSerialConnected:
 	{
 		PRINTF( "EIsSerialConnected" )
@@ -46,7 +46,28 @@ void CLoggingServerSession::DispatchMessageL(const RMessage2& aMessage)
 
 		return;
 	}
-
+	*/
+	case EConnectionStatus:
+		{
+			TInt status = 0;			
+			
+			if( LoggingServer().IsSerialConnected() ){
+				PRINT( _L("Serial connected") );
+				status |= (TInt)EConnectionSerial;
+			}
+			if( LoggingServer().IsSocketConnected() ){
+				PRINT( _L("Socket connected") );
+				status |= (TInt)EConnectionSocket;
+			}
+			
+			PRINTF( "EConnectionStatus:%d", (TInt)status )
+			
+			TPckgBuf<TInt> result((TInt)status);
+			aMessage.WriteL(0, result);
+					
+			return;
+		}
+		
 	case ELogServDisconnect:
 		PRINTF( "ELogServDisconnect" )
 		LoggingServer().DisconnectSerial();
@@ -255,9 +276,9 @@ void CLoggingServerSession::HandleMessageSendingL(const RMessage2& aMessage)
 	}PRINTF("SendMessageL exit");
 }
 
-CLoggingServerServer& CLoggingServerSession::LoggingServer()
+CLogManServer& CLoggingServerSession::LoggingServer()
 {
-	return *static_cast<CLoggingServerServer*> (const_cast<CServer2*> (Server()));
+	return *static_cast<CLogManServer*> (const_cast<CServer2*> (Server()));
 }
 void CLoggingServerSession::PanicClient(const RMessage2& aMessage, TInt aPanic) const
 {

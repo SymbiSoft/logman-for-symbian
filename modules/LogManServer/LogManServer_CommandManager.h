@@ -6,7 +6,7 @@
 #include "LogManServer_Defines.h"
 #include "LogManServer_SocketEngineObserver.h"
 
-class CLoggingServerServer;
+class CLogManServer;
 class CDesC8Array;
 class RFs;
 /// Handles commands sent from PC through serial connection
@@ -19,7 +19,7 @@ class CLoggingServerCommandManager: public CActive,
 
 public:
 	/** Constructor */
-	CLoggingServerCommandManager(CLoggingServerServer* iLoggingServerServer);
+	CLoggingServerCommandManager(CLogManServer* iLoggingServerServer);
 	/** Destructor */
 	~CLoggingServerCommandManager();
 
@@ -66,11 +66,11 @@ protected:
 	void LeaveIfFailedL(TInt aErr);
 
 	/** Handle to the LogMan service holding serial connection */
-	CLoggingServerServer *iLoggingServerServer;
+	CLogManServer *iLoggingServerServer;
 
 	RTimer iTimer;
 	RBuf8 iCommandBuffer;
-	friend class CLoggingServerServer;
+	friend class CLogManServer;
 };
 #endif
 

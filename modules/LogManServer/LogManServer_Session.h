@@ -3,7 +3,7 @@
 
 #include <e32base.h>
 #include "LogManServer_Server.h"
-class CLoggingServerServer;
+class CLogManServer;
 
 /// LogMan session class
 /** Handle client's session with the server */
@@ -25,7 +25,7 @@ class CLoggingServerSession : public CSession2
      */
 	void HandleMessageSendingL(const RMessage2& aMessage);
     /** @return logging server instance */
-	CLoggingServerServer& LoggingServer();
+	CLogManServer& LoggingServer();
 
     protected:
     /** Pass the message to suitable function based on the message id

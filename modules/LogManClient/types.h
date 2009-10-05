@@ -17,6 +17,13 @@ enum TRawMsgType {
     EMsgPartial
 };
 
+typedef enum {
+	EConnectionNone   = 0x0,
+	EConnectionSerial = 0x1,
+	EConnectionSocket = 0x2,
+	EConnectionFile   = 0x4
+} TConnectionStatus;
+
 const TUint KDefaultMessageSlots=4;
 
 // Generate build version
@@ -52,7 +59,7 @@ enum TLogServRqst
 	ELogServStop,
     EGetPortRange,
     ELoadModule,
-    EIsSerialConnected,
+    EConnectionStatus,
     EGetSentBytes,
 	//Getters and setters for connection info
     /*[[[cog

@@ -3,7 +3,7 @@
 
 // INCLUDES
 #include <coecntrl.h>
-
+#include "types.h"
 #include "logmanutils.h"
 
 /// Container holding LogMan service information on UI.
@@ -15,7 +15,8 @@ class SLogManInformation {
     /// Serial port number.
     TInt      iPort;
     /// Serial connection status of the server.
-    TInt      iConnected;
+    TConnectionStatus      iConnected;
+    TInt iConnectionError;
     /// Is server running.
     TBool     iRunning;
     /// How many bytes the server has sent.

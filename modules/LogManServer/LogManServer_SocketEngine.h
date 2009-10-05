@@ -82,7 +82,8 @@ public:
 	{
 		ENotConnected, EConnecting, EConnected, EListening, ETimedOut
 	};
-
+	TSocketEngineState SocketState(void);
+	
 protected:
 	// From base classes
 

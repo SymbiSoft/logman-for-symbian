@@ -13,7 +13,8 @@ _LIT( KStatusRunning,   "Running");
 _LIT( KStatusDisabled,  "Disabled");
 
 _LIT( KConnectionTitle,      "Connection Status" );
-_LIT( KConnectionActive,     "Active");
+_LIT( KConnectionSerialActive, "Serial");
+_LIT( KConnectionSocketActive, "Socket");
 _LIT( KConnectionInactive,   "Inactive");
 _LIT( KConnectionInUse,      "In use" );
 _LIT( KConnectionConnecting, "Connecting" );
@@ -89,21 +90,25 @@ void CLoggingServerGuiAppView::Draw( const TRect& /*aRect*/ ) const
 
     DrawTitleValuePair( gc, pos, KStatusTitle,KStatusRunning, KGreen );
 
-
+    color = KRed;
+    value.Copy( KConnectionInactive );
     // Draw connection info
-    switch( iLogManServiceInfo.iConnected ) {
-        case KErrNone:
-            value.Copy( KConnectionActive );
-            color = KGreen;
-        break;
-        case KRequestPending:
-            value.Copy( KConnectionConnecting );
-            color = KYellow;
-        break;
-        default:
-            value.Copy( KConnectionInactive );
-            color = KRed;
+    if( iLogManServiceInfo.iConnected & EConnectionSerial){
+    	value.Copy( KConnectionSerialActive );
+    	color = KGreen;
     }
+    if( iLogManServiceInfo.iConnected & EConnectionSocket){
+    	if( color != KRed ){
+    		value.Append(TChar(','));
+    		value.Append(KConnectionSocketActive);
+    	}
+    	else {
+    		value.Copy(KConnectionSocketActive);
+    	}
+    	color = KGreen;
+    	
+    }
+ 
     DrawTitleValuePair( gc, pos, KConnectionTitle, value, color );
 
     // Draw port name and port number

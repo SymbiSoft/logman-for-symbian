@@ -1,3 +1,4 @@
+#define __DEBUG_LOGGING__
 
 #include "../Common/loggingdefs.h"
 
@@ -76,15 +77,20 @@ EXPORT_C TInt RLogMan::Connect()
 
 EXPORT_C TBool RLogMan::IsSerialConnected()
 {
-    PRINTF( "RLogMan::IsSerialConnected()" );
-    TBool result;
-    TPckgBuf<TBool> pckg;
+    return this->ConnectionStatus() & EConnectionSerial;
+}
+
+EXPORT_C TConnectionStatus RLogMan::ConnectionStatus()
+{
+    PRINTF( "RLogMan::ConnectionStatus()" );
+    TConnectionStatus result;
+    TPckgBuf<TInt> pckg;
     TIpcArgs args(&pckg);
-    SendReceive(EIsSerialConnected, args);
+    SendReceive(EConnectionStatus, args);
 
-    result = pckg();
+    result = (TConnectionStatus)pckg();
 
-    PRINTF( "RLogMan::IsSerialConnected() result:%d", result );
+    PRINTF( "RLogMan::ConnectionStatus() result:%d", result );
     return result;
 
 }

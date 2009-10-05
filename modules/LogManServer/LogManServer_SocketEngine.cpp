@@ -151,6 +151,11 @@ void CSocketEngine::RunL()
 	}
 }
 
+CSocketEngine::TSocketEngineState CSocketEngine::SocketState(void)
+{
+	return iState;
+}
+
 void CSocketEngine::ConnectL(const TUint32 aIapId,
 		const TInetAddr& aIPAddress)
 {

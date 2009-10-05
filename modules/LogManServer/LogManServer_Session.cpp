@@ -12,16 +12,16 @@
 #include "LogManServer_Defines.h"
 #include "LogManServer_Session.h"
 
-CLoggingServerSession::CLoggingServerSession()
+CLogManSession::CLogManSession()
 {
 }
 
-CLoggingServerSession::~CLoggingServerSession()
+CLogManSession::~CLogManSession()
 {
 
 }
 
-void CLoggingServerSession::DispatchMessageL(const RMessage2& aMessage)
+void CLogManSession::DispatchMessageL(const RMessage2& aMessage)
 {
 	switch (aMessage.Function())
 	{
@@ -241,7 +241,7 @@ void CLoggingServerSession::DispatchMessageL(const RMessage2& aMessage)
 	}
 }
 
-void CLoggingServerSession::ServiceL(const RMessage2& aMessage)
+void CLogManSession::ServiceL(const RMessage2& aMessage)
 {
 	if (aMessage.IsNull())
 	{
@@ -254,7 +254,7 @@ PRINTF( "ServiceL err:%d", err )
 
 }
 
-void CLoggingServerSession::HandleMessageSendingL(const RMessage2& aMessage)
+void CLogManSession::HandleMessageSendingL(const RMessage2& aMessage)
 {
 	PRINTF("SendMessageL");
 
@@ -276,33 +276,33 @@ void CLoggingServerSession::HandleMessageSendingL(const RMessage2& aMessage)
 	}PRINTF("SendMessageL exit");
 }
 
-CLogManServer& CLoggingServerSession::LoggingServer()
+CLogManServer& CLogManSession::LoggingServer()
 {
 	return *static_cast<CLogManServer*> (const_cast<CServer2*> (Server()));
 }
-void CLoggingServerSession::PanicClient(const RMessage2& aMessage, TInt aPanic) const
+void CLogManSession::PanicClient(const RMessage2& aMessage, TInt aPanic) const
 {
 	_LIT(KTxtServer,"LogManServer");
 	aMessage.Panic(KTxtServer, aPanic);
 }
 
-TPortName CLoggingServerSession::PortName()
+TPortName CLogManSession::PortName()
 {
 	return LoggingServer().iConnectionInfo.iPortName;
 }
 
-TInt CLoggingServerSession::SetPortName(TPortName& aPortName)
+TInt CLogManSession::SetPortName(TPortName& aPortName)
 {
 	LoggingServer().iConnectionInfo.iPortName.Copy(aPortName);
 	return KErrNone;
 }
 
-TInt CLoggingServerSession::Port()
+TInt CLogManSession::Port()
 {
 	return LoggingServer().iConnectionInfo.iPort;
 }
 
-TInt CLoggingServerSession::SetPort(TInt aPort)
+TInt CLogManSession::SetPort(TInt aPort)
 {
 	LoggingServer().iConnectionInfo.iPort = aPort;
 	return KErrNone;

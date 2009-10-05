@@ -7,23 +7,23 @@
 
 #include "loggingdefs.h"
 
-CLoggingServerMessageQueue::CLoggingServerMessageQueue(CLogManServer* aLoggingServerServer)
-        : CActive(0),iLoggingServerServer(aLoggingServerServer)
+CLogManMessageQueue::CLogManMessageQueue(CLogManServer* aLogManServer)
+        : CActive(0),iLogManServer(aLogManServer)
 {
 
 }
 
-void CLoggingServerMessageQueue::ConstructL()
+void CLogManMessageQueue::ConstructL()
 {
     CActiveScheduler::Add(this);
     iMessages = new (ELeave) CDesC8ArrayFlat(10);
 }
 
-void CLoggingServerMessageQueue::AppendL( TDesC8& aMessage) {
+void CLogManMessageQueue::AppendL( TDesC8& aMessage) {
     iMessages->AppendL( aMessage );
 }
 
-void CLoggingServerMessageQueue::Start()
+void CLogManMessageQueue::Start()
 {
     PRINTF( "void CLoggingServerMessageQueue::Start()" )
 
@@ -32,19 +32,13 @@ void CLoggingServerMessageQueue::Start()
     SetActive();
 }
 
-void CLoggingServerMessageQueue::DoCancel() {
+void CLogManMessageQueue::DoCancel() {
 
 }
 
-void CLoggingServerMessageQueue::RunL()
+void CLogManMessageQueue::RunL()
 {
-    PRINTF( "void CLoggingServerMessageQueue::RunL()" )
-
-    if (iLoggingServerServer->IsClosing())
-    {
-        PRINTF("CLoggingServerMessageQueue stopping")
-    }
-    else
+    if (!iLogManServer->IsClosing())
     {
         for ( TInt i = 0; i < iMessages->MdcaCount(); i++)
         {
@@ -52,17 +46,15 @@ void CLoggingServerMessageQueue::RunL()
             const TPtrC8& data = iMessages->MdcaPoint(0);
             TMessageBuffer8 buffer; buffer.Copy( data );
 
-            PRINTF( "this->iLoggingServerServer->SendMessage( buffer );" )
-            this->iLoggingServerServer->SendMessage( buffer );
+            this->iLogManServer->SendMessage( buffer );
 
             // Remove from Queue
-            PRINTF( "iMessages->Delete(0);" )
             iMessages->Delete(0);
         }
     }
 }
 
-CLoggingServerMessageQueue::~CLoggingServerMessageQueue()
+CLogManMessageQueue::~CLogManMessageQueue()
 {
     Cancel();
     // Clear message array

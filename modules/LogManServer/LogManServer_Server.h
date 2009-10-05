@@ -14,11 +14,11 @@
 
 class RSocket;
 
-class CLoggingServerMessageQueue;
+class CLogManMessageQueue;
 class RComm;
 class RCommServ;
-class CLoggingServerSession;
-class CLoggingServerCommandManager;
+class CLogManSession;
+class CLogManCommandManager;
 
 /// Struct containing serial connection type strings and port number on server.
 struct SConnectionInfo {
@@ -126,10 +126,10 @@ private:
 private:
 
     /// Holds and sends the asynchronous messages
-    CLoggingServerMessageQueue* iMessageQueue;
+    CLogManMessageQueue* iMessageQueue;
 
     /// Handles commands sent from PC
-    CLoggingServerCommandManager* iCommandManager;
+    CLogManCommandManager* iCommandManager;
 
     CSocketEngine* iSocketEngine;
 
@@ -142,8 +142,8 @@ private:
     /// True if server is closing
     TBool iIsClosing;
 
-    friend class CLoggingServerSession;
-    friend class CLoggingServerCommandManager;
+    friend class CLogManSession;
+    friend class CLogManCommandManager;
 };
 
 #endif

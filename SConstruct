@@ -4,9 +4,9 @@ import os
 from os.path import join
 import sys
 import glob
-
 import scons_symbian
 from scons_symbian import *
+from scons_symbian.arguments import Help
 
 import codegen
 
@@ -22,39 +22,30 @@ LOGGINGSERVER_INCLUDES = [ join("modules", x) for x in [
 
 PACKAGE_DRIVE_MAP = { "C" : ".*[.](mif|rsc)" }
 
-opts = Variables()
-opts.Add('pythonlib', 'Select correct Python library', "Python222")
-opts.Add('cert', 'Set signing certificate', None)
-opts.Add('key', 'Set certificate key', None)
-opts.Add('passwd', 'Set certificate password', None)
-opts.Add('withtests', 'Include tests', False)
-
-env = Environment(options=opts)
-Help(opts.GenerateHelpText(env))
-
-CERT     = ARGUMENTS.get("cert", None)
-KEY     = ARGUMENTS.get("key", None)
-PASSWD  = ARGUMENTS.get("passwd", "" )
+Help('cert - Set certificate certificate\n')
+CERT  = ARGUMENTS.get("cert", None)
+Help('passwd - Set certificate key\n')
+KEY   = ARGUMENTS.get("key", None)
+Help('passwd - Set certificate password\n')
+PASSWD = ARGUMENTS.get("passwd", "" )
 
 #: Enable test compilation
+Help( 'withtests - Include tests\n')
 HAVE_TESTS = ARGUMENTS.get("withtests", "False" )
 HAVE_TESTS = eval( HAVE_TESTS )
-
-#: Select your Python library
-PYTHON_LIB = ARGUMENTS.get("pythonlib", "Python222")
 
 LOGMAN_VERSION = ".".join(map(str, codegen.pkg_gen.get_build_number()))
 LOGMAN_PACKAGE = "LogMan_%s_%s_%s.sis" % (COMPILER, RELEASE, LOGMAN_VERSION.replace(".", "_"))
 
-PYTHON_LIB = ARGUMENTS.get("pythonlib", "python222")
-Help("pythonlib - Python library to link pylogman with. python25 sets pymodprefix and openc settings automatically: default=Python222\n")
+#: Python library to link with.
+PYTHON_LIB = ARGUMENTS.get("pythonlib", "python25")
+Help("pythonlib - Python library to link pylogman with. python25 sets pymodprefix and openc settings automatically: default=python25\n")
 
 PYMODPREFIX = ARGUMENTS.get("pymodprefix", "")
 Help("pymodprefix - Prefix required at beginning of dynamic extension's filename: default=''\n")
 
 USE_OPENC = ARGUMENTS.get("openc", "false")
 Help("openc - Use OpenC: default=false\n")
-
   
 PACKAGE_UID  = 0xe3195807
 SERVER_UID   = PACKAGE_UID + 1
@@ -259,3 +250,4 @@ PyLogManDll()
 LogManGui() 
 ZModemLib()
 PTraceLib()
+

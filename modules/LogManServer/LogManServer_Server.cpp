@@ -13,7 +13,7 @@
 #include <f32file.h>
 #include <badesca.h>
 
-#define __DEBUG_LOGGING__
+//#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
 
 //\Epoc32\release\winscw\udeb\ecacm.csy

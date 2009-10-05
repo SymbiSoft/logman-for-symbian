@@ -6,7 +6,7 @@
  import symbiantypes
  ]]]*/
 //[[[end]]]
-#define __DEBUG_LOGGING__
+//#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
 
 #include "LogManServer_Defines.h"

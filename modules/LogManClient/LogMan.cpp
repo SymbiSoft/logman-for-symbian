@@ -1,4 +1,4 @@
-#define __DEBUG_LOGGING__
+//#define __DEBUG_LOGGING__
 
 #include "../Common/loggingdefs.h"
 

@@ -13,15 +13,15 @@ class RFs;
 /**
  *
  */
-class CLoggingServerCommandManager: public CActive,
+class CLogManCommandManager: public CActive,
 		public MSocketEngineObserver
 {
 
 public:
 	/** Constructor */
-	CLoggingServerCommandManager(CLogManServer* iLoggingServerServer);
+	CLogManCommandManager(CLogManServer* iLoggingServerServer);
 	/** Destructor */
-	~CLoggingServerCommandManager();
+	~CLogManCommandManager();
 
 	/** Second phase constructor */
 	void ConstructL();
@@ -40,14 +40,15 @@ public:
 	 */
 	void SocketData(TDesC8& aData);
 
-protected:
-	TInt HandleCmdListL();
-	TInt HandleCmdLsL(RArray<RBuf8>& aPath, RFs& aFs);
+protected:	
 	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters, RFs& aFs);
+	TInt HandleCmdDelL(RArray<RBuf8>& parameters, RFs& aFs);
 	TInt HandleCmdExecL(RArray<RBuf8>& aParameters, RFs& aFs);
-	TInt HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill);
-	TInt HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs);
 	TInt HandleCmdGetL(RArray<RBuf8>& aParameters, RFs& aFs);
+	TInt HandleCmdKillAndFindL(RArray<RBuf8>& aParameters, TBool aDoKill);
+	TInt HandleCmdListL();
+	TInt HandleCmdLsL(RArray<RBuf8>& aPath, RFs& aFs);			
+	TInt HandleCmdPutL(RArray<RBuf8>& aParameters, RFs& aFs);	
 
 	/** Handle shell commands */
 	TInt HandleCommand();
@@ -66,8 +67,7 @@ protected:
 	void LeaveIfFailedL(TInt aErr);
 
 	/** Handle to the LogMan service holding serial connection */
-	CLogManServer *iLoggingServerServer;
-
+	CLogManServer *iLogManServer;
 	RTimer iTimer;
 	RBuf8 iCommandBuffer;
 	friend class CLogManServer;

@@ -7,13 +7,13 @@ class CLogManServer;
 
 /// LogMan session class
 /** Handle client's session with the server */
-class CLoggingServerSession : public CSession2
+class CLogManSession : public CSession2
   {
   public:
     /** Construct CLoggingServerSession */
-	CLoggingServerSession();
+	CLogManSession();
 	/** Destroy CLoggingServerSession */
-	virtual ~CLoggingServerSession();
+	virtual ~CLogManSession();
 
 	/** First in handling the client's message. Passes to DispatchMessageL
 	  * @param aMessage Message to handle.

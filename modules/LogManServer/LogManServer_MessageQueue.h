@@ -11,14 +11,14 @@ class CDesC8Array;
 /** Holds a list of messages and sends them asynchronously
   * from the client's(RLogMan) perspective.
  */
-class CLoggingServerMessageQueue : public CActive
+class CLogManMessageQueue : public CActive
   {
 
   public:
     /** Constructor */
-	CLoggingServerMessageQueue(CLogManServer* iLoggingServerServer);
+	CLogManMessageQueue(CLogManServer* iLoggingServerServer);
 	/** Destructor */
-	~CLoggingServerMessageQueue();
+	~CLogManMessageQueue();
 
 	/** Second phase constructor */
 	void ConstructL();
@@ -42,7 +42,7 @@ class CLoggingServerMessageQueue : public CActive
 	void RunL();
 
 	/** Handle to the LogMan service holding serial connection */
-	CLogManServer *iLoggingServerServer;
+	CLogManServer *iLogManServer;
 
   };
 #endif

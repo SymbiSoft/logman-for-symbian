@@ -126,11 +126,11 @@ void CLogManServer::ConstructL()
 
 
 	// Creates message queue for asynchronous messaging
-	this->iMessageQueue = new (ELeave) CLoggingServerMessageQueue(this);
+	this->iMessageQueue = new (ELeave) CLogManMessageQueue(this);
 	CleanupStack::PushL(this->iMessageQueue);
 	this->iMessageQueue->ConstructL();
 
-	this->iCommandManager = new (ELeave) CLoggingServerCommandManager(this);
+	this->iCommandManager = new (ELeave) CLogManCommandManager(this);
 	CleanupStack::PushL(this->iCommandManager);
 	this->iCommandManager->ConstructL();
 
@@ -168,7 +168,7 @@ TBool CLogManServer::IsClosing()
 	return this->iIsClosing;
 }
 
-CSession2* CLogManServer::NewSessionL(const TVersion& aVersion,
+CSession2* CLogManServer::NewSessionL(const TVersion& /*aVersion*/,
 		const RMessage2& /*aMessage*/) const
 {
 
@@ -183,7 +183,7 @@ CSession2* CLogManServer::NewSessionL(const TVersion& aVersion,
 
 	//the connect message is delivered via the RMessage2 object passed.
 	//Create the session.
-	CLoggingServerSession* newsession = new (ELeave) CLoggingServerSession();
+	CLogManSession* newsession = new (ELeave) CLogManSession();
 
 	return newsession;
 

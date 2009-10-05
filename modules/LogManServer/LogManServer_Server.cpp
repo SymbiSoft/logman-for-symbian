@@ -12,7 +12,10 @@
 #include "LogManServer_CommandManager.h"
 #include <f32file.h>
 #include <badesca.h>
+
+#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
+
 //\Epoc32\release\winscw\udeb\ecacm.csy
 //\Epoc32\release\winscw\udeb\ecuart.csy
 //\Epoc32\release\winscw\udeb\ircomm.csy
@@ -44,23 +47,23 @@ const TInt KDefaultWriteTimeout = 5000000;
 /// Sent when connection has been established.
 _LIT8( KSerialStartedMsg, "LogMan Service: Serial connection established.\n" );
 
-CLoggingServerServer* CLoggingServerServer::NewLC()
+CLogManServer* CLogManServer::NewLC()
 {
-	CLoggingServerServer* self = new (ELeave) CLoggingServerServer(
+	CLogManServer* self = new (ELeave) CLogManServer(
 			EPriorityStandard);
 	CleanupStack::PushL(self);
 	self->ConstructL();
 	return self;
 }
 
-CLoggingServerServer* CLoggingServerServer::NewL()
+CLogManServer* CLogManServer::NewL()
 {
-	CLoggingServerServer* self = CLoggingServerServer::NewLC();
+	CLogManServer* self = CLogManServer::NewLC();
 	CleanupStack::Pop(self);
 	return self;
 }
 
-CLoggingServerServer::CLoggingServerServer(
+CLogManServer::CLogManServer(
 		CActive::TPriority aActiveObjectPriority) :
 	CServer2(aActiveObjectPriority), iIsSerialConnected(EFalse), iBytesSent(0),
 			iIsClosing(EFalse), iSocketEngine(NULL)
@@ -69,7 +72,7 @@ CLoggingServerServer::CLoggingServerServer(
 }
 
 //destructor
-CLoggingServerServer::~CLoggingServerServer()
+CLogManServer::~CLogManServer()
 {
 	if (iMessageQueue)
 	{
@@ -101,7 +104,7 @@ CLoggingServerServer::~CLoggingServerServer()
 
 }
 
-TInt CLoggingServerServer::InitializeSocketServer()
+TInt CLogManServer::InitializeSocketServer()
 {
 	if( iSocketEngine ) return KErrNone; // Already initialized
 
@@ -112,7 +115,7 @@ TInt CLoggingServerServer::InitializeSocketServer()
 	return err;
 }
 
-void CLoggingServerServer::ConstructL()
+void CLogManServer::ConstructL()
 {
 	// Make first sure that underlying interface is active
 	//StartInterfaceL( 0 );
@@ -160,12 +163,12 @@ void CLoggingServerServer::ConstructL()
 	this->iConnectionInfo.iPortName.Copy(tmp);
 }
 
-TBool CLoggingServerServer::IsClosing()
+TBool CLogManServer::IsClosing()
 {
 	return this->iIsClosing;
 }
 
-CSession2* CLoggingServerServer::NewSessionL(const TVersion& aVersion,
+CSession2* CLogManServer::NewSessionL(const TVersion& aVersion,
 		const RMessage2& /*aMessage*/) const
 {
 
@@ -186,13 +189,13 @@ CSession2* CLoggingServerServer::NewSessionL(const TVersion& aVersion,
 
 }
 
-void CLoggingServerServer::PanicServer(TLogServPanic aPanic)
+void CLogManServer::PanicServer(TLogServPanic aPanic)
 {
 	_LIT(KTxtServerPanic,"Logging Server Panic");
 	User::Panic(KTxtServerPanic, aPanic);
 }
 
-TInt CLoggingServerServer::SendMessage(const TDesC& aBuffer)
+TInt CLogManServer::SendMessage(const TDesC& aBuffer)
 {
 	PRINTF( "SendMessage16" );
 	TPtrC8 ptr(reinterpret_cast<const TUint8*> (aBuffer.Ptr()),
@@ -202,14 +205,14 @@ TInt CLoggingServerServer::SendMessage(const TDesC& aBuffer)
 	return err;
 }
 
-void CLoggingServerServer::SendSocketMessage( const TDesC8& aBuffer )
+void CLogManServer::SendSocketMessage( const TDesC8& aBuffer )
 {
 	if( iSocketEngine ) {
 		iSocketEngine->Write(aBuffer);
 	}
 }
 
-TInt CLoggingServerServer::SendMessage(const TDesC8& aBuffer)
+TInt CLogManServer::SendMessage(const TDesC8& aBuffer)
 {
 
 	SendSocketMessage( aBuffer );
@@ -237,14 +240,14 @@ TInt CLoggingServerServer::SendMessage(const TDesC8& aBuffer)
 	return sendstatus.Int();
 }
 
-void CLoggingServerServer::AddAsyncMessageL(const TDesC8& aBuffer)
+void CLogManServer::AddAsyncMessageL(const TDesC8& aBuffer)
 {
 	PRINTF( "AddAsyncMessageL" );PRINTF( "Adding asynchronous message %S", &aBuffer );
 	this->iMessageQueue->AppendL(const_cast<TDesC8&> (aBuffer));
 	this->iMessageQueue->Start();
 }
 
-TInt CLoggingServerServer::LoadModule(TFullName& aModuleName)
+TInt CLogManServer::LoadModule(TFullName& aModuleName)
 {
 
 	TInt err = iServer.LoadCommModule(aModuleName);
@@ -256,7 +259,7 @@ TInt CLoggingServerServer::LoadModule(TFullName& aModuleName)
 	return err;
 }
 
-TBool CLoggingServerServer::IsSerialConnected()
+TBool CLogManServer::IsSerialConnected()
 {
 
 	//PRINTF( "CLoggingServerServer::IsSerialConnected()" );
@@ -282,7 +285,26 @@ TBool CLoggingServerServer::IsSerialConnected()
 
 }
 
-void CLoggingServerServer::DisconnectSerial()
+TBool CLogManServer::IsSocketConnected()
+{
+	PRINTF( "iSocketEngine->SocketState():%d", iSocketEngine->SocketState() );
+	if( !iSocketEngine ) return EFalse;
+	
+	switch( iSocketEngine->SocketState()){
+		case CSocketEngine::ENotConnected:
+		case CSocketEngine::EConnecting: 
+		case CSocketEngine::ETimedOut:
+			return EFalse;	
+		case CSocketEngine::EConnected:
+		case CSocketEngine::EListening:
+			return ETrue;
+	}
+	
+	return EFalse;
+}
+
+
+void CLogManServer::DisconnectSerial()
 {
 	PRINTF( "CLoggingServerServer::DisconnectSerial()" );
 	iSerialComm.Close();
@@ -291,7 +313,7 @@ void CLoggingServerServer::DisconnectSerial()
 	iIsSerialConnected = EFalse;
 }
 
-TInt CLoggingServerServer::ConnectSerial()
+TInt CLogManServer::ConnectSerial()
 {
 	PRINTF( "CLoggingServerServer::ConnectSerial()" );
 
@@ -359,7 +381,7 @@ TInt CLoggingServerServer::ConnectSerial()
 	return err;
 }
 
-TUint32 CLoggingServerServer::BytesSent()
+TUint32 CLogManServer::BytesSent()
 {
 	return this->iBytesSent;
 }

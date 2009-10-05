@@ -4,7 +4,7 @@
 #include <e32base.h>
 
 #include "LogManServer_Defines.h"
-class CLoggingServerServer;
+class CLogManServer;
 class CDesC8Array;
 
 /// Message queue for asynchronous logging
@@ -16,7 +16,7 @@ class CLoggingServerMessageQueue : public CActive
 
   public:
     /** Constructor */
-	CLoggingServerMessageQueue(CLoggingServerServer* iLoggingServerServer);
+	CLoggingServerMessageQueue(CLogManServer* iLoggingServerServer);
 	/** Destructor */
 	~CLoggingServerMessageQueue();
 
@@ -42,7 +42,7 @@ class CLoggingServerMessageQueue : public CActive
 	void RunL();
 
 	/** Handle to the LogMan service holding serial connection */
-	CLoggingServerServer *iLoggingServerServer;
+	CLogManServer *iLoggingServerServer;
 
   };
 #endif

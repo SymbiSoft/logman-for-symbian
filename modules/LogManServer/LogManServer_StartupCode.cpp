@@ -14,23 +14,23 @@ GLDEF_C TInt E32Main()
 	CTrapCleanup* cleanup=CTrapCleanup::New();
 
 	if(cleanup == NULL)
-	  CLoggingServerServer::PanicServer(ECreateTrapCleanup);
+	  CLogManServer::PanicServer(ECreateTrapCleanup);
 
     //create an active scheduler
     //if this fails, panic
     CActiveScheduler *LoggingScheduler = new CActiveScheduler;
-	__ASSERT_ALWAYS(LoggingScheduler != NULL, CLoggingServerServer::PanicServer(EMainSchedulerError));
+	__ASSERT_ALWAYS(LoggingScheduler != NULL, CLogManServer::PanicServer(EMainSchedulerError));
 
 	//installs the active scheduler
 	CActiveScheduler::Install(LoggingScheduler);
 
 	//create an instance of the ServerObject
 	//if this fails, panic
-	CLoggingServerServer* LoggingServer;
-	TRAPD(result,LoggingServer = CLoggingServerServer::NewL());
+	CLogManServer* LoggingServer;
+	TRAPD(result,LoggingServer = CLogManServer::NewL());
 	PRINTF( "Server created");
 	if(result != KErrNone)
-		__ASSERT_ALWAYS(LoggingServer != NULL,CLoggingServerServer::PanicServer(ESvrCreateServer));
+		__ASSERT_ALWAYS(LoggingServer != NULL,CLogManServer::PanicServer(ESvrCreateServer));
 
 
 	//Adds the server with the specified name to the active scheduler,
@@ -39,7 +39,7 @@ GLDEF_C TInt E32Main()
 	TInt err = LoggingServer->Start(KLoggingServer);
 	PRINTF( "Done starting");
 	if(err != KErrNone)
-	  CLoggingServerServer::PanicServer(ESvrStartServer);
+	  CLogManServer::PanicServer(ESvrStartServer);
 
     // FIXME: If the client rendezvous after the server, the Client gets stuck.
     //        As a simple fix, wait to allow client rendezvous before the server

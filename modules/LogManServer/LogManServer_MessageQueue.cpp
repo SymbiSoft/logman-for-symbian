@@ -7,7 +7,7 @@
 
 #include "loggingdefs.h"
 
-CLoggingServerMessageQueue::CLoggingServerMessageQueue(CLoggingServerServer* aLoggingServerServer)
+CLoggingServerMessageQueue::CLoggingServerMessageQueue(CLogManServer* aLoggingServerServer)
         : CActive(0),iLoggingServerServer(aLoggingServerServer)
 {
 

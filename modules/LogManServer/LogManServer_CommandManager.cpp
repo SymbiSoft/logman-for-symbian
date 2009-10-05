@@ -48,7 +48,7 @@ const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
 
 CLoggingServerCommandManager::CLoggingServerCommandManager(
-		CLoggingServerServer* aLoggingServerServer) :
+		CLogManServer* aLoggingServerServer) :
 	CActive(0), iLoggingServerServer(aLoggingServerServer)
 {
 
@@ -76,7 +76,7 @@ void CLoggingServerCommandManager::Start()
 void CLoggingServerCommandManager::SocketState(TInt aNewState)
 {
 }
-;
+
 
 void CLoggingServerCommandManager::SocketData(TDesC8& aData)
 {
@@ -269,6 +269,7 @@ TInt CLoggingServerCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters,
 	CleanupStack::PopAndDestroy(&command);
 	CleanupStack::PopAndDestroy(&path);
 
+	return KErrNone;
 }
 
 /** Handle helper command */
@@ -295,6 +296,8 @@ TInt CLoggingServerCommandManager::HandleCmdListL()
 
 	iLoggingServerServer->SendMessage(KStrHelpMsg);
 	iLoggingServerServer->SendMessage(KStrNewLine);
+	
+	return KErrNone;
 }
 
 /** Handle file listing command */
@@ -562,7 +565,8 @@ TInt CLoggingServerCommandManager::HandleCmdKillAndFindL(
 	{
 		CleanupStack::PopAndDestroy(&pattern);
 	}
-
+	
+	return KErrNone;
 }
 
 #define max(a,b) (b<a)?a:b
@@ -628,6 +632,7 @@ TInt CLoggingServerCommandManager::HandleCmdGetL(RArray<RBuf8>& aParameters,
 
 	CleanupStack::PopAndDestroy(2); // buf, targetfile
 
+	return KErrNone;
 }
 
 /** Handle file transfer to device

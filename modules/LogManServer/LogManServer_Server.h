@@ -38,17 +38,17 @@ struct SSocketConnectionInfo {
 };
 /// LogMan server class
 /** Service handling serial connection and sending of messages through it. */
-class CLoggingServerServer : public CServer2
+class CLogManServer : public CServer2
 {
 public:
     /// Destructor
-    virtual ~CLoggingServerServer();
+    virtual ~CLogManServer();
 
     /// Symbian 2-phase constructor
-    static CLoggingServerServer* NewLC();
+    static CLogManServer* NewLC();
 
     /// Symbian 2-phase constructor
-    static CLoggingServerServer* NewL();
+    static CLogManServer* NewL();
 
     /** Create new session with the server */
     CSession2* NewSessionL(const TVersion& aVersion,const RMessage2& /*aMessage*/) const;
@@ -94,7 +94,8 @@ public:
      * @return ETrue if the serial connection is active
      */
     TBool IsSerialConnected();
-
+    TBool IsSocketConnected();
+    
     /**
      * @return Total bytes sent by the server.
      */
@@ -117,7 +118,7 @@ public:
 
 private:
     /// Constructor
-    CLoggingServerServer(CActive::TPriority aActiveObjectPriority);
+    CLogManServer(CActive::TPriority aActiveObjectPriority);
 
     /// 2nd phase constructor
     void ConstructL();

@@ -37,7 +37,7 @@ void CLoggingServerGuiAppUi::UpdateServiceInfoL()
 	if (result != KErrNone)
 	{
 		iAppView->iLogManServiceInfo.iRunning = EFalse;
-		iAppView->iLogManServiceInfo.iConnected = KErrUnknown;
+		iAppView->iLogManServiceInfo.iConnected = EConnectionNone;
 		iAppView->iLogManServiceInfo.iPort = 0;
 		iAppView->iLogManServiceInfo.iPortName.Copy(KEmptyStr);
 	}
@@ -47,14 +47,7 @@ void CLoggingServerGuiAppUi::UpdateServiceInfoL()
 		User::LeaveIfError(log.Connect());
 		CleanupClosePushL(log);
 
-		if (iAppView->iLogManServiceInfo.iConnected == KErrNone)
-		{
-			if (!log.IsSerialConnected())
-			{
-				iAppView->iLogManServiceInfo.iConnected = KErrDisconnected;
-			}
-		}
-
+		iAppView->iLogManServiceInfo.iConnected = log.ConnectionStatus();
 		iAppView->iLogManServiceInfo.iRunning = ETrue;
 		iAppView->iLogManServiceInfo.iPort = log.Port();
 		iAppView->iLogManServiceInfo.iPortName.Copy(log.PortName());
@@ -75,11 +68,13 @@ void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 {
 
 	// Connect
-	TInt err = aLogMan.ConnectSerial();
-	iAppView->iLogManServiceInfo.iConnected = err;
+	TInt err = aLogMan.ConnectSerial();	
+	iAppView->iLogManServiceInfo.iConnectionError = err;
 
 	if (err != KErrNone)
 	{
+		iAppView->iLogManServiceInfo.iConnected = EConnectionNone;
+		
 		_LIT(KConnectFailed, "Service failed to connect serial.");
 
 		// Stringify the error code.

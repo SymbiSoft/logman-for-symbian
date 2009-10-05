@@ -9,6 +9,7 @@ typedef struct {
 } TLogMan;
 
 
+
 // Declare C++ API
 #ifdef __cplusplus
 
@@ -71,10 +72,11 @@ public:
              Otherwise a system-wide error code.
 
     */
-    IMPORT_C TInt ConnectSerial();
-
+    IMPORT_C TInt ConnectSerial();    
+    
     /** @return ETrue if server's serial connection has been opened */
     IMPORT_C TBool IsSerialConnected();
+    IMPORT_C TConnectionStatus ConnectionStatus(void);
 
     /** @return The amount of bytes sent by the server */
     IMPORT_C TUint32 BytesSent();

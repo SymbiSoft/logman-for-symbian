@@ -52,7 +52,9 @@ class CLogManSession : public CSession2
     *   @param aPort Port to set
     */
     TInt SetPort( TInt aPort );
-
+    
+    TPortName Addr( );
+    TInt SetAddr(TPortName& aHost);
   };
 
 

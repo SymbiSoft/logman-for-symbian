@@ -10,6 +10,7 @@ rls_string str_r_menu_main_test_async    "Test Async Message"
 rls_string str_r_menu_main_exit          "Exit"
 
 rls_string str_r_menu_main_socket        "Socket"
+rls_string str_r_menu_main_listen        "Listen"
 
 rls_string str_r_menu_main_serial        "Serial"
 rls_string str_r_menu_main_connect       "Connect"

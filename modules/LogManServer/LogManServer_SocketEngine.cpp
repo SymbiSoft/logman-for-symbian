@@ -10,6 +10,8 @@
 #include    "LogManServer_SocketEngineObserver.h"
 #include    "LogManServer_SocketTimeOutTimer.h"
 
+#define __DEBUG_LOGGING__
+#include "../Common/loggingdefs.h"
 
 // ==== Constructs
 
@@ -156,8 +158,7 @@ CSocketEngine::TSocketEngineState CSocketEngine::SocketState(void)
 	return iState;
 }
 
-void CSocketEngine::ConnectL(const TUint32 aIapId,
-		const TInetAddr& aIPAddress)
+void CSocketEngine::ConnectL(const TUint32 aIapId)
 {
 	if (iState != ENotConnected)
 	{
@@ -171,7 +172,6 @@ void CSocketEngine::ConnectL(const TUint32 aIapId,
 	User::LeaveIfError(iDataSocket.Open(iSocketServer, KAfInet, KSockStream,
 			KProtocolInetTcp, iConnection) );
 
-	iAddress = aIPAddress;
 	iAddress.SetPort(KSocketLoggingPort);
 
 	// The Connect() allocate local address automatically if

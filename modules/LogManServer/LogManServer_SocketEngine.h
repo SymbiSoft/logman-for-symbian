@@ -48,7 +48,7 @@ public:
 	 * @param aIapId An iap id used for connection
 	 * @param aIPAddress An ip address where to connect.
 	 */
-	void ConnectL(const TUint32 aIapId, const TInetAddr& aIPAddress);
+	void ConnectL(const TUint32 aIapId);
 
 	/**
 	 * Writes to the socket.
@@ -178,7 +178,7 @@ private:
 
 	// Socket engine's state
 	TSocketEngineState iState;
-
+public:
 	// The remote address
 	TInetAddr iAddress;
 };

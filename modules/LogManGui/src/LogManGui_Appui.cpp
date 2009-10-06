@@ -64,6 +64,11 @@ void CLoggingServerGuiAppUi::StartSocketServer(RLogMan& aLogMan)
 	aLogMan.StartSocketServer();
 }
 
+void CLoggingServerGuiAppUi::ConnectSocketServer(RLogMan& aLogMan)
+{
+	aLogMan.ConnectSocketServer();
+}
+
 void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 {
 
@@ -151,9 +156,16 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		break;
 	}
 
-	case ELogServCmdMenuMainStartSocketServer:
+	case ELogServCmdMenuMainListenSocketServer:
 	{
 		StartSocketServer(log);
+		break;
+	}
+	case ELogServCmdMenuMainConnectSocketServer:
+	{
+		TPortName host = _L("127.0.0.1");
+		log.SetHost(host);
+		ConnectSocketServer(log);
 		break;
 	}
 	case ELogServCmdMenuMainDisconnect:
@@ -191,7 +203,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		log.Writef(KTestFormattedMsg8, EFalse, 8);
 		log.Writef(KTestFormattedMsg16, EFalse, 16);
 
-		_LIT(KTestStaticMsg8, "This is 8-bit message sent using static Log\n");
+		_LIT8(KTestStaticMsg8, "This is 8-bit message sent using static Log\n");
 		_LIT(KTestStaticMsg16, "This is 16-bit message sent using static Log\n");
 		RLogMan::Log(KTestStaticMsg8);
 		RLogMan::Log(KTestStaticMsg16);

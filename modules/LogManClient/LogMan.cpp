@@ -1,11 +1,12 @@
 //#define __DEBUG_LOGGING__
 
-#include "../Common/loggingdefs.h"
-
-#include "LogMan.h"
-#include "e32debug.h"
 #include <c32comm.h> //TPortName
 #include <string.h> // For strlen
+
+#include "../Common/loggingdefs.h"
+#include "types.h" // This must be before LogMan.h!
+#include "LogMan.h"
+#include "e32debug.h"
 
 //void __cyg_profile_func_exit(void *this_fn, void *call_site);
 EXPORT_C RLogMan::RLogMan()
@@ -258,12 +259,26 @@ EXPORT_C TInt RLogMan::StartSocketServer( )
 	TInt result;
 	TPckgBuf<TInt> pckg;
 	TIpcArgs args(&pckg);
-    SendReceive(EStartSocketServer, args);
+    SendReceive(ESocketServerListen, args);
 
     result = pckg();
     return result;
 
 }
+
+EXPORT_C TInt RLogMan::ConnectSocketServer( )
+{
+
+	TInt result;
+	TPckgBuf<TInt> pckg;
+	TIpcArgs args(&pckg);
+    SendReceive(ESocketServerConnect, args);
+
+    result = pckg();
+    return result;
+
+}
+
 
 EXPORT_C TPortName RLogMan::PortName( )
 {
@@ -302,12 +317,30 @@ EXPORT_C TInt RLogMan::SetPort( TInt& aData )
     return result;
 }
 
+EXPORT_C TInt RLogMan::SetHost( TPortName& aData )
+{
+    TIpcArgs args(&aData );
+    TInt result = SendReceive(ESetAddr, args);
+    return result;
+}
+
+EXPORT_C TPortName RLogMan::Host( )
+{
+    TPortName result;
+    TPckgBuf<TPortName> pckg;
+    TIpcArgs args(&pckg);
+    SendReceive(EGetAddr, args);
+
+    result = pckg();
+    return result;
+
+}
+
 _LIT8(KFmtStackInfo,"\nStackInfo\n  Free:%u, Used:%u, Size:%u\n");
 _LIT8(KFmtHeapInfo,"\nHeapInfo\n  Free:%u, Used:%u, Size:%u\n");
 
 EXPORT_C TInt RLogMan::StackInfo()
 {
-
     TUint32 stack_pointer = 0;
     stack_pointer = (TUint32)&stack_pointer;
     RThread thread;

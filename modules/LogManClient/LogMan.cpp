@@ -31,7 +31,7 @@ EXPORT_C TInt RLogMan::Connect()
 {
     PRINTF( "Connecting" );
 
-    RProcess logginServerProcess;
+    
     TFindServer findMyServer( KLoggingServer );
     TFullName servername;
 
@@ -45,7 +45,9 @@ EXPORT_C TInt RLogMan::Connect()
     }
     else
     {
+		RProcess logginServerProcess;
         TRequestStatus status = KRequestPending;
+		
         result = logginServerProcess.Create(KLoggingServerExe,KNoArgs);
         PRINTF( "logginServerProcess.Create: %d", result );
         if ( result != KErrNone )

@@ -8,7 +8,7 @@
 #include "loggingdefs.h"
 
 CLogManMessageQueue::CLogManMessageQueue(CLogManServer* aLogManServer)
-        : CActive(0),iLogManServer(aLogManServer)
+        : CActive(0),iLogManServer(aLogManServer),iMessages(NULL)
 {
 
 }

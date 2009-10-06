@@ -15,7 +15,7 @@ typedef struct {
 
 #include <e32std.h>
 #include <c32comm.h> //TPortName
-#include "types.h"
+#include <logman/types.h>
 
 #if !defined( __WINSCW__ )
 	#define __NON_INSTRUMENT_FUNCTION__   __attribute__((__no_instrument_function__))

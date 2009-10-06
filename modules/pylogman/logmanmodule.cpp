@@ -12,6 +12,7 @@ import logman
 #include <symbian_python_ext_util.h>
 
 #include "../Common/loggingdefs.h"
+#include "types.h"
 #include "LogMan.h" //RLogMan
 
 

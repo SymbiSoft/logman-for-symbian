@@ -92,9 +92,14 @@ RESOURCE MENU_PANE r_socket_sub_menu
         {
         MENU_ITEM
             {
-            command = ELogServCmdMenuMainStartSocketServer;
-            txt = str_r_menu_main_connect;
-            }
+            command = ELogServCmdMenuMainListenSocketServer;
+            txt = str_r_menu_main_listen;
+            },
+		MENU_ITEM
+            {
+			command = ELogServCmdMenuMainConnectSocketServer;
+			txt = str_r_menu_main_connect;
+			}
         };
     }
 

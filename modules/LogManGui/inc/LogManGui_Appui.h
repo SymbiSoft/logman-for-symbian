@@ -65,7 +65,7 @@ class CLoggingServerGuiAppUi : public CAknAppUi
          * Start server's socket server.
          */
         void StartSocketServer(RLogMan& aLogMan);
-
+        void ConnectSocketServer(RLogMan& aLogMan);
         //CArrayFix<TCoeHelpContext>* HelpContextL() const;
 
     private: // Data

@@ -14,6 +14,7 @@ class SConnectionInfo:
             #Attribute( TFullName, "ModuleName", "Name of the connection module to use." ),
             Attribute( TPortName, "PortName", "Name of the port to open." ),
             Attribute( TInt,      "Port", "Port number to open." ),
+            Attribute( TPortName, "Addr", "Remote address to connect to." ),
         ]
 
 ClassName = "CLoggingServerServer"

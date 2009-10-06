@@ -6,7 +6,7 @@
  import symbiantypes
  ]]]*/
 //[[[end]]]
-//#define __DEBUG_LOGGING__
+#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
 
 #include "LogManServer_Defines.h"
@@ -207,6 +207,13 @@ void CLogManSession::DispatchMessageL(const RMessage2& aMessage)
 	    SetPort(aBuffer);
 	    return;
 	}
+	case ESetAddr:
+	{
+	    TPortName aBuffer;
+	    aMessage.ReadL(0, aBuffer, 0);
+	    SetAddr(aBuffer);
+	    return;
+	}
 	case EGetPortName:
 	{
 
@@ -223,9 +230,24 @@ void CLogManSession::DispatchMessageL(const RMessage2& aMessage)
 	    aMessage.WriteL(0,p);
 	    return;
 	}
-	//[[[end]]]
+	case EGetAddr:
+	{
 
-	case EStartSocketServer:
+	    const TPortName& tmp = Addr( );
+	    TPckgBuf<TPortName> p( tmp );
+	    aMessage.WriteL(0,p);
+	    return;
+	}
+	//[[[end]]]
+	case ESocketServerConnect:
+	{
+		const TInt tmp = LoggingServer().ConnectToServer( );
+		TPckgBuf<TInt> p( tmp );
+		aMessage.WriteL(0,p);
+		return;
+	}
+	
+	case ESocketServerListen:
 	{
 		const TInt tmp = LoggingServer().InitializeSocketServer( );
 		TPckgBuf<TInt> p( tmp );
@@ -302,8 +324,20 @@ TInt CLogManSession::Port()
 	return LoggingServer().iConnectionInfo.iPort;
 }
 
+TPortName CLogManSession::Addr( )
+{
+	return LoggingServer().iConnectionInfo.iRemoteAddr;
+}
+
 TInt CLogManSession::SetPort(TInt aPort)
 {
 	LoggingServer().iConnectionInfo.iPort = aPort;
+	return KErrNone;
+}
+
+TInt CLogManSession::SetAddr(TPortName& aHost)
+{
+	PRINTF("SetAddr:%S", &aHost);
+	LoggingServer().iConnectionInfo.iRemoteAddr.Copy( aHost );
 	return KErrNone;
 }

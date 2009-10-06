@@ -8,14 +8,12 @@ typedef struct {
     void* cppInstance;
 } TLogMan;
 
-
-
 // Declare C++ API
 #ifdef __cplusplus
 
-#include <e32std.h>
-#include <c32comm.h> //TPortName
+#ifndef __LOGMAN_TYPES_H__
 #include <logman/types.h>
+#endif
 
 #if !defined( __WINSCW__ )
 	#define __NON_INSTRUMENT_FUNCTION__   __attribute__((__no_instrument_function__))
@@ -63,7 +61,8 @@ public:
              Otherwise a system-wide error code.
     */
     IMPORT_C TInt StartSocketServer( );
-
+    IMPORT_C TInt ConnectSocketServer();
+    
     /**
      Connect LogMan server's serial connection using current Port and PortName settings.
      @return KErrNone, if successful.
@@ -190,6 +189,12 @@ public:
     IMPORT_C TInt Port( );
     /** Set port number to open. */
     IMPORT_C TInt SetPort( TInt& aPort );
+    
+    /** Get local or remote host address depending on socket connection type(listen\connect). */
+	IMPORT_C TPortName Host();
+	/** Set remote host address. */
+	IMPORT_C TInt SetHost( TPortName& aPortName );
+	
 
 };
 

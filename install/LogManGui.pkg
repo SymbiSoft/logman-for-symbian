@@ -7,7 +7,7 @@
 &EN
 
 ;Localised package name
-#{"LogManGui"},(0xAF111111),1,09,01001,TYPE=SISSYSTEM
+#{"LogManGui"},(0xAF111111),1,09,01006,TYPE=SISSYSTEM
 
 ;Localised Vendor name
 %{"Jussi Toivola"}

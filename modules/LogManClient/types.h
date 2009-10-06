@@ -1,5 +1,8 @@
-#ifndef __LOGGING_SERVER_CLIENTS_TYPES_H__
-#define __LOGGING_SERVER_CLIENTS_TYPES_H__
+#ifndef __LOGMAN_TYPES_H__
+#define __LOGMAN_TYPES_H__
+
+#include <e32std.h>
+#include <c32comm.h> //TPortName
 
 _LIT(KLoggingServer,   "LogManServ");
 _LIT(KNoArgs,"");
@@ -45,7 +48,7 @@ cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 
 const TUint KLogServMajorVersionNumber=1;
 const TUint KLogServMinorVersionNumber=9;
-const TUint KLogServBuildVersionNumber=1001;
+const TUint KLogServBuildVersionNumber=1006;
 const TUint KRevisionNumber=0;
 
 ///[[[end]]]
@@ -77,11 +80,13 @@ enum TLogServRqst
     ]]]*/
     ESetPortName,
     ESetPort,
+    ESetAddr,
     EGetPortName,
     EGetPort,
+    EGetAddr,
     //[[[end]]]
-
-    EStartSocketServer,
+    ESocketServerConnect,
+    ESocketServerListen,
 
     KLogManMessageIdCount
 	};

@@ -26,6 +26,8 @@ struct SConnectionInfo {
     TPortName iPortName;
     /**Port number to open.*/
     TInt iPort;
+    /**Address of remote logging server */
+    TBuf<20> iRemoteAddr;
 };
 
 /// Struct containing socket connection type info
@@ -59,7 +61,7 @@ public:
      * @return KErrNone or system-wide error code, if fails.
      */
     TInt InitializeSocketServer();
-
+    TInt ConnectToServer();
     /**
      * Send message through socket. If there is no connection, fails silently.
      */

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "types.h"
 #include "LogMan.h"
 #include "string.h"
 

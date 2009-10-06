@@ -13,7 +13,7 @@
 #include <f32file.h>
 #include <badesca.h>
 
-//#define __DEBUG_LOGGING__
+#define __DEBUG_LOGGING__
 #include "../Common/loggingdefs.h"
 
 //\Epoc32\release\winscw\udeb\ecacm.csy
@@ -104,9 +104,32 @@ CLogManServer::~CLogManServer()
 
 }
 
+TInt CLogManServer::ConnectToServer()
+{
+	if( iSocketEngine ) {
+		iSocketEngine->Stop();
+		delete iSocketEngine;
+	}
+	PRINTF("ConnectToServer:%S", &(iConnectionInfo.iRemoteAddr));
+	
+	TInetAddr addr;
+	TInt err = addr.Input(iConnectionInfo.iRemoteAddr);
+	if( err != KErrNone ) return err;
+	
+	TRAP( err,
+			iSocketEngine = CSocketEngine::NewL( *(this->iCommandManager) );
+			iSocketEngine->iAddress = addr; 
+			iSocketEngine->ConnectL(0);
+	);
+	return err;
+}
+
 TInt CLogManServer::InitializeSocketServer()
 {
-	if( iSocketEngine ) return KErrNone; // Already initialized
+	if( iSocketEngine ) {
+		iSocketEngine->Stop();
+		delete iSocketEngine;
+	}
 
 	TRAPD( err,
 			iSocketEngine = CSocketEngine::NewL( *(this->iCommandManager) );

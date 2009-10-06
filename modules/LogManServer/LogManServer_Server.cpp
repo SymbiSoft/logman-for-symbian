@@ -53,6 +53,7 @@ CLogManServer* CLogManServer::NewLC()
 			EPriorityStandard);
 	CleanupStack::PushL(self);
 	self->ConstructL();
+
 	return self;
 }
 
@@ -139,14 +140,9 @@ TInt CLogManServer::InitializeSocketServer()
 }
 
 void CLogManServer::ConstructL()
-{
-	// Make first sure that underlying interface is active
-	//StartInterfaceL( 0 );
-
-	// The Connect() allocate local address automatically if
-	// not bind yet.
-	//iDataSocket.Connect( iAddress, iStatus );
-
+{	
+	// Set default
+	iConnectionInfo.iRemoteAddr.Copy( _L("127.0.0.1") );
 
 	// Creates message queue for asynchronous messaging
 	this->iMessageQueue = new (ELeave) CLogManMessageQueue(this);

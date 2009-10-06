@@ -163,9 +163,16 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 	}
 	case ELogServCmdMenuMainConnectSocketServer:
 	{
-		TPortName host = _L("127.0.0.1");
-		log.SetHost(host);
-		ConnectSocketServer(log);
+		_LIT(KHostQueryTxt, "Enter address of remote host");
+		TPortName host = log.Host();
+		if (GenericTextQueryL(KHostQueryTxt, host))
+		{
+			// TODO: Parse port.
+			if( log.SetHost(host) == KErrNone) 
+			{
+				ConnectSocketServer(log);			
+			}
+		}
 		break;
 	}
 	case ELogServCmdMenuMainDisconnect:

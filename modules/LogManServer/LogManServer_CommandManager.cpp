@@ -480,12 +480,10 @@ TInt CLogManCommandManager::HandleCmdKillAndFindL(
 					while( tfinder.Next(threadname) == KErrNone ) {
 
 						RThread thread;
-						RProcess owner;
-
 						if( thread.Open( tfinder ) == KErrNone )
 						{
-							TInt getProErr =  thread.Process( owner );
-
+							RProcess owner;
+							TInt getProErr =  thread.Process( owner );							
 							if( owner.Id() == process.Id() )
 							{
 								TThreadStackInfo sinfo;
@@ -618,12 +616,13 @@ TInt CLogManCommandManager::HandleCmdGetL(RArray<RBuf8>& aParameters,
 	LeaveIfFailedL(targetfile.Open(aFs, path_target, EFileShareReadersOrWriters));
 	CleanupClosePushL(targetfile);
 
-	TInt size = 0;
-	targetfile.Size(size);
 	TBuf8<BUFFER_SIZE> tmp;
 
 	// Set read position
 	if( startpos < 0 ){
+		TInt size = 0;
+		targetfile.Size(size);
+	
 		// Get position from end if negative;
 		startpos = Max( 0, size+startpos);
 		size -= startpos;

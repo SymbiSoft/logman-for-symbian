@@ -240,6 +240,15 @@ class LogMan:
                 #              Attribute( "PyObject*", "args") ],
                 #          code = getStrSetter( "ModuleName", "TFullName" )
                 #        ),
+                 Function( "static PyObject*", "PyLogMan_ShellEnabled",
+                            [ Attribute( "Type_LogMan*", "self") ],
+                          code = getSimpleGetter( "ShellEnabled", "TInt", "i" )
+                        ),
+                Function( "static PyObject*", "PyLogMan_SetShellEnabled",
+                            [ Attribute( "Type_LogMan*", "self"),
+                              Attribute( "PyObject*", "args") ],
+                          code = getIntSetter( "ShellEnabled" )
+                        ),
                 Function( "static PyObject*", "PyLogMan_Port",
                             [ Attribute( "Type_LogMan*", "self") ],
                           code = getSimpleGetter( "Port", "TInt", "i" )

@@ -9,6 +9,7 @@ MACRO       __SYMBIAN_OS_VERSION__=94
 MACRO       __UI_VERSION__=50
 
 SYSTEMINCLUDE /epoc32/include
+SYSTEMINCLUDE /epoc32/include
 SYSTEMINCLUDE /epoc32/include/variant
 
 USERINCLUDE ../../Common

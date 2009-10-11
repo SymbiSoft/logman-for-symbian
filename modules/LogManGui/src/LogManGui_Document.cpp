@@ -8,7 +8,7 @@ CEikAppUi* CLoggingServerGuiDocument::CreateAppUiL()
     // Create the application user interface, and return a pointer to it;
     // the framework takes ownership of this object
     return ( static_cast <CEikAppUi*> ( new ( ELeave )
-                                        CLoggingServerGuiAppUi ) );
+                                        CLogManAppUi ) );
 }
 
 

@@ -15,6 +15,7 @@ class SConnectionInfo:
             Attribute( TPortName, "PortName", "Name of the port to open." ),
             Attribute( TInt,      "Port", "Port number to open." ),
             Attribute( TPortName, "Addr", "Remote address to connect to." ),
+            Attribute( TBool,     "ShellEnabled", "Shell access enable\\disable." ),
         ]
 
 ClassName = "CLoggingServerServer"

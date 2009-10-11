@@ -79,6 +79,8 @@ static PyObject* PyLogMan_DisconnectSerial( Type_LogMan* self );
 static PyObject* PyLogMan_BytesSent( Type_LogMan* self );
 static PyObject* PyLogMan_MemoryInfo( Type_LogMan* self );
 static PyObject* PyLogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kwargs );
+static PyObject* PyLogMan_ShellEnabled( Type_LogMan* self );
+static PyObject* PyLogMan_SetShellEnabled( Type_LogMan* self, PyObject* args );
 static PyObject* PyLogMan_Port( Type_LogMan* self );
 static PyObject* PyLogMan_SetPort( Type_LogMan* self, PyObject* args );
 static PyObject* PyLogMan_PortName( Type_LogMan* self );
@@ -98,6 +100,8 @@ static const PyMethodDef LogMan_methods[] = {
     {"MemoryInfo",    (PyCFunction)PyLogMan_MemoryInfo, METH_NOARGS},
 // Different name to work like standard Python stdout
     {"write",    (PyCFunction)PyLogMan_Write, METH_VARARGS | METH_KEYWORDS},
+    {"ShellEnabled",    (PyCFunction)PyLogMan_ShellEnabled, METH_NOARGS},
+    {"SetShellEnabled",    (PyCFunction)PyLogMan_SetShellEnabled, METH_VARARGS},
     {"Port",    (PyCFunction)PyLogMan_Port, METH_NOARGS},
     {"SetPort",    (PyCFunction)PyLogMan_SetPort, METH_VARARGS},
     {"PortName",    (PyCFunction)PyLogMan_PortName, METH_NOARGS},
@@ -242,6 +246,35 @@ static PyObject* PyLogMan_Write( Type_LogMan* self, PyObject* args, PyObject* kw
     
     self->iLogMan->Write( aMsg, aDoAsync );
     //Py_END_ALLOW_THREADS;
+    
+    if (err)
+    {
+    	return SPyErr_SetFromSymbianOSErr(err);
+    }
+    
+    Py_INCREF(Py_True);
+    return Py_True;
+    
+}
+/// Python wrapper for RLogMan.ShellEnabled
+static PyObject* PyLogMan_ShellEnabled( Type_LogMan* self ){
+        
+    PRINTF("ShellEnabled");
+    TInt result = self->iLogMan->ShellEnabled();
+    return Py_BuildValue( "i", result );
+    
+}
+/// Python wrapper for RLogMan.SetShellEnabled
+static PyObject* PyLogMan_SetShellEnabled( Type_LogMan* self, PyObject* args ){
+        
+    TInt number = 0;
+    
+    if (!PyArg_ParseTuple(args, "i", &number ) )
+    {
+    	return 0;
+    }
+    
+    TInt err = self->iLogMan->SetShellEnabled( number );
     
     if (err)
     {

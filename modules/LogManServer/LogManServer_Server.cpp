@@ -67,7 +67,7 @@ CLogManServer* CLogManServer::NewL()
 CLogManServer::CLogManServer(
 		CActive::TPriority aActiveObjectPriority) :
 	CServer2(aActiveObjectPriority), iIsSerialConnected(EFalse), iBytesSent(0),
-			iIsClosing(EFalse), iSocketEngine(NULL)
+			iIsClosing(EFalse), iSocketEngine(NULL), iCommandManager(NULL)
 {
 	iConnectionInfo.iPort = KDefaultPortNumber;
 }
@@ -306,8 +306,9 @@ TBool CLogManServer::IsSerialConnected()
 
 TBool CLogManServer::IsSocketConnected()
 {
-	PRINTF( "iSocketEngine->SocketState():%d", iSocketEngine->SocketState() );
 	if( !iSocketEngine ) return EFalse;
+	
+	PRINTF( "iSocketEngine->SocketState():%d", iSocketEngine->SocketState() );
 	
 	switch( iSocketEngine->SocketState()){
 		case CSocketEngine::ENotConnected:

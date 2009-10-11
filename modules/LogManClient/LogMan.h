@@ -103,6 +103,12 @@ public:
     /** Utility to log both stack and heap usage */
     IMPORT_C TInt MemoryInfo();
 
+    /** Return ETrue if shell is enabled */
+    IMPORT_C TBool ShellEnabled();
+    
+    /** Enable or disable shell access */
+    IMPORT_C TInt SetShellEnabled(TBool aData);
+    
     /**
     High-level logging interface for simple one-line logging.
     Handles client init, message sending and closing.
@@ -235,8 +241,11 @@ TInt RLogMan::Writef(const TFmt& aFmt, TBool aDoAsync, ...)
 #endif
 
 _EXTERN BOOL LogMan_Log(const char * aString, BOOL aAsync, ...);
+/** Log information about stack usage */
 _EXTERN int LogMan_StackInfo(TLogMan * aLogMan);
+/** Log information about heap usage */
 _EXTERN int LogMan_HeapInfo(TLogMan * aLogMan);
+/** Utility to log both stack and heap usage */
 _EXTERN int LogMan_MemoryInfo(TLogMan * aLogMan);
 _EXTERN TLogMan* LogMan_New(void);
 _EXTERN BOOL LogMan_Connect(TLogMan *aLogMan);

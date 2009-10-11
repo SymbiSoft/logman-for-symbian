@@ -12,7 +12,7 @@ CApaDocument* CLoggingServerGuiApplication::CreateDocumentL()
 TUid CLoggingServerGuiApplication::AppDllUid() const
 {
     // Return the UID for the LoggingServerGui application
-    return KUidLoggingServerGuiApp;
+    return RProcess().SecureId();
 }
 
 // End of File

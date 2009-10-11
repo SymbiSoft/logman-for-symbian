@@ -6,8 +6,8 @@
 
 #pragma message( RDebug logging enabled )
 
-#define PRINT(args...) RDebug::Print( args);
-#define PRINTF(args...) RDebug::Printf( args );
+#define PRINT(args...)  RDebug::Print(_L("LogMan >>> ") ); RDebug::Print( args);
+#define PRINTF(args...) RDebug::Print(_L("LogMan >>> ") ); RDebug::Printf( args );
 
 #else
 

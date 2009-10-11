@@ -35,6 +35,11 @@ _LIT8(KCmdKill, "kill");
 _LIT8(KCmdPut, "put");
 _LIT8(KCmdGet, "get");
 _LIT8(KCmdListProcess, "ps");
+
+// TODO: Generate commands help
+/**[[[cog
+ ]]]*/
+///[[[end]]]
 _LIT8(KStrHelpMsg, ""
 	"list                   - List possible commands" NL
 	"del                    - Delete a file" NL
@@ -72,8 +77,9 @@ const TChar KCharDash = '\\';
 const TChar KDoubleColon = ':';
 
 CLogManCommandManager::CLogManCommandManager(
-		CLogManServer* aLoggingServerServer) :
-	CActive(0), iLogManServer(aLoggingServerServer)
+        CLogManServer* aLoggingServerServer) :
+CActive(0), iLogManServer(aLoggingServerServer),
+iEnabled(ETrue)
 {
 
 }
@@ -285,7 +291,7 @@ TInt CLogManCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters,
 	if (msg.Create(128 + process.FileName().Length()) == KErrNone)
 	{
 		TFileName filename = process.FileName();
-		msg.Format(KFmtProcessLaunchedMsg, filename);
+		msg.Format(KFmtProcessLaunchedMsg, &filename);
 		iLogManServer->SendMessage(msg);
 		msg.Close();
 	}
@@ -300,10 +306,6 @@ TInt CLogManCommandManager::HandleCmdExecL(RArray<RBuf8>& aParameters,
 /** Handle helper command */
 TInt CLogManCommandManager::HandleCmdListL()
 {
-	// TODO: Generate
-	/**[[[cog
-	 ]]]*/
-	///[[[end]]]
 	TBuf8<128> version;
 	_LIT8(KFmtVersionInfo, "LogMan Shell v.%d.%02d.%04d ("__DATE__ " " __TIME__ ") Rev:%d\n");
 
@@ -948,6 +950,9 @@ void AddToList(RArray<RBuf8>& aArgs, RBuf8& aArg)
 
 TInt CLogManCommandManager::HandleCommand()
 {
+	// Not active, ignore.
+	if( !iEnabled ) return KErrNone;
+	
 	RArray<RBuf8> args;
 	TRAPD(err, HandleCommandL(args) );
 
@@ -1048,5 +1053,15 @@ void CLogManCommandManager::HandleCommandL(RArray<RBuf8>& aArgs)
 	}
 
 	CleanupStack::PopAndDestroy(&fs);
+}
+
+TBool CLogManCommandManager::Enabled() const
+{
+    return iEnabled;
+}
+
+void CLogManCommandManager::SetEnabled(TBool iEnabled)
+{
+    this->iEnabled = iEnabled;
 }
 

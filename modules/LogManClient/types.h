@@ -48,7 +48,7 @@ cog.outl( data % ( vermaj, vermin, build, svnrev ) )
 
 const TUint KLogServMajorVersionNumber=1;
 const TUint KLogServMinorVersionNumber=9;
-const TUint KLogServBuildVersionNumber=1006;
+const TUint KLogServBuildVersionNumber=1011;
 const TUint KRevisionNumber=0;
 
 ///[[[end]]]
@@ -81,9 +81,11 @@ enum TLogServRqst
     ESetPortName,
     ESetPort,
     ESetAddr,
+    ESetShellEnabled,
     EGetPortName,
     EGetPort,
     EGetAddr,
+    EGetShellEnabled,
     //[[[end]]]
     ESocketServerConnect,
     ESocketServerListen,

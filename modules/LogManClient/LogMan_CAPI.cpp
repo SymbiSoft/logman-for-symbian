@@ -44,23 +44,65 @@ EXPORT_C void LogMan_Write(TLogMan *aLogMan, const char *aFmt, BOOL aAsync, ...)
     va_end(ap);	
 }
 
-/** Log information about stack usage */
-EXPORT_C int LogMan_StackInfo(TLogMan * aLogMan)
+// Generate simple getters and setters 
+
+/**[[[cog
+
+methods = [ 
+    ( "int", "ShellEnabled", "" ),
+    ( "int", "SetShellEnabled", ["int aEnable"] ), 
+    ( "int", "StackInfo", "" ),
+    ( "int", "HeapInfo", "" ),
+    ( "int", "MemoryInfo", "" ),
+];
+template = """
+EXPORT_C %(TYPE)s LogMan_%(NAME)s( TLogMan * aLogMan%(ARGS)s )
 {
-	return static_cast<RLogMan*>(aLogMan->cppInstance)->StackInfo();
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->%(NAME)s(%(PASSEDARGS)s);
+}
+"""
+
+for m in methods:
+    ret, name, args = m
+    passedargs = ""
+    if len(args) > 0:
+        passedargs = ",".join( [ x.split(" ")[-1] for x in args ] )
+        args = ", " + ", ".join( args ) 
+    fields = { "TYPE" : ret, "NAME" : name, "ARGS" : args, "PASSEDARGS" : passedargs }
+    cog.outl( template % fields )
+
+]]]*/
+
+EXPORT_C int LogMan_ShellEnabled( TLogMan * aLogMan )
+{
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->ShellEnabled();
 }
 
-/** Log information about heap usage */
-EXPORT_C int LogMan_HeapInfo(TLogMan * aLogMan)
+
+EXPORT_C int LogMan_SetShellEnabled( TLogMan * aLogMan, int aEnable )
 {
-	return static_cast<RLogMan*>(aLogMan->cppInstance)->HeapInfo();
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->SetShellEnabled(aEnable);
 }
 
-/** Utility to log both stack and heap usage */
-EXPORT_C int LogMan_MemoryInfo(TLogMan * aLogMan)
+
+EXPORT_C int LogMan_StackInfo( TLogMan * aLogMan )
 {
-	return static_cast<RLogMan*>(aLogMan->cppInstance)->MemoryInfo();
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->StackInfo();
 }
+
+
+EXPORT_C int LogMan_HeapInfo( TLogMan * aLogMan )
+{
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->HeapInfo();
+}
+
+
+EXPORT_C int LogMan_MemoryInfo( TLogMan * aLogMan )
+{
+    return static_cast<RLogMan*>(aLogMan->cppInstance)->MemoryInfo();
+}
+
+///[[[end]]]
 
 EXPORT_C BOOL LogMan_Log( const char * aFmt, BOOL aDoAsync, ...)
 {

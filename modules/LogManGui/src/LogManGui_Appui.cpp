@@ -17,13 +17,13 @@
 #include "LogMan.h"
 #include "logmanutils.h"
 
-void CLoggingServerGuiAppUi::HandleForegroundEventL(TBool aForeground)
+void CLogManAppUi::HandleForegroundEventL(TBool aForeground)
 {
 	LOGMAN_SENDLOGF( "HandleForegroundEventL %d", aForeground )
 	UpdateServiceInfoL( );
 }
 
-void CLoggingServerGuiAppUi::UpdateServiceInfoL()
+void CLogManAppUi::UpdateServiceInfoL()
 {
 
 	LOGMAN_SENDLOG( "UpdateServiceInfoL" )
@@ -59,17 +59,18 @@ void CLoggingServerGuiAppUi::UpdateServiceInfoL()
 
 }
 
-void CLoggingServerGuiAppUi::StartSocketServer(RLogMan& aLogMan)
+
+void CLogManAppUi::StartSocketServer(RLogMan& aLogMan)
 {
 	aLogMan.StartSocketServer();
 }
 
-void CLoggingServerGuiAppUi::ConnectSocketServer(RLogMan& aLogMan)
+void CLogManAppUi::ConnectSocketServer(RLogMan& aLogMan)
 {
 	aLogMan.ConnectSocketServer();
 }
 
-void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
+void CLogManAppUi::ConnectSerial(RLogMan& aLogMan)
 {
 
 	// Connect
@@ -126,7 +127,21 @@ void CLoggingServerGuiAppUi::ConnectSerial(RLogMan& aLogMan)
 	}
 
 }
-void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
+
+
+void CLogManAppUi::DynInitMenuPaneL(TInt aResourceId, CEikMenuPane* aMenuPane)
+{
+    if (aResourceId == R_SHELL_SUBMENU)
+    {
+        RLogMan log; log.Connect();
+        TBool enabled = log.ShellEnabled(); 
+        aMenuPane->SetItemDimmed(ELogManMenuEnableShell, enabled);
+        aMenuPane->SetItemDimmed(ELogManMenuDisableShell, !enabled);
+
+    }
+}
+
+void CLogManAppUi::HandleCommandL(TInt aCommand)
 {
 
 	// Handle here to avoid connection to RLogMan unnecesarily
@@ -155,7 +170,19 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 		ConnectSerial(log);
 		break;
 	}
-
+	
+	case ELogManMenuEnableShell:
+	{
+		log.SetShellEnabled(ETrue);
+		break;
+	}
+	
+	case ELogManMenuDisableShell:
+	{
+		log.SetShellEnabled(EFalse);
+		break;
+	}
+	
 	case ELogServCmdMenuMainListenSocketServer:
 	{
 		StartSocketServer(log);
@@ -331,7 +358,7 @@ void CLoggingServerGuiAppUi::HandleCommandL(TInt aCommand)
 	CleanupStack::PopAndDestroy(&log);
 }
 
-void CLoggingServerGuiAppUi::HandleStatusPaneSizeChange()
+void CLogManAppUi::HandleStatusPaneSizeChange()
 {
 	iAppView->SetRect(ClientRect());
 	iAppView->DrawNow();
@@ -356,7 +383,7 @@ void CLoggingServerGuiAppUi::HandleStatusPaneSizeChange()
  }
  */
 // ============================ Construction ===============================
-void CLoggingServerGuiAppUi::ConstructL()
+void CLogManAppUi::ConstructL()
 {
 	// Initialise app UI with standard value.
 	LOGMAN_SENDLINE(BaseConstructL(CAknAppUi::EAknEnableSkin);)
@@ -369,12 +396,12 @@ void CLoggingServerGuiAppUi::ConstructL()
 	UpdateServiceInfoL();
 }
 
-CLoggingServerGuiAppUi::CLoggingServerGuiAppUi()
+CLogManAppUi::CLogManAppUi()
 {
 	// No implementation required
 }
 
-CLoggingServerGuiAppUi::~CLoggingServerGuiAppUi()
+CLogManAppUi::~CLogManAppUi()
 {
 LOGMAN_SENDLOG( "CLoggingServerGuiAppUi" )
 if ( iAppView )

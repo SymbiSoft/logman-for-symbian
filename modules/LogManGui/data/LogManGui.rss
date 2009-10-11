@@ -95,15 +95,31 @@ RESOURCE MENU_PANE r_socket_sub_menu
             command = ELogServCmdMenuMainListenSocketServer;
             txt = str_r_menu_main_listen;
             },
-		MENU_ITEM
+        MENU_ITEM
             {
-			command = ELogServCmdMenuMainConnectSocketServer;
-			txt = str_r_menu_main_connect;
-			}
+            command = ELogServCmdMenuMainConnectSocketServer;
+            txt = str_r_menu_main_connect;
+            }
         };
     }
 
-    
+RESOURCE MENU_PANE r_shell_submenu
+    {
+    items =
+        {
+        MENU_ITEM
+            {
+            command = ELogManMenuEnableShell;
+            txt = str_r_menu_enable;
+            },
+        MENU_ITEM
+            {
+            command = ELogManMenuDisableShell;
+            txt = str_r_menu_disable;
+            }
+        };
+    }
+
 RESOURCE MENU_PANE r_serial_sub_menu
     {
     items =
@@ -163,9 +179,14 @@ RESOURCE MENU_PANE r_LoggingServerGui_menu
                 {
                 txt     = str_r_menu_main_serial;
                 cascade = r_serial_sub_menu;
-                },
-        
-        
+                },  
+                
+        MENU_ITEM
+            {
+            txt     = str_r_menu_main_shell;
+            cascade = r_shell_submenu;
+            },
+
         MENU_ITEM
                 {
                 command = ELogServCmdMenuMainSendTest;
@@ -177,10 +198,10 @@ RESOURCE MENU_PANE r_LoggingServerGui_menu
                 txt = str_r_menu_main_test_async;
                 },
         MENU_ITEM
-				{
-				command = ELogManGui_CmdHelp;
-				txt = str_r_menu_main_help;
-				},
+                {
+                command = ELogManGui_CmdHelp;
+                txt = str_r_menu_main_help;
+                },
         MENU_ITEM
                 {
                 command = EAknSoftkeyExit;
@@ -204,8 +225,8 @@ RESOURCE LOCALISABLE_APP_INFO r_LoggingServerGui_localisable_app_info
         caption = str_r_logging_server_caption;
 
         number_of_icons = 1;
-	   	icon_file = "\\resource\\apps\\LoggingServerGui_aif.mif";
-	    };
+           icon_file = "\\resource\\apps\\LoggingServerGui_aif.mif";
+        };
     }
 
 

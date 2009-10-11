@@ -55,8 +55,10 @@ class CLogManSession : public CSession2
     
     TPortName Addr( );
     TInt SetAddr(TPortName& aHost);
+    
+    TInt SetShellEnabled(TBool aEnabled);
+    TBool ShellEnabled(void);
   };
-
 
 #endif
 

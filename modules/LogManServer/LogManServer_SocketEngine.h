@@ -19,71 +19,58 @@ class CSocketTimeOutTimer;
 class CSocketEngine: public CActive,
 		public MSocketTimeOutNotify,
 		public MSocketReaderNotifier
-//public MSocketWriterNotifier
 {
+    //public MSocketWriterNotifier
 public:
-
-	/**
+    /**
 	 * Static constructor
 	 * @param aObserver A reference to the socket engine observer.
 	 */
-	static CSocketEngine* NewL(MSocketEngineObserver& aObserver);
-
-	/**
+    static CSocketEngine *NewL(MSocketEngineObserver & aObserver);
+    /**
 	 * Static constructor. On return the instance is left to the CleanupStack
 	 * @param aObserver A reference to the socket engine observer.
 	 */
-	static CSocketEngine* NewLC(MSocketEngineObserver& aObserver);
-
-	/**
+    static CSocketEngine *NewLC(MSocketEngineObserver & aObserver);
+    /**
 	 * Destructor
 	 */
-	~CSocketEngine();
-
+    ~CSocketEngine();
 public:
-	// From base classes
-
-	/**
+    // From base classes
+    /**
 	 * Connecting the socket to the aIPAddress.
 	 * @param aIapId An iap id used for connection
 	 * @param aIPAddress An ip address where to connect.
 	 */
-	void ConnectL(const TUint32 aIapId);
-
-	/**
+    void ConnectL(const TUint32 aIapId);
+    /**
 	 * Writes to the socket.
 	 * @param aTxt A text to write to the socket.
 	 */
-	void Write(const TDesC8& aTxt);
-
-	/**
+    void Write(const TDesC8 & aTxt);
+    /**
 	 * Reads from the socket.
 	 */
-	void Read();
-
-	/**
+    void Read();
+    /**
 	 * Closing the socket.
 	 */
-	void Stop();
-
-	/**
+    void Stop();
+    /**
 	 * Starts listening local game port
 	 * @param aIapId The IAP id of the active accesspoint.
 	 * @return A local address
 	 */
-	TInetAddr& StartListeningL(const TUint32 aIapId);
-
+    TInetAddr & StartListeningL(const TUint32 aIapId);
 public:
-
-	/**
+    /**
 	 * Socket engine state enumerations.
 	 */
-	enum TSocketEngineState
-	{
-		ENotConnected, EConnecting, EConnected, EListening, ETimedOut
-	};
-	TSocketEngineState SocketState(void);
-	
+    enum TSocketEngineState{ ENotConnected, EConnecting, EConnected, EListening, ETimedOut};
+    TSocketEngineState SocketState(void);
+    
+
 protected:
 	// From base classes
 
@@ -178,6 +165,8 @@ private:
 
 	// Socket engine's state
 	TSocketEngineState iState;
+	
+	
 public:
 	// The remote address
 	TInetAddr iAddress;

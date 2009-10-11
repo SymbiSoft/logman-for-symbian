@@ -6,7 +6,7 @@
 #include <akndoc.h>
 
 // FORWARD DECLARATIONS
-class CLoggingServerGuiAppUi;
+class CLogManAppUi;
 class CEikApplication;
 
 

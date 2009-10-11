@@ -214,6 +214,13 @@ void CLogManSession::DispatchMessageL(const RMessage2& aMessage)
 	    SetAddr(aBuffer);
 	    return;
 	}
+	case ESetShellEnabled:
+	{
+	    TBool aBuffer;
+	    aBuffer = (TBool)aMessage.Int0();
+	    SetShellEnabled(aBuffer);
+	    return;
+	}
 	case EGetPortName:
 	{
 
@@ -235,6 +242,14 @@ void CLogManSession::DispatchMessageL(const RMessage2& aMessage)
 
 	    const TPortName& tmp = Addr( );
 	    TPckgBuf<TPortName> p( tmp );
+	    aMessage.WriteL(0,p);
+	    return;
+	}
+	case EGetShellEnabled:
+	{
+
+	    const TBool tmp = ShellEnabled( );
+	    TPckgBuf<TBool> p( tmp );
 	    aMessage.WriteL(0,p);
 	    return;
 	}
@@ -302,6 +317,7 @@ CLogManServer& CLogManSession::LoggingServer()
 {
 	return *static_cast<CLogManServer*> (const_cast<CServer2*> (Server()));
 }
+
 void CLogManSession::PanicClient(const RMessage2& aMessage, TInt aPanic) const
 {
 	_LIT(KTxtServer,"LogManServer");
@@ -340,4 +356,26 @@ TInt CLogManSession::SetAddr(TPortName& aHost)
 	PRINTF("SetAddr:%S", &aHost);
 	LoggingServer().iConnectionInfo.iRemoteAddr.Copy( aHost );
 	return KErrNone;
+}
+
+TInt CLogManSession::SetShellEnabled(TBool aEnabled)
+{
+    CLogManCommandManager *m = LoggingServer().CommandManager();
+    if (!m)
+    {
+        return KErrNone;
+    }
+
+    m->SetEnabled(aEnabled);
+    return KErrNone;
+}
+
+TBool CLogManSession::ShellEnabled()
+{
+    CLogManCommandManager *m = LoggingServer().CommandManager();
+    if (!m)
+    {
+        return KErrNone;
+    }
+    return m->Enabled();
 }

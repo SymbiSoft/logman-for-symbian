@@ -11,6 +11,7 @@
 #include "../LogManClient/types.h"
 //#include "LogManServer_SocketWriter.h"
 #include "LogManServer_SocketEngine.h"
+#include "LogManServer_CommandManager.h"
 
 class RSocket;
 
@@ -18,7 +19,6 @@ class CLogManMessageQueue;
 class RComm;
 class RCommServ;
 class CLogManSession;
-class CLogManCommandManager;
 
 /// Struct containing serial connection type strings and port number on server.
 struct SConnectionInfo {
@@ -117,7 +117,12 @@ public:
     SConnectionInfo iConnectionInfo;
     /// Communications server
     RCommServ iServer;
-
+    
+    CLogManCommandManager* CommandManager(void)
+    {
+    	return iCommandManager;
+    }
+    
 private:
     /// Constructor
     CLogManServer(CActive::TPriority aActiveObjectPriority);

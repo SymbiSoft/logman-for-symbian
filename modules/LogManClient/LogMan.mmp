@@ -9,6 +9,7 @@ MACRO       __SYMBIAN_OS_VERSION__=94
 MACRO       __UI_VERSION__=50
 
 SYSTEMINCLUDE /epoc32/include
+SYSTEMINCLUDE /epoc32/include
 SYSTEMINCLUDE /epoc32/include/libc
 SYSTEMINCLUDE /epoc32/include/variant
 
@@ -20,6 +21,7 @@ SOURCEPATH  .
 
 
 SOURCE      LogMan.cpp
+SOURCE      LogMan_CAPI.cpp
 
 LIBRARY     euser.lib
 LIBRARY     efsrv.lib

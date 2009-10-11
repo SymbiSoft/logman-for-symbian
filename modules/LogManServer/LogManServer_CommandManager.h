@@ -39,7 +39,10 @@ public:
 	 * @param aData The data from socket.
 	 */
 	void SocketData(TDesC8& aData);
-
+	
+    TBool Enabled() const;
+    void SetEnabled(TBool aEnabled);
+    
 protected:	
 	TInt HandleCmdCopyFilesL(RArray<RBuf8>& parameters, RFs& aFs);
 	TInt HandleCmdDelL(RArray<RBuf8>& parameters, RFs& aFs);
@@ -70,6 +73,10 @@ protected:
 	CLogManServer *iLogManServer;
 	RTimer iTimer;
 	RBuf8 iCommandBuffer;
+	
+	// EFalse to disable
+	TBool iEnabled;
+	
 	friend class CLogManServer;
 };
 #endif
